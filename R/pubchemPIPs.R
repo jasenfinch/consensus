@@ -1,9 +1,11 @@
-
+#' pubchemPIPs
+#' @example 
+#' pubchemPIPs('C4H6O5', '[M-H]1-')
 #' @importFrom stringr str_c
 #' @importFrom httr GET content config
 #' @importFrom purrr map
 #' @importFrom dplyr bind_rows filter mutate rowwise
-#' @importFrom mzAnnotation descriptors metaboliteDB convert getAccessions 
+#' @importFrom mzAnnotation descriptors metaboliteDB getAccessions 
 #' @importFrom magrittr %>%
 #' @importFrom tibble as_tibble
 
@@ -18,19 +20,33 @@ pubchemPIPs <- function(MF,IP){
     GET(config(http_version = 0)) %>%
     content() %>%
     {.$Waiting$ListKey}
- 
-  cid_cmd <- str_c('https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/listkey/',
-                   key,
-                   '/cids/JSON')
   
-  cids <- cid_cmd %>%
-    GET(config(http_version = 0)) %>%
-    content() %>%
-    {.$IdentifierList$CID} %>%
-    unlist()
+  success <- F
+  
+  while (success == F) {
+    cid_cmd <- str_c('https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/listkey/',
+                     key,
+                     '/cids/JSON')
+    
+    cids <- cid_cmd %>%
+      GET(config(http_version = 0)) %>%
+      content()
+    
+    if (names(cids) == "IdentifierList") {
+      cids <- cids %>%
+      {.$IdentifierList$CID} %>%
+        unlist()
+      success <- T
+    } else {
+      if (names(cids) == 'Waiting') {
+        key <- cids$Waiting$ListKey
+      } else {
+        break()
+      }
+    }
+  }
 
-  
-  message(str_c(length(cids),' CIDs returned\n'))
+  message(str_c(length(cids),' CIDs returned...'))
   
   if (length(cids) > 200) {
     cids <- cids %>%
@@ -39,7 +55,7 @@ pubchemPIPs <- function(MF,IP){
     cids <- list(cids)
   }
   
-  descs <- c('IUPACName','MolecularFormula','Charge','InChI','InChIKey')
+  descs <- c('IUPACName','MolecularFormula','Charge','InChI','InChIKey','CanonicalSMILES')
   chem_info_cmd <- cids %>%
     map(~{
       str_c('https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/',
@@ -61,13 +77,11 @@ pubchemPIPs <- function(MF,IP){
     bind_rows() %>%
     filter(Charge == 0) %>%
     mutate(ACCESSION_ID = 1:nrow(.)) %>%
-    rowwise() %>%
-    mutate(SMILE = suppressMessages(convert(InChI,'inchi','smiles')))
+    rename(SMILE = CanonicalSMILES)
   
   descriptorTable <- mzAnnotation::descriptors(chem_info)
   
   db <- metaboliteDB(chem_info,descriptorTable)
-  
   
   rule <- Adducts$Rule[Adducts$Name == IP]
   
@@ -76,7 +90,7 @@ pubchemPIPs <- function(MF,IP){
   accessions <- ips %>%
     mzAnnotation::getAccessions()
   
-  message('of which ',nrow(accessions),' can ionize')
+  message('...of which ',nrow(accessions),' can ionize')
   
   return(accessions)
 }

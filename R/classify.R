@@ -1,16 +1,15 @@
 
 #' @importFrom magrittr set_names
 #' @importFrom dplyr distinct select
-#' @importFrom classyfireR entity_classification
+#' @importFrom classyfireR get_classification
 #' @importFrom purrr map_chr
 #' @importFrom tidyr spread
 
 
-classify <- function(inchis){
-  classi <- inchis %>%
-    map_chr(convert,inputType = 'inchi',outputType = 'inchikey') %>%
-    map(entity_classification) %>%
-    set_names(inchis)
+classify <- function(inchikey){
+  classi <- inchikey %>%
+    map(get_classification) %>%
+    set_names(inchikey)
   
   # missing <- names(classifications)[sapply(classifications,is.null)]
   
@@ -22,9 +21,7 @@ classify <- function(inchis){
         select(-CHEMONT) %>%
         spread(.,Level,Classification)
     }) %>%
-    bind_rows(.id = 'InChI') %>%
+    bind_rows(.id = 'InChIKey') %>%
     distinct() %>%
-    filter(!is.na(kingdom)) %>%
-    select(InChI,kingdom,superclass,class,subclass)
-  
+    filter(!is.na(kingdom)) 
 }
