@@ -1,7 +1,7 @@
 
 consensus <- function(classifications){
   consensusClasses <- classifications %>%
-   split(.$MolecularFormula) %>%
+   split(str_c(.$MolecularFormula,.$Adduct,sep = ' ')) %>%
     map(~{
       cl <- .
       levels <- names(cl)[5:length(names(cl))]

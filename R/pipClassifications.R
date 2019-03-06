@@ -3,6 +3,7 @@ pipClassifications <- function(pips){
   classi <- pips %>%
     # filter(MolecularFormula == 'C4H6O5') %>%
     .$InChIKey %>%
+    unique() %>% 
     classify()
   
   classifications <- pips %>%

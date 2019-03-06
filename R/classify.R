@@ -11,8 +11,6 @@ classify <- function(inchikey){
     map(get_classification) %>%
     set_names(inchikey)
   
-  # missing <- names(classifications)[sapply(classifications,is.null)]
-  
   classi %>%
     .[!sapply(.,is.null)] %>%
     map(~{
