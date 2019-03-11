@@ -4,13 +4,15 @@
 #' @importFrom classyfireR get_classification
 #' @importFrom purrr map_chr
 #' @importFrom tidyr spread
+#' @importFrom parallel detectCores makeCluster stopCluster parLapply
+#' @export
 
-
-classify <- function(inchikey){
+classify <- function(inchikey,nCores = detectCores(), clusterType = 'PSOCK'){
+  clus <- makeCluster(nCores,type = clusterType)
   classi <- inchikey %>%
-    map(get_classification) %>%
+    parLapply(cl = clus,fun = get_classification) %>%
     set_names(inchikey)
-  
+  stopCluster(clus)
   classi %>%
     .[!sapply(.,is.null)] %>%
     map(~{

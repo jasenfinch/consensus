@@ -1,10 +1,15 @@
+#' @export
 
-pipClassifications <- function(pips){
+pipClassifications <- function(pips,nCores = detectCores(), clusterType = 'PSOCK'){
   classi <- pips %>%
     # filter(MolecularFormula == 'C4H6O5') %>%
     .$InChIKey %>%
-    unique() %>% 
-    classify()
+    unique() 
+  
+  message(length(classi),' InChIKeys to classify')
+  
+  classi <- classi %>% 
+    classify(nCores,clusterType)
   
   classifications <- pips %>%
     left_join(classi, by = "InChIKey") %>%

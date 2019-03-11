@@ -1,5 +1,5 @@
 
-consensus <- function(classifications){
+consensusCls <- function(classifications,threshold = 0.5){
   consensusClasses <- classifications %>%
    split(str_c(.$MolecularFormula,.$Adduct,sep = ' ')) %>%
     map(~{
@@ -76,7 +76,7 @@ consensus <- function(classifications){
       cons <- consensus %>%
         select(-ID)
       
-      while (maxScore < 0.5) {
+      while (maxScore < threshold) {
         cons <- cons %>%
           select(-Score) %>%
           .[,-ncol(.)] %>%
@@ -107,4 +107,22 @@ consensus <- function(classifications){
       .$consensusClass
     }) %>%
     bind_rows()
+}
+
+#' @export
+
+consensus <- function(ips,filterUnclassified = T){
+  
+  con <- new('Consensus')
+  con@IPs <- ips
+  
+  con <- pubchemPIPs(con)
+  classifications <- pipClassifications(pips,nCores = detectCores() * 0.75)
+  
+  consensusClasses <- classifications %>%
+    filter(kingdom != 'Unclassified') %>%
+    consensusCls(threshold = 1/3) %>%
+    select('MolecularFormula','Adduct','Score','kingdom','superclass','class','subclass',names(.)[str_detect(names(.),'level')])
+  
+  return(consensusClasses)
 }
