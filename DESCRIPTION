@@ -6,8 +6,19 @@ Authors@R:
            family = "Last",
            role = c("aut", "cre"),
            email = "first.last@example.com")
-Description: Consensus chemical classifications for putative molecular formula assignments
+Description: Consensus chemical classifications for putative molecular formula assignments.
 Depends: mzAnnotation
+Imports: MFassign,
+        classyfireR,
+        dplyr,
+        httr,
+        magrittr,
+        progress,
+        purrr,
+        stringr,
+        tibble,
+        tidyr,
+        methods
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true

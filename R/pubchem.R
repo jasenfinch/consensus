@@ -1,4 +1,4 @@
-
+#' @importFrom dplyr rename
 
 pubchemMatch <- function(MF){
   message(str_c('\n',MF))
@@ -106,9 +106,6 @@ pips <- function(hits,adducts){
 }
 
 
-#' pubchemPIPs
-#' @examples 
-#' pubchemPIPs('C4H6O5', '[M-H]1-')
 #' @importFrom stringr str_c
 #' @importFrom httr GET content config
 #' @importFrom purrr map

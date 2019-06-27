@@ -1,4 +1,7 @@
 
+globalVariables(c('.','kingdom','CID','MolecularFormula','Adduct','InChIKey','superclass','subclass','level 5','MF',
+                  'Charge','CanonicalSMILES','CovalentUnitCount'))
+
 consensusCls <- function(classifications,threshold = 0.5){
   consensusClasses <- classifications %>%
     split(str_c(.$MolecularFormula,.$Adduct,sep = ' ')) %>%
@@ -109,12 +112,13 @@ consensusCls <- function(classifications,threshold = 0.5){
     bind_rows()
 }
 
+#' @importFrom stringr str_detect
 #' @export
 
-consensusClassification <- function(MF,adducts = c('[M-H]1-',threshold = 0.5,nCores = availableCores() * 0.75)){
+consensusClassification <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5){
   hits <- pubchemMatch(MF)
   PIPs <- pips(hits,adducts)
-  classifications <- pipClassifications(PIPs,nCores = nCores)
+  classifications <- pipClassifications(PIPs)
   classifications %>%
     consensusCls(threshold = threshold) %>%
     select('MolecularFormula','Adduct','Score','kingdom','superclass','class','subclass',names(.)[str_detect(names(.),'level')])
@@ -122,6 +126,7 @@ consensusClassification <- function(MF,adducts = c('[M-H]1-',threshold = 0.5,nCo
 
 #' @importClassesFrom MFassign Assignment
 #' @importFrom MFassign assignments
+#' @importFrom methods new
 
 setMethod('consensus',signature = 'Assignment',
           function(x,filterUnclassified = F){
@@ -137,7 +142,7 @@ setMethod('consensus',signature = 'Assignment',
             message(str_c('\nIdentifying consensus classifications for ',nrow(ips),' ionisation products consisting of ',length(unique(ips$MF)),' molecular formulas'))
             
             con <- pubchemPIPs(con)
-            classifications <- pipClassifications(pips,nCores = detectCores() * 0.75)
+            classifications <- pipClassifications(pips)
             
             consensusClasses <- classifications %>%
               filter(kingdom != 'Unclassified') %>%
