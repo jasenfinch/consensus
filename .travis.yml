@@ -10,7 +10,7 @@ r:
   - devel
   
 apt_packages:
-  - libopenbabel
+  - libopenbabel-dev
   
 r_github_packages:
   - jasenfinch/mzAnnotation
