@@ -112,6 +112,11 @@ consensusCls <- function(classifications,threshold = 0.5){
     bind_rows()
 }
 
+#' consensusClassification
+#' @description Calculate a consensus classification for a given molecular formula and adducts.
+#' @param MF molecular formula
+#' @param adducts character vector of adducts
+#' @param threshold consensus threshold
 #' @importFrom stringr str_detect
 #' @export
 
