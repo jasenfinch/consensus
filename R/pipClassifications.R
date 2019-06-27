@@ -1,21 +1,26 @@
-
-setMethod('pipClassifications',signature = 'Consensus',
-          function(ips,nCores = detectCores(), clusterType = 'PSOCK'){
-            pips <- ips@PIPs
-            classi <- pips %>%
-              .$InChIKey %>%
-              unique() 
-            
-            message(length(classi),' InChIKeys to classify')
-            
-            classi <- classi %>% 
-              classify(nCores,clusterType)
-            
-            classifications <- pips %>%
-              left_join(classi, by = "InChIKey") %>%
-              select(CID:Adduct,InChIKey,kingdom,superclass,class,subclass,`level 5`:names(.)[length(names(.))])
-            classifications$kingdom[is.na(classifications$kingdom)] <- 'Unclassified'
-            
-            return(classifications)
-          }
-)
+#' @importFrom dplyr left_join
+pipClassifications <- function(PIPs){
+ 
+  inchis <- PIPs %>%
+    .$InChIKey %>%
+    unique() 
+  
+  message('Retreiving classifications...')
+  
+  classi <- inchis %>% 
+    classify()
+  
+  classifications <- PIPs %>%
+    left_join(classi, by = "InChIKey") %>%
+    select(CID,MolecularFormula,Adduct,InChIKey,kingdom,superclass,class,subclass,`level 5`:names(.)[length(names(.))]) %>%
+    filter(!is.na(kingdom))
+  
+  # classifications$kingdom[is.na(classifications$kingdom)] <- 'Unclassified'
+  
+  message(str_c(length(unique(classifications$InChIKey)),' classifications returned'))
+  
+  # classifications <- classifications %>%
+    # filter(kingdom == 'Unclassified')
+  
+  return(classifications)
+}

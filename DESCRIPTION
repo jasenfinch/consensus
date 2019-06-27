@@ -1,14 +1,31 @@
 Package: consensus
 Title: Consensus Chemical Classifications For Putative Molecular Formula Assignments
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: 
     person(given = "First",
            family = "Last",
            role = c("aut", "cre"),
            email = "first.last@example.com")
-Description: Consensus chemical classifications for putative molecular formula assignments
+Description: Consensus chemical classifications for putative molecular formula assignments.
 Depends: mzAnnotation
+Imports: MFassign,
+        classyfireR,
+        dplyr,
+        httr,
+        magrittr,
+        progress,
+        purrr,
+        stringr,
+        tibble,
+        tidyr,
+        methods
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
+collate: 'allGenerics.R'
+    'allClasses.R'
+    'classify.R'
+    'consensus.R'
+    'pipClassifications.R'
+    'pubchem.R'

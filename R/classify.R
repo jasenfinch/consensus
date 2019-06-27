@@ -2,19 +2,19 @@
 #' @importFrom magrittr set_names
 #' @importFrom dplyr distinct select
 #' @importFrom classyfireR get_classification
-#' @importFrom purrr map_chr
+#' @importFrom purrr map_lgl
 #' @importFrom tidyr spread
-#' @importFrom parallel detectCores makeCluster stopCluster parLapply
-#' @export
 
-classify <- function(inchikey,nCores = detectCores(), clusterType = 'PSOCK'){
-  clus <- makeCluster(nCores,type = clusterType)
-  classi <- inchikey %>%
-    parLapply(cl = clus,fun = get_classification) %>%
-    set_names(inchikey)
-  stopCluster(clus)
+classify <- function(inchikey){
+  
+  suppressMessages(
+    classi <- inchikey %>%
+      map(get_classification) %>%
+      set_names(inchikey)
+  )
+  
   classi %>%
-    .[!sapply(.,is.null)] %>%
+    .[!map_lgl(.,is.null)] %>%
     map(~{
       d <- .
       d %>%
