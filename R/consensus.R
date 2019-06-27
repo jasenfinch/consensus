@@ -1,7 +1,7 @@
 
 consensusCls <- function(classifications,threshold = 0.5){
   consensusClasses <- classifications %>%
-   split(str_c(.$MolecularFormula,.$Adduct,sep = ' ')) %>%
+    split(str_c(.$MolecularFormula,.$Adduct,sep = ' ')) %>%
     map(~{
       cl <- .
       levels <- names(cl)[5:length(names(cl))]
@@ -109,20 +109,31 @@ consensusCls <- function(classifications,threshold = 0.5){
     bind_rows()
 }
 
+#' @importClassesFrom MFassign Assignment
+#' @importFrom MFassign assignments
 #' @export
 
-consensus <- function(ips,filterUnclassified = T){
-  
-  con <- new('Consensus')
-  con@IPs <- ips
-  
-  con <- pubchemPIPs(con)
-  classifications <- pipClassifications(pips,nCores = detectCores() * 0.75)
-  
-  consensusClasses <- classifications %>%
-    filter(kingdom != 'Unclassified') %>%
-    consensusCls(threshold = 1/3) %>%
-    select('MolecularFormula','Adduct','Score','kingdom','superclass','class','subclass',names(.)[str_detect(names(.),'level')])
-  
-  return(consensusClasses)
-}
+setMethod('consensus',signature = 'Assignment',
+          function(x,filterUnclassified = F){
+            
+            ips <- x %>%
+              assignments() %>%
+              select(MF,Adduct) %>%
+              distinct()
+            
+            con <- new('Consensus')
+            con@IPs <- ips
+            
+            message(str_c('\nIdentifying consensus classifications for ',nrow(ips),' ionisation products consisting of ',length(unique(ips$MF)),' molecular formulas'))
+            
+            con <- pubchemPIPs(con)
+            classifications <- pipClassifications(pips,nCores = detectCores() * 0.75)
+            
+            consensusClasses <- classifications %>%
+              filter(kingdom != 'Unclassified') %>%
+              consensusCls(threshold = 1/3) %>%
+              select('MolecularFormula','Adduct','Score','kingdom','superclass','class','subclass',names(.)[str_detect(names(.),'level')])
+            
+            return(consensusClasses)
+          }
+)
