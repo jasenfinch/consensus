@@ -1,21 +1,26 @@
-#' @export
-
-pipClassifications <- function(pips,nCores = detectCores(), clusterType = 'PSOCK'){
-  classi <- pips %>%
-    # filter(MolecularFormula == 'C4H6O5') %>%
+#' @importFrom dplyr left_join
+pipClassifications <- function(PIPs){
+ 
+  inchis <- PIPs %>%
     .$InChIKey %>%
     unique() 
   
-  message(length(classi),' InChIKeys to classify')
+  message('Retreiving classifications...')
   
-  classi <- classi %>% 
-    classify(nCores,clusterType)
+  classi <- inchis %>% 
+    classify()
   
-  classifications <- pips %>%
+  classifications <- PIPs %>%
     left_join(classi, by = "InChIKey") %>%
-    select(CID:Adduct,InChIKey,kingdom,superclass,class,subclass,`level 5`:names(.)[length(names(.))]) #%>%
-  # filter(!is.na(kingdom))
-  classifications$kingdom[is.na(classifications$kingdom)] <- 'Unclassified'
+    select(CID,MolecularFormula,Adduct,InChIKey,kingdom,superclass,class,subclass,`level 5`:names(.)[length(names(.))]) %>%
+    filter(!is.na(kingdom))
+  
+  # classifications$kingdom[is.na(classifications$kingdom)] <- 'Unclassified'
+  
+  message(str_c(length(unique(classifications$InChIKey)),' classifications returned'))
+  
+  # classifications <- classifications %>%
+    # filter(kingdom == 'Unclassified')
   
   return(classifications)
 }
