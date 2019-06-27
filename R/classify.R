@@ -5,16 +5,30 @@
 #' @importFrom purrr map_chr
 #' @importFrom tidyr spread
 #' @importFrom parallel detectCores makeCluster stopCluster parLapply
-#' @export
 
-classify <- function(inchikey,nCores = detectCores(), clusterType = 'PSOCK'){
-  clus <- makeCluster(nCores,type = clusterType)
-  classi <- inchikey %>%
-    parLapply(cl = clus,fun = get_classification) %>%
-    set_names(inchikey)
-  stopCluster(clus)
+classify <- function(inchikey,nCores = availableCores() * 0.75){
+  
+  # plan(multiprocess,workers = nCores)
+  # 
+  # suppressMessages(classi <- inchikey %>%
+  #   future_map(get_classification) %>%
+  #   set_names(inchikey))
+  
+  # clus <- makeCluster(nCores,type = 'FORK')
+  # suppressMessages(classi <- inchikey %>%
+  #                    parLapply(cl = clus,fun = get_classification) %>%
+  #                    set_names(inchikey)
+  # )
+  # stopCluster(clus)
+  
+  suppressMessages(
+    classi <- inchikey %>%
+      map(get_classification) %>%
+      set_names(inchikey)
+  )
+  
   classi %>%
-    .[!sapply(.,is.null)] %>%
+    .[!map_lgl(.,is.null)] %>%
     map(~{
       d <- .
       d %>%

@@ -11,11 +11,11 @@ consensusCls <- function(classifications,threshold = 0.5){
         distinct() %>%
         rowid_to_column(var = 'ID')
       
-      freq <- cl %>%
-        left_join(classes, by = c("MolecularFormula", "Adduct", "kingdom", "superclass", "class", "subclass", "level 5", "level 6", "level 7", "level 8", "level 9")) %>%
+      suppressMessages(freq <- cl %>%
+        left_join(classes) %>%
         group_by(ID) %>%
         summarise(N = n()) %>%
-        right_join(classes, by = "ID")
+        right_join(classes, by = "ID"))
       
       votes <- levels %>%
         map(~{
@@ -109,9 +109,19 @@ consensusCls <- function(classifications,threshold = 0.5){
     bind_rows()
 }
 
+#' @export
+
+consensusClassification <- function(MF,adducts = c('[M-H]1-',threshold = 0.5,nCores = availableCores() * 0.75)){
+  hits <- pubchemMatch(MF)
+  PIPs <- pips(hits,adducts)
+  classifications <- pipClassifications(PIPs,nCores = nCores)
+  classifications %>%
+    consensusCls(threshold = threshold) %>%
+    select('MolecularFormula','Adduct','Score','kingdom','superclass','class','subclass',names(.)[str_detect(names(.),'level')])
+}
+
 #' @importClassesFrom MFassign Assignment
 #' @importFrom MFassign assignments
-#' @export
 
 setMethod('consensus',signature = 'Assignment',
           function(x,filterUnclassified = F){

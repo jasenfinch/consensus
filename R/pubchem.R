@@ -1,6 +1,8 @@
 
 
 pubchemMatch <- function(MF){
+  message(str_c('\n',MF))
+  message('Retreiving CIDs...')
   cmd <- str_c('https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/formula/',
                MF,
                '/JSON')
@@ -131,8 +133,6 @@ setMethod('pubchemPIPs',signature = 'Consensus',
                 d <- .
                 MF <- d$MF[1]
                 IPs <- d$Adduct
-                
-                message(str_c('\n',MF))
                 
                 hits <- pubchemMatch(MF)
                 
