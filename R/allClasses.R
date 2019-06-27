@@ -2,8 +2,8 @@
 setClass('Consensus',
          slots = list(
            IPs = 'tbl_df',
-           PIPs = 'list',
+           PIPs = 'tbl_df',
            classifications = 'tbl_df',
-           consensus = 'tbl_df'
+           consensus = 'list'
          )
 )

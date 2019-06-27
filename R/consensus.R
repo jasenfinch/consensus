@@ -116,8 +116,9 @@ consensus <- function(ips,filterUnclassified = T){
   con <- new('Consensus')
   con@IPs <- ips
   
-  con <- pubchemPIPs(con)
-  classifications <- pipClassifications(pips,nCores = detectCores() * 0.75)
+  con <- con %>%
+    pubchemPIPs() %>%
+    pipClassifications(nCores = detectCores() * 0.75)
   
   consensusClasses <- classifications %>%
     filter(kingdom != 'Unclassified') %>%
