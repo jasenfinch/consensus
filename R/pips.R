@@ -5,8 +5,6 @@ pipClassifications <- function(PIPs){
     .$InChIKey %>%
     unique() 
   
-  message('Retreiving classifications...')
-  
   classi <- inchis %>% 
     classify()
   
@@ -16,8 +14,6 @@ pipClassifications <- function(PIPs){
     filter(!is.na(kingdom))
   
   # classifications$kingdom[is.na(classifications$kingdom)] <- 'Unclassified'
-  
-  message(str_c(length(unique(classifications$InChIKey)),' classifications returned'))
   
   # classifications <- classifications %>%
     # filter(kingdom == 'Unclassified')
