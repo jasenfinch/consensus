@@ -1,7 +1,9 @@
 #' @importFrom FELLA buildGraphFromKEGGREST
 #' @importFrom tidygraph as_tbl_graph
 #' @importFrom MFassign nodes
-#' @importFrom dplyr anti_join full_join
+#' @importFrom dplyr anti_join full_join rowwise
+#' @importFrom utils capture.output
+#' @importFrom mzAnnotation descriptors
 
 setMethod('keggConsensus',signature = 'Assignment',
           function(x,organism = 'hsa', threshold = 0.5){

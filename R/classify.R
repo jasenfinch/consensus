@@ -1,11 +1,12 @@
 
-#' @importFrom magrittr set_names
-#' @importFrom dplyr distinct select
+#' @importFrom magrittr set_names %>%
+#' @importFrom dplyr distinct select bind_rows filter
 #' @importFrom classyfireR get_classification
-#' @importFrom purrr map_lgl
+#' @importFrom purrr map_lgl map
 #' @importFrom tidyr spread
 #' @importFrom tidyselect last_col
-#' @import progress
+#' @importFrom progress progress_bar
+#' @importFrom stringr str_c
 
 classify <- function(inchikey){
   

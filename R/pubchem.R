@@ -1,4 +1,6 @@
-#' @importFrom dplyr rename
+#' @importFrom dplyr rename mutate
+#' @importFrom httr GET content config
+#' @importFrom tibble as_tibble
 
 pubchemMatch <- function(MF){
   message(str_c('\n',MF))
@@ -84,6 +86,8 @@ pubchemMatch <- function(MF){
   message(str_c(nrow(chem_info),' CIDs returned'))
   return(chem_info)
 }
+
+#' @importFrom mzAnnotation metaboliteDB
 
 pips <- function(hits,adducts){
   descriptorTable <- descriptors(hits)

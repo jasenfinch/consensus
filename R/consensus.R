@@ -125,6 +125,7 @@ consensusCls <- function(classifications,threshold = 0.5){
 #' @examples
 #' consensusClassification('C10H10O7')
 #' @importFrom stringr str_detect
+#' @importFrom tibble tibble
 #' @export
 
 consensusClassification <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5){
