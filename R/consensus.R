@@ -2,6 +2,10 @@
 globalVariables(c('.','kingdom','CID','MolecularFormula','Adduct','InChIKey','superclass','subclass','level 5','MF',
                   'Charge','CanonicalSMILES','CovalentUnitCount'))
 
+#' @importFrom tibble rowid_to_column
+#' @importFrom dplyr everything group_by summarise right_join
+#' @importFrom tidyr gather
+
 consensusCls <- function(classifications,threshold = 0.5){
   consensusClasses <- classifications %>%
     split(str_c(.$MolecularFormula,.$Adduct,sep = ' ')) %>%
@@ -10,7 +14,7 @@ consensusCls <- function(classifications,threshold = 0.5){
       levels <- names(cl)[5:length(names(cl))]
       
       classes <- cl %>%
-        select(MolecularFormula,Adduct,kingdom:names(.)[length(names(.))]) %>%
+        select(MolecularFormula,Adduct,everything()) %>%
         distinct() %>%
         rowid_to_column(var = 'ID')
       

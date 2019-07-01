@@ -4,6 +4,7 @@
 #' @importFrom classyfireR get_classification
 #' @importFrom purrr map_lgl
 #' @importFrom tidyr spread
+#' @importFrom tidyselect last_col
 #' @import progress
 
 classify <- function(inchikey){
@@ -36,7 +37,7 @@ classify <- function(inchikey){
     filter(!is.na(kingdom)) %>%
     select(InChIKey,kingdom,superclass,class,subclass,`level 5`:last_col())
   
-  message(str_c(length(unique(classifications$InChIKey)),' classifications returned'))
+  message(str_c(length(unique(classi$InChIKey)),' classifications returned'))
   
   return(classi)
 }
