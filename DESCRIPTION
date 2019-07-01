@@ -7,7 +7,8 @@ Authors@R:
            role = c("aut", "cre"),
            email = "first.last@example.com")
 Description: Consensus chemical classifications for putative molecular formula assignments.
-Depends: mzAnnotation
+Depends: R (>= 3.5),
+        mzAnnotation
 Imports: MFassign,
         classyfireR,
         dplyr,
