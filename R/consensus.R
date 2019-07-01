@@ -1,5 +1,5 @@
 
-globalVariables(c('.','kingdom','CID','MolecularFormula','Adduct','InChIKey','superclass','subclass','level 5','MF',
+globalVariables(c('.','kingdom','CID','MF','Adduct','InChIKey','superclass','subclass','level 5','MF',
                   'Charge','CanonicalSMILES','CovalentUnitCount'))
 
 #' @importFrom tibble rowid_to_column
@@ -8,13 +8,13 @@ globalVariables(c('.','kingdom','CID','MolecularFormula','Adduct','InChIKey','su
 
 consensusCls <- function(classifications,threshold = 0.5){
   consensusClasses <- classifications %>%
-    split(str_c(.$MolecularFormula,.$Adduct,sep = ' ')) %>%
+    split(str_c(.$MF,.$Adduct,sep = ' ')) %>%
     map(~{
       cl <- .
-      levels <- names(cl)[5:length(names(cl))]
+      levels <- names(cl)[which(names(cl) == 'kingdom'):length(names(cl))]
       
       classes <- cl %>%
-        select(MolecularFormula,Adduct,everything()) %>%
+        select(MF,Adduct,everything()) %>%
         distinct() %>%
         rowid_to_column(var = 'ID')
       
@@ -34,7 +34,7 @@ consensusCls <- function(classifications,threshold = 0.5){
             map(~{
               d <- .
               d %>%
-                group_by(MolecularFormula,Adduct,Class) %>%
+                group_by(MF,Adduct,Class) %>%
                 summarise(N = sum(N))
             }) %>%
             bind_rows()
@@ -49,7 +49,7 @@ consensusCls <- function(classifications,threshold = 0.5){
           d <- .
           d %>%
             gather('Level','Class',-(ID:Adduct)) %>%
-            left_join(votes, by = c("MolecularFormula", "Adduct", "Level", "Class")) %>%
+            left_join(votes, by = c("MF", "Adduct", "Level", "Class")) %>%
             select(-Class) %>%
             spread(Level,N)
         }) %>%
@@ -105,7 +105,7 @@ consensusCls <- function(classifications,threshold = 0.5){
       
       consensusClass <- classes %>%
         filter(ID == cons$ID) %>%
-        select(MolecularFormula:Adduct,consensusLevels) %>%
+        select(MF:Adduct,consensusLevels) %>%
         mutate(Score = cons$Score)
       
       return(list(classes = classes,consensusScores = consensus,consensusClass = consensusClass))
@@ -129,11 +129,25 @@ consensusCls <- function(classifications,threshold = 0.5){
 
 consensusClassification <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5){
   hits <- pubchemMatch(MF)
+  
+  if (nrow(hits) == 0) {
+    return(tibble(MF = MF,Adduct = adducts,kingdom = 'No hits'))
+  }
+  
   PIPs <- pips(hits,adducts)
+  
+  if (nrow(PIPs) == 0) {
+    return(tibble(MF = MF,Adduct = adducts,kingdom = 'No hits'))
+  }
+  
   classifications <- pipClassifications(PIPs)
+  
+  if (nrow(classifications) == 0) {
+    return(tibble(MF = MF,Adduct = adducts,kingdom = 'Unclassified'))
+  }
+  
   classifications %>%
-    consensusCls(threshold = threshold) %>%
-    select('MolecularFormula','Adduct','Score',everything())
+    consensusCls(threshold = threshold)
 }
 
 #' @importClassesFrom MFassign Assignment
@@ -141,7 +155,7 @@ consensusClassification <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5)
 #' @importFrom methods new
 
 setMethod('consensus',signature = 'Assignment',
-          function(x,filterUnclassified = F){
+          function(x,organism = 'hsa',threshold = 0.5){
             
             ips <- x %>%
               assignments() %>%
@@ -159,7 +173,7 @@ setMethod('consensus',signature = 'Assignment',
             consensusClasses <- classifications %>%
               filter(kingdom != 'Unclassified') %>%
               consensusCls(threshold = 1/3) %>%
-              select('MolecularFormula','Adduct','Score','kingdom','superclass','class','subclass',names(.)[str_detect(names(.),'level')])
+              select('MF','Adduct','Score','kingdom','superclass','class','subclass',names(.)[str_detect(names(.),'level')])
             
             return(consensusClasses)
           }

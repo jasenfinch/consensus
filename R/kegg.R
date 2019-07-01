@@ -1,17 +1,22 @@
 #' @importFrom FELLA buildGraphFromKEGGREST
 #' @importFrom tidygraph as_tbl_graph
 #' @importFrom MFassign nodes
+#' @importFrom dplyr anti_join full_join
 
 setMethod('keggConsensus',signature = 'Assignment',
-          function(x,organism = 'hsa'){
-            g <- suppressMessages(buildGraphFromKEGGREST(organism = organism, filter.path = NULL) %>%
-                as_tbl_graph() %>%
-                nodes() %>%
-                filter(com == 5))
+          function(x,organism = 'hsa', threshold = 0.5){
+            capture.output({
+              suppressMessages({
+                g <- buildGraphFromKEGGREST(organism = organism, filter.path = NULL) %>%
+                  as_tbl_graph() %>%
+                  nodes() %>%
+                  filter(com == 5)
+              })
+            })
             
-            suppressMessages(met <- metabolites %>%
+            met <- metabolites %>%
               filter(ACCESSION_ID %in% g$name) %>%
-              {metaboliteDB(.,descriptors = descriptors(.))})
+              {metaboliteDB(.,descriptors = descriptors(.))}
             
             mfs <- x %>%
               assignments() %>%
@@ -32,14 +37,26 @@ setMethod('keggConsensus',signature = 'Assignment',
               rowwise() %>%
               mutate(inchikey = mzAnnotation::convert(INCHI,'inchi','inchikey'))
             
+            noHits <- mfs %>%
+              select(-Name) %>%
+              anti_join(MFhits, by = c("MF", "Adduct")) %>%
+              mutate(kingdom = 'No hits')
+            
             classifications <- MFhits$inchikey %>%
               unique() %>%
               classify() %>%
-              left_join(MFhits,by = c('InChIKey' = 'inchikey')) %>%
-              rename(MolecularFormula = MF)
+              right_join(MFhits,by = c('InChIKey' = 'inchikey')) %>%
+              select(ACCESSION_ID:last_col(),everything())
             
-            classifications %>%
+            noClassifications <- MFhits %>%
+              anti_join(classifications, by = c("ACCESSION_ID", "MF", "INCHI", "SMILE", "Name", "Adduct")) %>%
+              select(MF,Adduct) %>%
+              mutate(kingdom = 'unclassified')
+            
+            consensi <- classifications %>%
               consensusCls(threshold = threshold) %>%
-              select('MolecularFormula','Adduct','Score',everything())
+              full_join(noHits, by = c("MF", "Adduct", "kingdom")) %>%
+              full_join(noClassifications, by = c("MF", "Adduct", "kingdom"))
+            return(consensi)
           }
 )
