@@ -110,6 +110,7 @@ consensusCls <- function(classifications,threshold = 0.5){
       .$consensusClass
     }) %>%
     bind_rows()
+  return(consensusClasses)
 }
 
 #' consensusClassification
@@ -117,6 +118,8 @@ consensusCls <- function(classifications,threshold = 0.5){
 #' @param MF molecular formula
 #' @param adducts character vector of adducts
 #' @param threshold consensus threshold
+#' @examples
+#' consensusClassification('C10H10O7')
 #' @importFrom stringr str_detect
 #' @export
 
@@ -126,7 +129,7 @@ consensusClassification <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5)
   classifications <- pipClassifications(PIPs)
   classifications %>%
     consensusCls(threshold = threshold) %>%
-    select('MolecularFormula','Adduct','Score','kingdom','superclass','class','subclass',names(.)[str_detect(names(.),'level')])
+    select('MolecularFormula','Adduct','Score',everything())
 }
 
 #' @importClassesFrom MFassign Assignment
