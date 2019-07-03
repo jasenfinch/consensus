@@ -4,6 +4,7 @@
 #' @importFrom dplyr anti_join full_join rowwise
 #' @importFrom utils capture.output
 #' @importFrom mzAnnotation descriptors
+#' @export
 
 setMethod('keggConsensus',signature = 'Assignment',
           function(x,organism = 'hsa', threshold = 0.5){

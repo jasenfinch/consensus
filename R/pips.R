@@ -10,8 +10,9 @@ pipClassifications <- function(PIPs){
     classify()
   
   classifications <- PIPs %>%
+    select(-(SMILE:ACCESSION_ID),CID,MF,Adduct,InChIKey) %>%
     left_join(classi, by = "InChIKey") %>%
-    select(CID,MF,Adduct,InChIKey,kingdom,superclass,class,subclass,`level 5`:names(.)[length(names(.))]) %>%
+    select(CID,MF,Adduct,InChIKey,kingdom,everything()) %>%
     filter(!is.na(kingdom))
   
   # classifications$kingdom[is.na(classifications$kingdom)] <- 'Unclassified'

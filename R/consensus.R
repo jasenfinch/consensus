@@ -7,114 +7,121 @@ globalVariables(c('.','kingdom','CID','MF','Adduct','InChIKey','superclass','sub
 #' @importFrom tidyr gather
 
 consensusCls <- function(classifications,threshold = 0.5){
-  consensusClasses <- classifications %>%
-    split(str_c(.$MF,.$Adduct,sep = ' ')) %>%
-    map(~{
-      cl <- .
-      levels <- names(cl)[which(names(cl) == 'kingdom'):length(names(cl))]
-      
-      classes <- cl %>%
-        select(MF,Adduct,everything()) %>%
-        distinct() %>%
-        rowid_to_column(var = 'ID')
-      
-      suppressMessages(freq <- cl %>%
-        left_join(classes) %>%
-        group_by(ID) %>%
-        summarise(N = n()) %>%
-        right_join(classes, by = "ID"))
-      
-      votes <- levels %>%
-        map(~{
-          lev <- .
-          freq %>%
-            rename('Class' = !!lev) %>%
-            select(ID:Adduct,Class) %>%
-            split(.$Class) %>%
-            map(~{
-              d <- .
-              d %>%
-                group_by(MF,Adduct,Class) %>%
-                summarise(N = sum(N))
-            }) %>%
-            bind_rows()
-        }) %>%
-        set_names(levels) %>%
-        bind_rows(.id = 'Level')
-      
-      votesTable <- freq %>%
-        select(-N) %>%
-        split(1:nrow(.)) %>%
-        map(~{
-          d <- .
-          d %>%
-            gather('Level','Class',-(ID:Adduct)) %>%
-            left_join(votes, by = c("MF", "Adduct", "Level", "Class")) %>%
-            select(-Class) %>%
-            spread(Level,N)
-        }) %>%
-        bind_rows() %>%
-        select(ID:Adduct,kingdom,superclass,class,subclass,`level 5`:names(cl)[length(names(cl))])
-      
-      N <- nrow(cl)
-      
-      p <- votesTable %>%
-        mutate(N = N) %>%
-        select(N,kingdom:names(.)[length(names(.))])
-      proportions <- p
-      for (i in 2:ncol(proportions)) {
-        proportions[,i] <- p[,i] / p[,i - 1]
-      }
-      proportions <- proportions %>%
-        select(-N) %>%
-        mutate(ID = 1:nrow(.))
-      
-      consensus <- proportions %>%
-        select(-ID) %>% 
-        split(1:nrow(.)) %>%
-        map(~{
-          mutate(.,Score = prod(.,na.rm = T))  
-        }) %>%
-        bind_rows() %>%
-        mutate(ID = 1:nrow(.))
-      
-      maxScore <- max(consensus$Score)
-      
-      cons <- consensus %>%
-        select(-ID)
-      
-      while (maxScore < threshold) {
-        cons <- cons %>%
-          select(-Score) %>%
-          .[,-ncol(.)] %>%
+  
+  if (nrow(classifications) > 1) {
+    consensusClasses <- classifications %>%
+      split(str_c(.$MF,.$Adduct,sep = ' ')) %>%
+      map(~{
+        cl <- .
+        levels <- names(cl)[which(names(cl) == 'kingdom'):length(names(cl))]
+        
+        classes <- cl %>%
+          select(MF,Adduct,everything()) %>%
+          distinct() %>%
+          rowid_to_column(var = 'ID')
+        
+        suppressMessages(freq <- cl %>%
+                           left_join(classes) %>%
+                           group_by(ID) %>%
+                           summarise(N = n()) %>%
+                           right_join(classes, by = "ID"))
+        
+        votes <- levels %>%
+          map(~{
+            lev <- .
+            freq %>%
+              rename('Class' = !!lev) %>%
+              select(ID:Adduct,Class) %>%
+              split(.$Class) %>%
+              map(~{
+                d <- .
+                d %>%
+                  group_by(MF,Adduct,Class) %>%
+                  summarise(N = sum(N))
+              }) %>%
+              bind_rows()
+          }) %>%
+          set_names(levels) %>%
+          bind_rows(.id = 'Level')
+        
+        votesTable <- freq %>%
+          select(-N) %>%
+          split(1:nrow(.)) %>%
+          map(~{
+            d <- .
+            d %>%
+              gather('Level','Class',-(ID:Adduct)) %>%
+              left_join(votes, by = c("MF", "Adduct", "Level", "Class")) %>%
+              select(-Class) %>%
+              spread(Level,N)
+          }) %>%
+          bind_rows() %>%
+          select(ID:Adduct,kingdom,superclass,class,subclass,`level 5`:names(cl)[length(names(cl))])
+        
+        N <- nrow(cl)
+        
+        p <- votesTable %>%
+          mutate(N = N) %>%
+          select(N,kingdom:names(.)[length(names(.))])
+        proportions <- p
+        for (i in 2:ncol(proportions)) {
+          proportions[,i] <- p[,i] / p[,i - 1]
+        }
+        proportions <- proportions %>%
+          select(-N) %>%
+          mutate(ID = 1:nrow(.))
+        
+        consensus <- proportions %>%
+          select(-ID) %>% 
           split(1:nrow(.)) %>%
           map(~{
             mutate(.,Score = prod(.,na.rm = T))  
           }) %>%
-          bind_rows()
+          bind_rows() %>%
+          mutate(ID = 1:nrow(.))
         
-        maxScore <- max(cons$Score)
-      }
-      
-      cons <- cons %>%
-        mutate(ID = 1:nrow(.)) %>%
-        filter(Score == max(Score)) %>%
-        .[1,]
-      
-      consensusLevels <- names(cons)[1:(ncol(cons) - 2)]
-      
-      consensusClass <- classes %>%
-        filter(ID == cons$ID) %>%
-        select(MF:Adduct,consensusLevels) %>%
-        mutate(Score = cons$Score)
-      
-      return(list(classes = classes,consensusScores = consensus,consensusClass = consensusClass))
-    }) %>%
-    map(~{
-      .$consensusClass
-    }) %>%
-    bind_rows()
-  return(consensusClasses)
+        maxScore <- max(consensus$Score)
+        
+        cons <- consensus %>%
+          select(-ID)
+        
+        while (maxScore < threshold) {
+          cons <- cons %>%
+            select(-Score) %>%
+            .[,-ncol(.)] %>%
+            split(1:nrow(.)) %>%
+            map(~{
+              mutate(.,Score = prod(.,na.rm = T))  
+            }) %>%
+            bind_rows()
+          
+          maxScore <- max(cons$Score)
+        }
+        
+        cons <- cons %>%
+          mutate(ID = 1:nrow(.)) %>%
+          filter(Score == max(Score)) %>%
+          .[1,]
+        
+        consensusLevels <- names(cons)[1:(ncol(cons) - 2)]
+        
+        consensusClass <- classes %>%
+          filter(ID == cons$ID) %>%
+          select(MF:Adduct,consensusLevels) %>%
+          mutate(Score = cons$Score)
+        
+        return(list(classes = classes,consensusScores = consensus,consensusClass = consensusClass))
+      }) %>%
+      map(~{
+        .$consensusClass
+      }) %>%
+      bind_rows()
+  } else {
+    consensusClasses <- classifications %>%
+      select(-CID,-InChIKey) %>%
+      mutate(Score = 1)
+  }
+  return(consensusClasses) 
 }
 
 #' consensusClassification
@@ -131,7 +138,7 @@ consensusCls <- function(classifications,threshold = 0.5){
 consensusClassification <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5){
   hits <- pubchemMatch(MF)
   
-  if (nrow(hits) == 0) {
+  if (is.null(hits)) {
     return(tibble(MF = MF,Adduct = adducts,kingdom = 'No hits'))
   }
   
@@ -147,8 +154,16 @@ consensusClassification <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5)
     return(tibble(MF = MF,Adduct = adducts,kingdom = 'Unclassified'))
   }
   
-  classifications %>%
+  con <- classifications %>%
     consensusCls(threshold = threshold)
+  
+  consensus <- new('Consensus')
+  consensus@hits <- hits
+  consensus@PIPs <- PIPs
+  consensus@classifications <- classifications
+  consensus@consensus <- con
+  
+  return(consensus)
 }
 
 #' @importClassesFrom MFassign Assignment

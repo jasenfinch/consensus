@@ -25,6 +25,8 @@ classify <- function(inchikey){
     }) %>%
     set_names(inchikey)
   
+  classes <- c('kingdom','superclass','class','subclass')
+  
   classi <- classi %>%
     .[!map_lgl(.,is.null)] %>%
     map(~{
@@ -35,8 +37,13 @@ classify <- function(inchikey){
     }) %>%
     bind_rows(.id = 'InChIKey') %>%
     distinct() %>%
-    filter(!is.na(kingdom)) %>%
-    select(InChIKey,kingdom,superclass,class,subclass,`level 5`:last_col())
+    filter(!is.na(kingdom))
+  
+  classes <- c('kingdom','superclass','class','subclass') %>%
+    {.[. %in% names(classi)]}
+  
+  classi <- classi %>%
+    select(InChIKey,{{classes}},contains('level'))
   
   message(str_c(length(unique(classi$InChIKey)),' classifications returned'))
   
