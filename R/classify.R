@@ -39,13 +39,17 @@ classify <- function(inchikey){
     distinct() %>%
     filter(!is.na(kingdom))
   
-  classes <- c('kingdom','superclass','class','subclass') %>%
-    {.[. %in% names(classi)]}
-  
-  classi <- classi %>%
-    select(InChIKey,{{classes}},contains('level'))
-  
-  message(str_c(length(unique(classi$InChIKey)),' classifications returned'))
+  if (nrow(classi) > 0) {
+    classes <- c('kingdom','superclass','class','subclass') %>%
+      {.[. %in% names(classi)]}
+    
+    classi <- classi %>%
+      select(InChIKey,{{classes}},contains('level'))
+    
+    message(str_c(length(unique(classi$InChIKey)),' classifications returned'))  
+  } else {
+    message('0 classifications returned')
+  }
   
   return(classi)
 }

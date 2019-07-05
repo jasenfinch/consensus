@@ -56,7 +56,7 @@ consensusCls <- function(classifications,threshold = 0.5){
               spread(Level,N)
           }) %>%
           bind_rows() %>%
-          select(ID:Adduct,kingdom,superclass,class,subclass,`level 5`:names(cl)[length(names(cl))])
+          select(ID:Adduct,kingdom,superclass,class,subclass,contains('level'))
         
         N <- nrow(cl)
         
