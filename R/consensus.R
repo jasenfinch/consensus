@@ -139,23 +139,30 @@ consensusClassification <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5)
   hits <- pubchemMatch(MF)
   
   if (is.null(hits)) {
-    return(tibble(MF = MF,Adduct = adducts,kingdom = 'No hits'))
+    hits <- tibble()
+    PIPs <- tibble()
+    classifications <- tibble()
+    con <-  tibble(MF = MF,Adduct = adducts,kingdom = 'No hits')
+  } else {
+    PIPs <- pips(hits,adducts)
+    
+    if (nrow(PIPs) == 0) {
+      PIPs <- tibble()
+      classifications <- tibble()
+      con <- tibble(MF = MF,Adduct = adducts,kingdom = 'No hits')
+    } else {
+      classifications <- pipClassifications(PIPs)
+      
+      if (nrow(classifications) == 0) {
+        classifications <- tibble()
+        con <- tibble(MF = MF,Adduct = adducts,kingdom = 'Unclassified')
+      } else {
+        con <- classifications %>%
+          consensusCls(threshold = threshold)   
+      }
+      
+    }
   }
-  
-  PIPs <- pips(hits,adducts)
-  
-  if (nrow(PIPs) == 0) {
-    return(tibble(MF = MF,Adduct = adducts,kingdom = 'No hits'))
-  }
-  
-  classifications <- pipClassifications(PIPs)
-  
-  if (nrow(classifications) == 0) {
-    return(tibble(MF = MF,Adduct = adducts,kingdom = 'Unclassified'))
-  }
-  
-  con <- classifications %>%
-    consensusCls(threshold = threshold)
   
   consensus <- new('Consensus')
   consensus@hits <- hits
