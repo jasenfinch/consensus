@@ -5,6 +5,7 @@ globalVariables(c('.','kingdom','CID','MF','Adduct','InChIKey','superclass','sub
 #' @importFrom tibble rowid_to_column
 #' @importFrom dplyr everything group_by summarise right_join
 #' @importFrom tidyr gather
+#' @importFrom tidyselect contains
 
 consensusCls <- function(classifications,threshold = 0.5){
   
@@ -44,6 +45,8 @@ consensusCls <- function(classifications,threshold = 0.5){
           set_names(levels) %>%
           bind_rows(.id = 'Level')
         
+        clLevels <- c('kingdom','superclass','class','subclass')
+        
         votesTable <- freq %>%
           select(-N) %>%
           split(1:nrow(.)) %>%
@@ -55,8 +58,12 @@ consensusCls <- function(classifications,threshold = 0.5){
               select(-Class) %>%
               spread(Level,N)
           }) %>%
-          bind_rows() %>%
-          select(ID:Adduct,kingdom,superclass,class,subclass,contains('level'))
+          bind_rows() 
+        
+        clLevels <- clLevels[clLevels %in% names(votesTable)]
+        
+        votesTable <- votesTable %>%
+          select(ID:Adduct,clLevels,contains('level'))
         
         N <- nrow(cl)
         
@@ -176,28 +183,42 @@ consensusClassification <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5)
 #' @importClassesFrom MFassign Assignment
 #' @importFrom MFassign assignments
 #' @importFrom methods new
+#' @importFrom metaboWorkflows resultsAnnotation flags
+#' @importFrom lubridate seconds_to_period
 
-setMethod('consensus',signature = 'Assignment',
-          function(x,organism = 'hsa',threshold = 0.5){
+setMethod('consensus',signature = 'Workflow',
+          function(x,organism = 'hsa', threshold = 0.5){
             
-            ips <- x %>%
-              assignments() %>%
-              select(MF,Adduct) %>%
+            if (!('MFassignment' %in% flags(x))) {
+              stop('Molecular assignment needs to be run on Workflow object!')
+            }
+            
+            a <- x %>%
+              resultsAnnotation()
+            
+            z <- keggConsensus(a,organism = 'bdi')
+            
+            n <- z %>%
+              filter(kingdom == 'No hits' | kingdom == 'Unclassified') %>%
               distinct()
             
-            con <- new('Consensus')
-            con@IPs <- ips
+            startTime <- proc.time()
+            pc <- n %>%
+              select(MF,Adduct) %>%
+              split(.$MF) %>%
+              map(~{
+                consensusClassification(.$MF[1],.$Adduct)
+              }) 
+            endTime <- proc.time()
             
-            message(str_c('\nIdentifying consensus classifications for ',nrow(ips),' ionisation products consisting of ',length(unique(ips$MF)),' molecular formulas'))
+            elapsed <- {endTime - startTime} %>%
+              .[3] %>%
+              round(1) %>%
+              seconds_to_period() %>%
+              str_c('[',.,']')
             
-            con <- pubchemPIPs(con)
-            classifications <- pipClassifications(pips)
+            cat('\n',elapsed)
             
-            consensusClasses <- classifications %>%
-              filter(kingdom != 'Unclassified') %>%
-              consensusCls(threshold = 1/3) %>%
-              select('MF','Adduct','Score','kingdom','superclass','class','subclass',names(.)[str_detect(names(.),'level')])
-            
-            return(consensusClasses)
+            return(pc)
           }
 )

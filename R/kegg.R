@@ -8,6 +8,7 @@
 
 setMethod('keggConsensus',signature = 'Assignment',
           function(x,organism = 'hsa', threshold = 0.5){
+            
             capture.output({
               suppressMessages({
                 g <- buildGraphFromKEGGREST(organism = organism, filter.path = NULL) %>%
@@ -17,9 +18,9 @@ setMethod('keggConsensus',signature = 'Assignment',
               })
             })
             
-            met <- metabolites %>%
+            suppressMessages(met <- metabolites %>%
               filter(ACCESSION_ID %in% g$name) %>%
-              {metaboliteDB(.,descriptors = descriptors(.))}
+              {metaboliteDB(.,descriptors = descriptors(.))})
             
             mfs <- x %>%
               assignments() %>%
