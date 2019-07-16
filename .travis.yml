@@ -10,7 +10,11 @@ r:
   - devel
   
 apt_packages:
-  - libopenbabel-dev
+ - libnetcdf-dev
+ - udunits-bin
+ - libudunits2-dev
+ - netcdf-bin
+ - libopenbabel-dev
   
 r_github_packages:
   - thomasp85/patchwork
