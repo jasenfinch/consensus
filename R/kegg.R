@@ -1,3 +1,8 @@
+#' keggConsensus
+#' @description Collate consensus classifications for molecular formula assignments using KEGG.
+#' @param x S4 object of class Assignment
+#' @param organism organism kegg ID.
+#' @param threshold majority assignment threshold for consensus classifications
 #' @importFrom FELLA buildGraphFromKEGGREST
 #' @importFrom tidygraph as_tbl_graph
 #' @importFrom MFassign nodes
