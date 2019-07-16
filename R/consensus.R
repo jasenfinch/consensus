@@ -1,6 +1,6 @@
 
 globalVariables(c('.','kingdom','CID','MF','Adduct','InChIKey','superclass','subclass','level 5','MF',
-                  'Charge','CanonicalSMILES','CovalentUnitCount'))
+                  'Charge','CanonicalSMILES','CovalentUnitCount','SMILE','ACCESSION_ID','MolecularFormula','com','Name','INCHI'))
 
 #' @importFrom tibble rowid_to_column
 #' @importFrom dplyr everything group_by summarise right_join
@@ -180,11 +180,19 @@ consensusClassification <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5)
   return(consensus)
 }
 
+#' consensus
+#' @rdname consensus
+#' @description Consensus classifications for molecular formula assignments.
+#' @param x S4 object of class Workflow
+#' @param organism organism kegg ID.
+#' @param threshold majority assignment threshold for consensus classifications
 #' @importClassesFrom MFassign Assignment
 #' @importFrom MFassign assignments
 #' @importFrom methods new
 #' @importFrom metaboWorkflows resultsAnnotation flags
 #' @importFrom lubridate seconds_to_period
+#' @importClassesFrom metaboWorkflows Workflow
+#' @export
 
 setMethod('consensus',signature = 'Workflow',
           function(x,organism = 'hsa', threshold = 0.5){

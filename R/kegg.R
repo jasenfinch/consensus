@@ -1,4 +1,5 @@
 #' keggConsensus
+#' @rdname keggConsensus
 #' @description Collate consensus classifications for molecular formula assignments using KEGG.
 #' @param x S4 object of class Assignment
 #' @param organism organism kegg ID.
