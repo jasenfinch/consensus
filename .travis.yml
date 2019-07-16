@@ -16,6 +16,10 @@ r_github_packages:
   - thomasp85/patchwork
   - jasenfinch/mzAnnotation
   - jasenfinch/MFassign
+  - aberHRML/binneR
+  - jasenfinch/metabolyseR
+  - jasenfinch/profilePro
+  - jasenfinch/metaboMisc
   - jasenfinch/metaboWorkflows
   
 notifications:
