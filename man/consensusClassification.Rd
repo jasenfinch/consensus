@@ -16,3 +16,6 @@ consensusClassification(MF, adducts = c("[M-H]1-"), threshold = 0.5)
 \description{
 Calculate a consensus classification for a given molecular formula and adducts.
 }
+\examples{
+consensusClassification('C10H10O7')
+}

@@ -1,4 +1,6 @@
-#' @importFrom dplyr rename
+#' @importFrom dplyr rename mutate
+#' @importFrom httr GET content config
+#' @importFrom tibble as_tibble
 
 pubchemMatch <- function(MF){
   message(str_c('\n',MF))
@@ -72,7 +74,8 @@ pubchemMatch <- function(MF){
      chem_info <- chem_info  %>%
         mutate(ACCESSION_ID = 1:nrow(.)) %>%
         rename(SMILE = CanonicalSMILES) %>%
-        filter(CovalentUnitCount == 1)  
+        filter(CovalentUnitCount == 1) %>%
+       rename(MF = MolecularFormula)
     } else {
       message('0 CIDs returned')
       return(NULL)
@@ -83,6 +86,8 @@ pubchemMatch <- function(MF){
   message(str_c(nrow(chem_info),' CIDs returned'))
   return(chem_info)
 }
+
+#' @importFrom mzAnnotation metaboliteDB
 
 pips <- function(hits,adducts){
   descriptorTable <- descriptors(hits)
@@ -104,53 +109,3 @@ pips <- function(hits,adducts){
   
   return(accessions)
 }
-
-
-#' @importFrom stringr str_c
-#' @importFrom httr GET content config
-#' @importFrom purrr map
-#' @importFrom dplyr bind_rows filter mutate rowwise
-#' @importFrom mzAnnotation descriptors metaboliteDB getAccessions 
-#' @importFrom magrittr %>%
-#' @importFrom tibble as_tibble
-#' @importFrom progress progress_bar
-
-setMethod('pubchemPIPs',signature = 'Consensus',
-          function(ips){
-            iprods <- ips@IPs
-            
-            pb <- progress_bar$new(
-              format = "  retrieving [:bar] :percent eta: :eta",
-              total = length(unique(iprods$MF)), clear = FALSE)
-            pb$tick(0)
-            
-            PIPs <- iprods %>%
-              split(.$MF) %>%
-              map(~{
-                d <- .
-                MF <- d$MF[1]
-                IPs <- d$Adduct
-                
-                hits <- pubchemMatch(MF)
-                
-                if (!is.null(hits)) {
-                  accessions <- pips(hits,IPs)
-                } else {
-                  return(NULL)
-                }
-                
-                if (!is.null(accessions)) {
-                  accessions <- accessions %>%
-                    select(CID,MolecularFormula,Adduct,SMILE:Charge)
-                } else {
-                  return(NULL)
-                }
-                pb$tick()
-                message('\n')
-                return(accessions)
-              }) %>%
-              bind_rows()
-            ips@PIPs <- PIPs
-            return(ips)
-          }
-)

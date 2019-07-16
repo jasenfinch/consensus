@@ -1,13 +1,15 @@
 Package: consensus
 Title: Consensus Chemical Classifications For Putative Molecular Formula Assignments
-Version: 0.0.1
+Version: 0.1.0
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Jasen",
+           family = "Finch",
            role = c("aut", "cre"),
-           email = "first.last@example.com")
+           email = "jsf9@aber.ac.uk")
 Description: Consensus chemical classifications for putative molecular formula assignments.
-Depends: mzAnnotation
+biocViews:  Metabolomics
+Depends: R (>= 3.5),
+        mzAnnotation
 Imports: MFassign,
         classyfireR,
         dplyr,
@@ -18,7 +20,12 @@ Imports: MFassign,
         stringr,
         tibble,
         tidyr,
-        methods
+        methods,
+        FELLA,
+        tidygraph,
+        tidyselect,
+        metaboWorkflows,
+        lubridate
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true

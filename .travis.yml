@@ -10,12 +10,21 @@ r:
   - devel
   
 apt_packages:
-  - libopenbabel-dev
+ - libnetcdf-dev
+ - udunits-bin
+ - libudunits2-dev
+ - netcdf-bin
+ - libopenbabel-dev
   
 r_github_packages:
   - thomasp85/patchwork
   - jasenfinch/mzAnnotation
   - jasenfinch/MFassign
+  - jasenfinch/profilePro
+  - aberHRML/binneR
+  - jasenfinch/metabolyseR
+  - jasenfinch/metaboMisc
+  - jasenfinch/metaboWorkflows
   
 notifications:
     email:
