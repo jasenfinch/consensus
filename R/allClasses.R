@@ -7,3 +7,10 @@ setClass('Consensus',
            consensus = 'tbl_df'
          )
 )
+
+setClass('Consensuses',
+         slots = list(
+           consensuses = 'list',
+           results = 'tbl_df'
+         )
+)
