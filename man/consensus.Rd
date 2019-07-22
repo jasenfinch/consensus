@@ -3,12 +3,12 @@
 \docType{methods}
 \name{consensus}
 \alias{consensus}
-\alias{consensus,Workflow-method}
+\alias{consensus,Assignment-method}
 \title{consensus}
 \usage{
 consensus(x, organism = "hsa", threshold = 0.5)
 
-\S4method{consensus}{Workflow}(x, organism = "hsa", threshold = 0.5)
+\S4method{consensus}{Assignment}(x, organism = "hsa", threshold = 0.5)
 }
 \arguments{
 \item{x}{S4 object of class Workflow}

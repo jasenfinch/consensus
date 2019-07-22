@@ -136,13 +136,14 @@ consensusCls <- function(classifications,threshold = 0.5){
 #' @param MF molecular formula
 #' @param adducts character vector of adducts
 #' @param threshold consensus threshold
+#' @param adductRules Adduct formation rules to use for putative ionisation products. Defaults to \code{mzAnnotation::adducts()}
 #' @examples
 #' consensusClassification('C10H10O7')
 #' @importFrom stringr str_detect
 #' @importFrom tibble tibble
 #' @export
 
-consensusClassification <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5){
+consensusClassification <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5, adductRules = adducts()){
   hits <- pubchemMatch(MF)
   
   if (is.null(hits)) {
@@ -189,24 +190,18 @@ consensusClassification <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5)
 #' @importClassesFrom MFassign Assignment
 #' @importFrom MFassign assignments
 #' @importFrom methods new
-#' @importFrom metaboWorkflows resultsAnnotation flags
 #' @importFrom lubridate seconds_to_period
-#' @importClassesFrom metaboWorkflows Workflow
 #' @export
 
-setMethod('consensus',signature = 'Workflow',
+setMethod('consensus',signature = 'Assignment',
           function(x,organism = 'hsa', threshold = 0.5){
             
-            if (!('MFassignment' %in% flags(x))) {
-              stop('Molecular assignment needs to be run on Workflow object!')
-            }
+            adductRules <- x@parameters@adductRules
             
-            a <- x %>%
-              resultsAnnotation()
-            
-            z <- keggConsensus(a,organism = 'bdi')
+            z <- keggConsensus(x,organism = organism)
             
             n <- z %>%
+              .@consensus %>%
               filter(kingdom == 'No hits' | kingdom == 'Unclassified') %>%
               distinct()
             
@@ -215,7 +210,7 @@ setMethod('consensus',signature = 'Workflow',
               select(MF,Adduct) %>%
               split(.$MF) %>%
               map(~{
-                consensusClassification(.$MF[1],.$Adduct)
+                consensusClassification(.$MF[1],.$Adduct,adductRules = adductRules)
               }) 
             endTime <- proc.time()
             
@@ -227,6 +222,34 @@ setMethod('consensus',signature = 'Workflow',
             
             cat('\n',elapsed)
             
-            return(pc)
+            con <- pc %>%
+              map(~{
+                .@consensus
+              }) %>%
+              bind_rows() %>%
+              select(MF,Adduct,Score,everything()) %>%
+              bind_rows(z %>%
+                          filter(kingdom != 'No hits' & kingdom != 'Unclassified'))
+
+            dat <- x %>%
+              .@data %>%
+              gather('Feature','Intensity') %>%
+              group_by(Feature) %>%
+              summarise(Intensity = mean(Intensity)) %>%
+              mutate(MF = str_split_fixed(Feature,' ',4)[,2],
+                     Isotope = str_split_fixed(Feature,' ',4)[,3],
+                     Adduct = str_split_fixed(Feature,' ',4)[,4]
+                     )
+            dat[dat == ''] <- NA
+            dat <- dat %>%
+              left_join(con)
+            dat$kingdom[is.na(dat$kingdom)] <- 'Unknown'
+            
+            consense <- new('Consensuses')
+            
+            consense@consensuses <- c(list(KEGG = z),pc)
+            consense@results <- dat
+            
+            return(consense)
           }
 )
