@@ -19,10 +19,10 @@ apt_packages:
 r_github_packages:
   - thomasp85/patchwork
   - jasenfinch/mzAnnotation
+  - jasenfinch/metabolyseR
   - jasenfinch/MFassign
   - jasenfinch/profilePro
   - aberHRML/binneR
-  - jasenfinch/metabolyseR
   - jasenfinch/metaboMisc
   - jasenfinch/metaboWorkflows
   
