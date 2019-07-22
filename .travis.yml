@@ -16,6 +16,9 @@ apt_packages:
  - netcdf-bin
  - libopenbabel-dev
   
+bioc_packages:
+    - impute
+    
 r_github_packages:
   - thomasp85/patchwork
   - jasenfinch/mzAnnotation
