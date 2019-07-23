@@ -191,10 +191,19 @@ consensusClassification <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5,
 #' @importFrom MFassign assignments
 #' @importFrom methods new
 #' @importFrom lubridate seconds_to_period
+#' @examples
+#' library(MFassign) 
+#' p <- assignmentParameters('FIE')
+#' p@nCores <- 2
+#' assignment <- assignMFs(peakData,p)
+#' 
+#' consensusCl <- consensus(assignment)
 #' @export
 
 setMethod('consensus',signature = 'Assignment',
           function(x,organism = 'hsa', threshold = 0.5){
+            
+            consense <- new('Consensuses')
             
             adductRules <- x@parameters@adductRules
             
@@ -205,55 +214,58 @@ setMethod('consensus',signature = 'Assignment',
               filter(kingdom == 'No hits' | kingdom == 'Unclassified') %>%
               distinct()
             
-            startTime <- proc.time()
-            pc <- n %>%
-              select(MF,Adduct) %>%
-              split(.$MF) %>%
-              map(~{
-                consensusClassification(.$MF[1],.$Adduct,adductRules = adductRules)
-              }) 
-            endTime <- proc.time()
-            
-            elapsed <- {endTime - startTime} %>%
-              .[3] %>%
-              round(1) %>%
-              seconds_to_period() %>%
-              str_c('[',.,']')
-            
-            cat('\n',elapsed)
-            
-            con <- pc %>%
-              map(~{
-                .@consensus
-              }) %>%
-              bind_rows() %>%
-              select(MF,Adduct,Score,everything()) %>%
-              bind_rows(z@consensus %>%
-                          filter(kingdom != 'No hits' & kingdom != 'Unclassified'))
-
-            dat <- x %>%
-              .@data %>%
-              gather('Feature','Intensity') %>%
-              group_by(Feature) %>%
-              summarise(Intensity = mean(Intensity))
-            dat[dat == ''] <- NA
-            dat <- dat %>%
-              left_join(con %>%
-                          left_join(x %>% 
-                                      assignments() %>% 
-                                      select(Name,Feature,MF,Adduct), 
-                                    by = c("MF", "Adduct")), 
-                        by = c('Feature')) %>%
-              select(Name,everything())
-            dat$Name[is.na(dat$Name)] <- dat$Feature[is.na(dat$Name)]
-            dat <- dat %>%
-              select(-Feature)
-            dat$kingdom[is.na(dat$kingdom)] <- 'Unknown'
-            
-            consense <- new('Consensuses')
-            
-            consense@consensuses <- c(list(KEGG = z),pc)
-            consense@results <- dat
+            if (nrow(n) > 0) {
+              startTime <- proc.time()
+              pc <- n %>%
+                select(MF,Adduct) %>%
+                split(.$MF) %>%
+                map(~{
+                  consensusClassification(.$MF[1],.$Adduct,adductRules = adductRules)
+                }) 
+              endTime <- proc.time()
+              
+              elapsed <- {endTime - startTime} %>%
+                .[3] %>%
+                round(1) %>%
+                seconds_to_period() %>%
+                str_c('[',.,']')
+              
+              cat('\n',elapsed)
+              
+              con <- pc %>%
+                map(~{
+                  .@consensus
+                }) %>%
+                bind_rows() %>%
+                select(MF,Adduct,Score,everything()) %>%
+                bind_rows(z@consensus %>%
+                            filter(kingdom != 'No hits' & kingdom != 'Unclassified'))
+              
+              dat <- x %>%
+                .@data %>%
+                gather('Feature','Intensity') %>%
+                group_by(Feature) %>%
+                summarise(Intensity = mean(Intensity))
+              dat[dat == ''] <- NA
+              dat <- dat %>%
+                left_join(con %>%
+                            left_join(x %>% 
+                                        assignments() %>% 
+                                        select(Name,Feature,MF,Adduct), 
+                                      by = c("MF", "Adduct")), 
+                          by = c('Feature')) %>%
+                select(Name,everything())
+              dat$Name[is.na(dat$Name)] <- dat$Feature[is.na(dat$Name)]
+              dat <- dat %>%
+                select(-Feature)
+              dat$kingdom[is.na(dat$kingdom)] <- 'Unknown'
+              
+              consense@consensuses <- c(list(KEGG = z),pc)
+              consense@results <- dat 
+            } else {
+              consense@consensuses <- list(KEGG = z)
+              consense@results <- z@consensus
+            }
             
             return(consense)
           }

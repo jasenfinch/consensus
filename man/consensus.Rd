@@ -20,3 +20,11 @@ consensus(x, organism = "hsa", threshold = 0.5)
 \description{
 Consensus classifications for molecular formula assignments.
 }
+\examples{
+library(MFassign) 
+p <- assignmentParameters('FIE')
+p@nCores <- 2
+assignment <- assignMFs(peakData,p)
+
+consensusCl <- consensus(assignment)
+}
