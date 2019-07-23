@@ -3,12 +3,12 @@
 \docType{methods}
 \name{consensus}
 \alias{consensus}
-\alias{consensus,Workflow-method}
+\alias{consensus,Assignment-method}
 \title{consensus}
 \usage{
 consensus(x, organism = "hsa", threshold = 0.5)
 
-\S4method{consensus}{Workflow}(x, organism = "hsa", threshold = 0.5)
+\S4method{consensus}{Assignment}(x, organism = "hsa", threshold = 0.5)
 }
 \arguments{
 \item{x}{S4 object of class Workflow}
@@ -19,4 +19,12 @@ consensus(x, organism = "hsa", threshold = 0.5)
 }
 \description{
 Consensus classifications for molecular formula assignments.
+}
+\examples{
+library(MFassign) 
+p <- assignmentParameters('FIE')
+p@nCores <- 2
+assignment <- assignMFs(peakData,p)
+
+consensusCl <- consensus(assignment)
 }

@@ -87,15 +87,15 @@ pubchemMatch <- function(MF){
   return(chem_info)
 }
 
-#' @importFrom mzAnnotation metaboliteDB
+#' @importFrom mzAnnotation metaboliteDB adducts
 
-pips <- function(hits,adducts){
+pips <- function(hits,adducts,adductRules = adducts()){
   descriptorTable <- descriptors(hits)
   db <- metaboliteDB(hits,descriptorTable)
   
   accessions <- adducts %>%
     map(~{
-      rule <- Adducts$Rule[Adducts$Name == .]
+      rule <- adductRules$Rule[adductRules$Name == .]
       
       ips <- filterIP(db,rule)
       
