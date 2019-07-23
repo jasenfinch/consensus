@@ -8,6 +8,12 @@ setClass('Consensus',
          )
 )
 
+#' Consensuses
+#' @description An S4 class to store consensus structural classifications.
+#' @slot consensuses list containing consensus results for each MF
+#' @slot results tibble containing consensus structural classifications for each feature
+#' @export
+
 setClass('Consensuses',
          slots = list(
            consensuses = 'list',
