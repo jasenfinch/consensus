@@ -228,21 +228,26 @@ setMethod('consensus',signature = 'Assignment',
               }) %>%
               bind_rows() %>%
               select(MF,Adduct,Score,everything()) %>%
-              bind_rows(z %>%
+              bind_rows(z@consensus %>%
                           filter(kingdom != 'No hits' & kingdom != 'Unclassified'))
 
             dat <- x %>%
               .@data %>%
               gather('Feature','Intensity') %>%
               group_by(Feature) %>%
-              summarise(Intensity = mean(Intensity)) %>%
-              mutate(MF = str_split_fixed(Feature,' ',4)[,2],
-                     Isotope = str_split_fixed(Feature,' ',4)[,3],
-                     Adduct = str_split_fixed(Feature,' ',4)[,4]
-                     )
+              summarise(Intensity = mean(Intensity))
             dat[dat == ''] <- NA
             dat <- dat %>%
-              left_join(con)
+              left_join(con %>%
+                          left_join(x %>% 
+                                      assignments() %>% 
+                                      select(Name,Feature,MF,Adduct), 
+                                    by = c("MF", "Adduct")), 
+                        by = c('Feature')) %>%
+              select(Name,everything())
+            dat$Name[is.na(dat$Name)] <- dat$Feature[is.na(dat$Name)]
+            dat <- dat %>%
+              select(-Feature)
             dat$kingdom[is.na(dat$kingdom)] <- 'Unknown'
             
             consense <- new('Consensuses')
