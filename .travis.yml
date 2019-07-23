@@ -24,10 +24,6 @@ r_github_packages:
   - jasenfinch/mzAnnotation
   - jasenfinch/metabolyseR
   - jasenfinch/MFassign
-  - jasenfinch/profilePro
-  - aberHRML/binneR
-  - jasenfinch/metaboMisc
-  - jasenfinch/metaboWorkflows
   
 notifications:
     email:

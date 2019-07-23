@@ -1,6 +1,6 @@
 Package: consensus
 Title: Consensus Chemical Classifications For Putative Molecular Formula Assignments
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     person(given = "Jasen",
            family = "Finch",
@@ -24,7 +24,6 @@ Imports: MFassign,
         FELLA,
         tidygraph,
         tidyselect,
-        metaboWorkflows,
         lubridate
 License: GPL (>= 3)
 Encoding: UTF-8
