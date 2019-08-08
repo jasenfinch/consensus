@@ -1,5 +1,5 @@
-# consensus
+construction
 
-[![Travis build status](https://travis-ci.org/jasenfinch/consensus.svg?branch=master)](https://travis-ci.org/jasenfinch/consensus)
+[![Travis build status](https://travis-ci.org/jasenfinch/construction.svg?branch=master)](https://travis-ci.org/jasenfinch/construction)
 
-Consensus structural classifications for putative molecular formula assignments
+Consensus structural chemical classifications for putative molecular formula assignments
