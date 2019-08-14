@@ -20,6 +20,7 @@ classify <- function(inchikey){
   classi <- inchikey %>%
     map(~{
       cl <- suppressMessages(get_classification(.))
+      Sys.sleep(5)
       pb$tick()
       return(cl)
     }) %>%
