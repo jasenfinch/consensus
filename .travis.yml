@@ -15,6 +15,8 @@ apt_packages:
  - libudunits2-dev
  - netcdf-bin
  - libopenbabel-dev
+ - mesa-common-dev
+ - libglu1-mesa-dev
   
 bioc_packages:
     - impute

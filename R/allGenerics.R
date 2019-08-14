@@ -4,8 +4,8 @@ setGeneric('keggConsensus',function(x,organism = 'hsa', threshold = 0.5){
   standardGeneric('keggConsensus')
 })
 
-#' @rdname consensus
+#' @rdname construct
 
-setGeneric('consensus',function(x,organism = 'hsa', threshold = 0.5){
-  standardGeneric('consensus')
+setGeneric('construct',function(x,organism = 'hsa', threshold = 0.5, databases = c('kegg','pubchem')){
+  standardGeneric('construct')
 })
