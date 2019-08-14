@@ -26,6 +26,10 @@ globalVariables(c('.','kingdom','CID','MF','Adduct','InChIKey','superclass','sub
 setMethod('construct',signature = 'Assignment',
           function(x, organism = 'hsa', threshold = 0.5, databases = c('kegg','pubchem')){
             
+            if (!(TRUE %in% (c('kegg','pubchem') %in% databases))){
+              stop('Databases should include "kegg" and/or "pubchem".')
+            }
+            
             consense <- new('Consensuses')
             
             adductRules <- x@parameters@adductRules
@@ -38,10 +42,14 @@ setMethod('construct',signature = 'Assignment',
                 filter(kingdom == 'No hits' | kingdom == 'Unclassified') %>%
                 distinct() 
             } else {
-              
+              n <- x %>% 
+                assignments() %>%
+                select(MF,Adduct) %>%
+                distinct() %>%
+                mutate(kingdom = 'No hits')
             }
             
-            if ('pubchem' %in% databases | nrow(n) > 0) {
+            if ('pubchem' %in% databases) {
               startTime <- proc.time()
               pc <- n %>%
                 select(MF,Adduct) %>%
@@ -63,10 +71,19 @@ setMethod('construct',signature = 'Assignment',
                   .@consensus
                 }) %>%
                 bind_rows() %>%
-                select(MF,Adduct,Score,everything()) %>%
-                bind_rows(z@consensus %>%
-                            filter(kingdom != 'No hits' & kingdom != 'Unclassified'))
+                select(MF,Adduct,Score,everything())
               
+              if ('kegg' %in% databases) {
+                con <- con %>%
+                  bind_rows(z@consensus %>%
+                              filter(kingdom != 'No hits' & kingdom != 'Unclassified')) 
+              }
+            } else {
+              con <- z %>%
+                .@consensus %>%
+                select(MF,Adduct,Score,everything())
+            }
+            
               dat <- x %>%
                 .@data %>%
                 gather('Feature','Intensity') %>%
@@ -86,12 +103,15 @@ setMethod('construct',signature = 'Assignment',
                 select(-Feature)
               dat$kingdom[is.na(dat$kingdom)] <- 'Unknown'
               
-              consense@consensuses <- c(list(KEGG = z),pc)
+              if ('kegg' %in% databases) {
+                consense@consensuses <- c(consense@consensuses,list(KEGG = z))
+              }
+              
+              if ('kegg' %in% databases) {
+                consense@consensuses <- c(consense@consensuses,list(pc))
+              }
+              
               consense@results <- dat 
-            } else {
-              consense@consensuses <- list(KEGG = z)
-              consense@results <- z@consensus
-            }
             
             return(consense)
           }
