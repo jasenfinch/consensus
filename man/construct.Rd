@@ -18,6 +18,8 @@ construct(x, organism = "hsa", threshold = 0.5, databases = c("kegg",
 \item{organism}{organism kegg ID.}
 
 \item{threshold}{majority assignment threshold for consensus classifications}
+
+\item{databases}{databases to use for PIP searches. Either kegg or pubchem.}
 }
 \description{
 Consensus structural classifications for molecular formula assignments.
