@@ -2,7 +2,7 @@
 
 export(consensusClassification)
 exportClasses(Consensuses)
-exportMethods(consensus)
+exportMethods(construct)
 exportMethods(keggConsensus)
 importClassesFrom(MFassign,Assignment)
 importFrom(FELLA,buildGraphFromKEGGREST)

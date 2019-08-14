@@ -138,7 +138,9 @@ consensusCls <- function(classifications,threshold = 0.5){
 #' @param threshold consensus threshold
 #' @param adductRules Adduct formation rules to use for putative ionisation products. Defaults to \code{mzAnnotation::adducts()}
 #' @examples
+#' \dontrun{
 #' consensusClassification('C10H10O7')
+#' }
 #' @importFrom stringr str_detect
 #' @importFrom tibble tibble
 #' @export
@@ -181,9 +183,9 @@ consensusClassification <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5,
   return(consensus)
 }
 
-#' consensus
-#' @rdname consensus
-#' @description Consensus classifications for molecular formula assignments.
+#' construct
+#' @rdname construct
+#' @description Consensus structural classifications for molecular formula assignments.
 #' @param x S4 object of class Workflow
 #' @param organism organism kegg ID.
 #' @param threshold majority assignment threshold for consensus classifications
@@ -192,27 +194,35 @@ consensusClassification <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5,
 #' @importFrom methods new
 #' @importFrom lubridate seconds_to_period
 #' @examples
+#' \dontrun{
 #' library(MFassign) 
 #' p <- assignmentParameters('FIE')
 #' p@nCores <- 2
 #' assignment <- assignMFs(peakData,p)
 #' 
-#' consensusCl <- consensus(assignment)
+#' consensusCl <- construct(assignment)
+#' }
 #' @export
 
-setMethod('consensus',signature = 'Assignment',
-          function(x,organism = 'hsa', threshold = 0.5){
+setMethod('construct',signature = 'Assignment',
+          function(x, organism = 'hsa', threshold = 0.5, databases = c('kegg','pubchem')){
             
             consense <- new('Consensuses')
             
             adductRules <- x@parameters@adductRules
             
-            z <- keggConsensus(x,organism = organism)
+            if ('kegg' %in% databases) {
+              z <- keggConsensus(x,organism = organism)
+              
+              n <- z %>%
+                .@consensus %>%
+                filter(kingdom == 'No hits' | kingdom == 'Unclassified') %>%
+                distinct() 
+            }
             
-            n <- z %>%
-              .@consensus %>%
-              filter(kingdom == 'No hits' | kingdom == 'Unclassified') %>%
-              distinct()
+            if ('pubchem' %in% databases) {
+              
+            }
             
             if (nrow(n) > 0) {
               startTime <- proc.time()
