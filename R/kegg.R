@@ -1,3 +1,31 @@
+#' keggCompoundInfo
+#' @description Return KEGG compound accession information.
+#' @param IDs KEGG compound accession IDs
+#' @examples 
+#' keggCompoundInfo(c('C00089','C00149'))
+#' @export
+
+keggCompoundInfo <- function(IDs){
+  IDs %>%
+    split(ceiling(seq_along(.)/10)) %>%
+    map(~{
+      keggGet(.) %>%
+        map(~{
+          d <- .
+          d %>%
+            map(~{str_c(.,collapse = '; ')}) %>%
+            as_tibble() %>%
+            select(ENTRY,NAME,FORMULA,EXACT_MASS,PATHWAY,REACTION,ENZYME) %>%
+            rename(SYNONYM = NAME) %>%
+            mutate(NAME = str_split_fixed(SYNONYM,';',2)[,1],
+                   SYNONYM = str_split_fixed(SYNONYM,';',2)[,2]) %>%
+              select(ENTRY,NAME,SYNONYM:ENZYME)
+          }) %>%
+        bind_rows()
+    }) %>%
+    bind_rows()
+}
+
 #' keggCompounds
 #' @description Return KEGG compound accession IDs for a given organism
 #' @param organism KEGG organism ID. If NULL use all compounds.
@@ -28,16 +56,66 @@ keggCompounds <- function(organism = NULL){
   return(compounds)
 }
 
+#' keggPIPs
+#' @description Return KEGG putative ionisation products (PIPs) for given molecular formulas and their adducts.
+#' @param MFs tibble containing 2 columns. The first named MF containing molecular formulas. The second named Adduct containing adducts. See example.
+#' @param organism KEGG organism ID. If NULL use all compounds.
+#' @examples 
+#' \dontrun{
+#' d <- tibble(MF = c('C12H22O11','C4H6O5'),Adduct = rep('[M-H]1-',2))
+#' keggPIPs(d,'hsa')
+#' }
+#' @importFrom dplyr tbl_df
+#' @importFrom mzAnnotation filterACCESSIONS adducts convert
+#' @export
+
+keggPIPs <- function(MFs,organism = NULL, adductRules = adducts()){
+  
+  compounds <- keggCompounds(organism)
+  
+  met <- metabolites %>%
+    filterACCESSIONS(compounds)
+  
+  hits <- MFs %>%
+    split(1:nrow(.)) %>%
+    map(~{
+      m <- .
+      met %>%
+        filterMF(m$MF) %>%
+        getAccessions() %>%
+        mutate(MF = m$MF,Adduct = m$Adduct)
+    }) %>%
+    bind_rows() %>%
+    mutate(Name = str_c(MF,' ',Adduct)) %>%
+    rowwise() %>%
+    select(Name,MF,Adduct,everything())
+  
+  pips <- hits %>%
+    split(.$Name) %>%
+    map(~{
+      m <- .
+      met %>%
+        filterMF(m$MF[1]) %>%
+        filterIP(adductRules$Rule[adductRules$Name == m$Adduct[1]]) %>%
+        getAccessions() %>%
+        mutate(Name = m$Name[1],MF = m$MF[1],Adduct = m$Adduct[1])
+    }) %>%
+    bind_rows() %>%
+    rowwise() %>%
+    mutate(INCHIKEY = convert(INCHI,'inchi','inchikey')) %>%
+    tbl_df() %>%
+    select(MF,Adduct,everything(),-Name)
+  
+  return(pips)
+}
+
 #' keggConsensus
 #' @rdname keggConsensus
 #' @description Collate consensus classifications for molecular formula assignments using KEGG.
 #' @param x S4 object of class Assignment
 #' @param organism organism kegg ID. If NULL use all compounds.
 #' @param threshold majority assignment threshold for consensus classifications
-#' @importFrom tidygraph as_tbl_graph
-#' @importFrom MFassign nodes
 #' @importFrom dplyr anti_join full_join rowwise
-#' @importFrom utils capture.output
 #' @importFrom mzAnnotation descriptors
 #' @export
 
@@ -46,53 +124,25 @@ setMethod('keggConsensus',signature = 'Assignment',
             
             adductRules <- x@parameters@adductRules
             
-            compounds <- keggCompounds(organism)
-            
-            suppressMessages(met <- metabolites %>%
-              filter(ACCESSION_ID %in% g$name) %>%
-              {metaboliteDB(.,descriptors = descriptors(.))})
-            
             mfs <- x %>%
               assignments() %>%
               select(Name,MF,Adduct) %>%
               distinct()
             
-            hits <- mfs %>%
-              split(1:nrow(.)) %>%
-              map(~{
-                m <- .
-                met %>%
-                  filterMF(m$MF) %>%
-                  getAccessions() %>%
-                  mutate(Name = m$Name,MF = m$MF,Adduct = m$Adduct)
-              }) %>%
-              bind_rows() %>%
-              rowwise() %>%
-              mutate(inchikey = mzAnnotation::convert(INCHI,'inchi','inchikey'))
-            
-            pips <- hits %>%
-              split(.$Name) %>%
-              map(~{
-                m <- .
-                met %>%
-                  filterMF(m$MF[1]) %>%
-                  filterIP(adductRules$Rule[adductRules$Name == m$Adduct[1]]) %>%
-                  getAccessions() %>%
-                  mutate(Name = m$Name[1],MF = m$MF[1],Adduct = m$Adduct[1])
-              }) %>%
-              bind_rows() %>%
-              rowwise() %>%
-              mutate(inchikey = mzAnnotation::convert(INCHI,'inchi','inchikey'))
+            pips <- mfs %>%
+              select(MF,Adduct) %>%
+              distinct() %>%
+              keggPIPs()
             
             noPIPs <- mfs %>%
               select(-Name) %>%
               anti_join(pips, by = c("MF", "Adduct")) %>%
               mutate(kingdom = 'No hits')
             
-            classifications <- pips$inchikey %>%
+            classifications <- pips$INCHIKEY %>%
               unique() %>%
               classify() %>%
-              right_join(pips,by = c('InChIKey' = 'inchikey')) %>%
+              right_join(pips,by = c('InChIKey' = 'INCHIKEY')) %>%
               select(ACCESSION_ID:last_col(),everything())
             
             noClassifications <- pips %>%
