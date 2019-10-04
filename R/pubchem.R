@@ -1,6 +1,14 @@
+#' pubchemMatch
+#' @description Query the pubchem database for molecular formula matches.
+#' @param MF a molecular formula to query
 #' @importFrom dplyr rename mutate
 #' @importFrom httr GET content config
 #' @importFrom tibble as_tibble
+#' @examples
+#' \dontrun{ 
+#' pubchemMatch('C12H22O11')
+#' }
+#' @export
 
 pubchemMatch <- function(MF){
   message(str_c('\n',MF))

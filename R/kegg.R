@@ -1,10 +1,39 @@
+#' keggCompounds
+#' @description Return KEGG compound accession IDs for a given organism
+#' @param organism KEGG organism ID. If NULL use all compounds.
+#' @examples 
+#' \dontrun{
+#' keggCompounds('hsa')
+#' }
+#' @importFrom KEGGREST keggLink keggGet
+#' @importFrom stringr str_remove_all coll str_split_fixed str_split
+#' @importFrom tibble deframe
+#' @export
+
+keggCompounds <- function(organism = NULL){
+  
+  if (is.null(organism)) {
+    compounds <- metabolites$ACCESSION_ID
+  } else {
+    enzymes <- keggLink(organism,'enzyme') %>%
+      names()
+    compounds <- keggLink('compound','enzyme') %>%
+      {tibble(Enzyme = names(.),Compound = .)} %>%
+      filter(Enzyme %in% enzymes) %>%
+      select(Compound) %>%
+      distinct() %>%
+      deframe() %>%
+      str_remove_all('cpd:')
+  }
+  return(compounds)
+}
+
 #' keggConsensus
 #' @rdname keggConsensus
 #' @description Collate consensus classifications for molecular formula assignments using KEGG.
 #' @param x S4 object of class Assignment
-#' @param organism organism kegg ID.
+#' @param organism organism kegg ID. If NULL use all compounds.
 #' @param threshold majority assignment threshold for consensus classifications
-#' @importFrom FELLA buildGraphFromKEGGREST
 #' @importFrom tidygraph as_tbl_graph
 #' @importFrom MFassign nodes
 #' @importFrom dplyr anti_join full_join rowwise
@@ -13,18 +42,11 @@
 #' @export
 
 setMethod('keggConsensus',signature = 'Assignment',
-          function(x,organism = 'hsa', threshold = 0.5){
+          function(x,organism = NULL, threshold = 0.5){
             
             adductRules <- x@parameters@adductRules
             
-            capture.output({
-              suppressMessages({
-                g <- buildGraphFromKEGGREST(organism = organism, filter.path = NULL) %>%
-                  as_tbl_graph() %>%
-                  nodes() %>%
-                  filter(com == 5)
-              })
-            })
+            compounds <- keggCompounds(organism)
             
             suppressMessages(met <- metabolites %>%
               filter(ACCESSION_ID %in% g$name) %>%

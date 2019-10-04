@@ -8,13 +8,13 @@
 \usage{
 keggConsensus(x, organism = "hsa", threshold = 0.5)
 
-\S4method{keggConsensus}{Assignment}(x, organism = "hsa",
+\S4method{keggConsensus}{Assignment}(x, organism = NULL,
   threshold = 0.5)
 }
 \arguments{
 \item{x}{S4 object of class Assignment}
 
-\item{organism}{organism kegg ID.}
+\item{organism}{organism kegg ID. If NULL use all compounds.}
 
 \item{threshold}{majority assignment threshold for consensus classifications}
 }
