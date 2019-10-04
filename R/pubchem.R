@@ -117,3 +117,55 @@ pips <- function(hits,adducts,adductRules = adducts()){
   
   return(accessions)
 }
+
+#' pubchemConsensus
+#' @description Calculate a consensus classification for a given molecular formula and adducts based on the pubchem database.
+#' @param MF molecular formula
+#' @param adducts character vector of adducts
+#' @param threshold consensus threshold
+#' @param adductRules Adduct formation rules to use for putative ionisation products. Defaults to \code{mzAnnotation::adducts()}
+#' @examples
+#' \dontrun{
+#' pubchemConsensus('C10H10O7')
+#' }
+#' @importFrom stringr str_detect
+#' @importFrom tibble tibble
+#' @export
+
+pubchemConsensus <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5, adductRules = adducts()){
+  hits <- pubchemMatch(MF)
+  
+  if (is.null(hits)) {
+    hits <- tibble()
+    PIPs <- tibble()
+    classifications <- tibble()
+    con <-  tibble(MF = MF,Adduct = adducts,kingdom = 'No hits')
+  } else {
+    PIPs <- pips(hits,adducts)
+    
+    if (nrow(PIPs) == 0) {
+      PIPs <- tibble()
+      classifications <- tibble()
+      con <- tibble(MF = MF,Adduct = adducts,kingdom = 'No hits')
+    } else {
+      classifications <- pipClassifications(PIPs)
+      
+      if (nrow(classifications) == 0) {
+        classifications <- tibble()
+        con <- tibble(MF = MF,Adduct = adducts,kingdom = 'Unclassified')
+      } else {
+        con <- classifications %>%
+          consensus(threshold = threshold)   
+      }
+      
+    }
+  }
+  
+  consensus <- new('Consensus')
+  consensus@hits <- hits
+  consensus@PIPs <- PIPs
+  consensus@classifications <- classifications
+  consensus@consensus <- con
+  
+  return(consensus)
+}

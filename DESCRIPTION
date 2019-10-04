@@ -10,21 +10,20 @@ Description: Consensus structural chemical classifications for putative molecula
 biocViews:  Metabolomics
 Depends: R (>= 3.5),
         mzAnnotation
-Imports: MFassign,
+Imports: KEGGREST,
+        MFassign,
         classyfireR,
         dplyr,
         httr,
+        lubridate,
         magrittr,
+        methods,
         progress,
         purrr,
         stringr,
-        tibble,
         tidyr,
-        methods,
-        FELLA,
-        tidygraph,
         tidyselect,
-        lubridate
+        tibble
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
