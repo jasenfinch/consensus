@@ -95,29 +95,6 @@ pubchemMatch <- function(MF){
   return(chem_info)
 }
 
-#' @importFrom mzAnnotation metaboliteDB adducts
-
-pips <- function(hits,adducts,adductRules = adducts()){
-  descriptorTable <- descriptors(hits)
-  db <- metaboliteDB(hits,descriptorTable)
-  
-  accessions <- adducts %>%
-    map(~{
-      rule <- adductRules$Rule[adductRules$Name == .]
-      
-      ips <- filterIP(db,rule)
-      
-      ips <- ips %>%
-        getAccessions()
-      message(nrow(ips),' of ',nrow(hits),' can ionize as ',.)
-      return(ips)
-    }) %>%
-    set_names(adducts) %>%
-    bind_rows(.id = 'Adduct')
-  
-  return(accessions)
-}
-
 #' pubchemConsensus
 #' @description Calculate a consensus classification for a given molecular formula and adducts based on the pubchem database.
 #' @param MF molecular formula

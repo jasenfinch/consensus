@@ -1,4 +1,4 @@
-#' @importFrom mzAnnotation filterMF
+#' @importFrom mzAnnotation filterMF metaboliteDB
 
 setMethod('mfHits',signature = 'Consensus',
           function(x){
@@ -14,8 +14,8 @@ setMethod('mfHits',signature = 'Consensus',
               hits <- met %>%
                 filterMF(mf(x))
               message(str_c(hits %>% 
-                        getAccessions() %>% 
-                        nrow()), 'hits returned')
+                              getAccessions() %>% 
+                              nrow()), ' hits returned')
             }
             
             if (db == 'pubchem') {
@@ -23,6 +23,30 @@ setMethod('mfHits',signature = 'Consensus',
                 {metaboliteDB(.,descriptors(.))}
             }
             
+            hits@accessions[[1]] <- hits@accessions[[1]] %>%
+              rowwise() %>%
+              mutate(INCHIKEY = convert(INCHI,'inchi','inchikey')) %>%
+              tbl_df()
+            
             x@hits <- hits
+            return(x)
+          })
+
+setMethod('pips',signature = 'Consensus',
+          function(x){
+            
+            a <- adductRules(x)
+            h <- hits(x)
+            
+            p <- a$Rule %>%
+              map(filterIP,db = h) %>%
+              set_names(a$Name) %>%
+              map(getAccessions) %>%
+              bind_rows(.id = 'Adduct') %>%
+              select(Adduct,ACCESSION_ID)
+              
+            
+            x@PIPs <- p
+            
             return(x)
           })

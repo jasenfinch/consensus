@@ -43,14 +43,18 @@ setGeneric('consensusClassifications',function(x){
   standardGeneric('consensusClassifications')
 })
 
-#' @rdname mfHits
 setGeneric('mfHits',function(x){
   standardGeneric('mfHits')
 })
 
-#' @rdname keggConstruct
-
-setGeneric('keggConstruct',function(x,organism = 'hsa', threshold = 50){
-  standardGeneric('keggConstruct')
+setGeneric('pips',function(x){
+  standardGeneric('pips')
 })
 
+setGeneric('classify',function(x){
+  standardGeneric('classify')
+})
+
+setGeneric('consensus',function(x){
+  standardGeneric('consensus')
+})

@@ -8,21 +8,22 @@ globalVariables(c('.','kingdom','CID','MF','Adduct','InChIKey','superclass','sub
 #' @param organism KEGG organism ID. Ignored if kegg is not specified in db.
 #' @param adductRules adduct rules table as returned by mzAnnotation::adducts()
 #' @param threshold % majority threshold for consensus classifications 
+#' @importFrom mzAnnotation adducts
 #' @export
 
-construct <- function(MF, db = c('kegg','pubchem'), organism = NULL, adductRules = adducts(), threshold = 50){
+construct <- function(MF, db = c('kegg','pubchem'), organism = character(), adductRules = adducts(), threshold = 50){
   consense <- new('Consensus')
   consense@MF <- MF
   consense@adductRules <- adductRules
   consense@organism <- organism 
   consense@threshold <- threshold
-  
-  if ('kegg' %in% db) {
-    consense@database <- 'kegg'
-  }
+
+  consense@database <- 'kegg'
   
   consense <- mfHits(consense)
-  consense <- keggPIPs(consense)
+  consense <- classify(consense)
+  consense <- pips(consense)
+  consense <- consensus(consense)
   
   return(consense)
 }

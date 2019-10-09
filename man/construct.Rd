@@ -4,7 +4,7 @@
 \alias{construct}
 \title{construct}
 \usage{
-construct(MF, db = c("kegg", "pubchem"), organism = NULL,
+construct(MF, db = c("kegg", "pubchem"), organism = character(),
   adductRules = adducts(), threshold = 50)
 }
 \arguments{

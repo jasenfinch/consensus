@@ -7,9 +7,9 @@ setMethod('show','Consensus',
             cat('Organism:\t',organism(object),'\n')
             cat('Database:\t',database(object),'\n')
             cat('Threshold:\t',str_c(threshold(object),'%'),'\n')
-            cat('Hits:',hits(object) %>% getAccessions() %>% nrow(),'\n')
-            cat('PIPs:',nrow(PIPs(object)),'\n')
+            cat('Hits:\t\t',hits(object) %>% getAccessions() %>% nrow(),'\n')
             cat('Classifications:',nrow(classifications(object)),'\n')
-            cat('Consensuses:',nrow(consensusClassifications(object)))
+            cat('PIPs:\t\t',nrow(PIPs(object)),'\n')
+            cat('Consensuses:\t',nrow(consensusClassifications(object)))
           }
 )

@@ -22,9 +22,9 @@ An S4 class to store consensus structral classification results for a molecular 
 
 \item{\code{hits}}{MetaboliteDatabase containing molecular formula hits from given database}
 
-\item{\code{PIPs}}{putative ionisation product matches from database hits for given adduct rules}
-
 \item{\code{classifications}}{structural classifications for database hits}
+
+\item{\code{PIPs}}{putative ionisation product matches from database hits for given adduct rules}
 
 \item{\code{consensus}}{consensus structural classifications for adducts}
 }}
