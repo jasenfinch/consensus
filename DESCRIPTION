@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "jsf9@aber.ac.uk")
 Description: Consensus structural chemical classifications for putative molecular formula assignments.
-biocViews:  Metabolomics
+biocViews: Metabolomics
 Depends: R (>= 3.5),
         mzAnnotation
 Imports: KEGGREST,
@@ -34,3 +34,6 @@ collate: 'allGenerics.R'
     'consensus.R'
     'pipClassifications.R'
     'pubchem.R'
+Suggests: 
+    testthat,
+    covr

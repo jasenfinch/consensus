@@ -125,7 +125,8 @@ consensus <- function(classifications,threshold = 0.5){
       mutate(Score = 1)
   }
   
-  consensusClasses <- consensusClasses
+  consensusClasses <- consensusClasses %>%
+    rename(Consensus)
   
   return(consensusClasses) 
 }
