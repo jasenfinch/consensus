@@ -2,18 +2,22 @@ language: R
 cache: packages
 sudo: required
 warnings_are_errors: true
+
 r:
 - release
 - devel
+
 apt_packages:
 - libopenbabel-dev
 - mesa-common-dev
 - libglu1-mesa-dev
+
 r_github_packages:
 - thomasp85/patchwork
 - jasenfinch/mzAnnotation
 - jasenfinch/metabolyseR
 - jasenfinch/MFassign
+
 notifications:
   email: false 
   slack:
