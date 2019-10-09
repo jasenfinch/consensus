@@ -14,7 +14,7 @@ keggConsensus(MFs, organism = NULL, adductRules = adducts(),
 
 \item{adductRules}{tibble containing adduct formation rules as returned by mzAnnotation::adducts()}
 
-\item{threshold}{% majority assignment threshold for consensus classifications}
+\item{threshold}{\% majority assignment threshold for consensus classifications}
 }
 \description{
 Return consensus structural classifications for given molecular formulas and their adducts based on the KEGG compound database.

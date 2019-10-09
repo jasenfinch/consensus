@@ -1,2 +1,2 @@
 
-globalVariables(c('Compound','Consensus (%)','Enzyme'))
+globalVariables(c('Compound','Consensus (%)','Enzyme','InChI','SMILES'))

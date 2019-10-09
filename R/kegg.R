@@ -121,7 +121,7 @@ keggPIPs <- function(MFs,organism = NULL, adductRules = adducts()){
 #' @param MFs tibble containing 2 columns. The first named MF containing molecular formulas. The second named Adduct containing adducts. See example.
 #' @param organism KEGG organism ID. If NULL use all compounds.
 #' @param adductRules tibble containing adduct formation rules as returned by mzAnnotation::adducts()
-#' @param threshold % majority assignment threshold for consensus classifications
+#' @param threshold \% majority assignment threshold for consensus classifications
 #' @examples 
 #' \dontrun{
 #' d <- tibble(MF = c('C12H22O11','C4H6O5'),Adduct = rep('[M-H]1-',2))
