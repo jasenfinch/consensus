@@ -6,7 +6,7 @@
 \alias{construct,Assignment-method}
 \title{construct}
 \usage{
-construct(x, organism = "hsa", threshold = 0.5, databases = c("kegg",
+construct(x, organism = "hsa", threshold = 50, databases = c("kegg",
   "pubchem"))
 
 \S4method{construct}{Assignment}(x, organism = "hsa", threshold = 0.5,

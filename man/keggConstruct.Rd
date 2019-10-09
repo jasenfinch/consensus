@@ -6,7 +6,7 @@
 \alias{keggConstruct,Assignment-method}
 \title{keggConstruct}
 \usage{
-keggConstruct(x, organism = "hsa", threshold = 0.5)
+keggConstruct(x, organism = "hsa", threshold = 50)
 
 \S4method{keggConstruct}{Assignment}(x, organism = NULL,
   threshold = 50)
@@ -16,7 +16,7 @@ keggConstruct(x, organism = "hsa", threshold = 0.5)
 
 \item{organism}{organism kegg ID. If NULL use all compounds.}
 
-\item{threshold}{majority assignment threshold for consensus classifications}
+\item{threshold}{\% majority assignment threshold for consensus classifications}
 }
 \description{
 Collate consensus classifications for molecular formula assignments using KEGG.
