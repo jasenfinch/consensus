@@ -20,7 +20,7 @@ An S4 class to store consensus structral classification results for a molecular 
 
 \item{\code{threshold}}{% majority for consensus classification}
 
-\item{\code{hits}}{molecular formula hits from given database}
+\item{\code{hits}}{MetaboliteDatabase containing molecular formula hits from given database}
 
 \item{\code{PIPs}}{putative ionisation product matches from database hits for given adduct rules}
 

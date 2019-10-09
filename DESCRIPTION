@@ -37,3 +37,14 @@ collate: 'allGenerics.R'
 Suggests: 
     testthat,
     covr
+Collate: allClasses.R
+        allGenerics.R
+        access.R
+        classify.R
+        consensus.R
+        construct.R
+        construction.R
+        kegg.R
+        pubchem.R
+        show-method.R
+        search.R
