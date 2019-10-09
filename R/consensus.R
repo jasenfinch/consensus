@@ -1,5 +1,5 @@
 #' @importFrom tibble rowid_to_column
-#' @importFrom dplyr everything group_by summarise right_join
+#' @importFrom dplyr everything group_by summarise right_join n
 #' @importFrom tidyr gather
 #' @importFrom tidyselect contains
 
@@ -78,7 +78,7 @@ consensus <- function(classifications,threshold = 0.5){
           select(-ID) %>% 
           split(1:nrow(.)) %>%
           map(~{
-            mutate(.,Score = prod(.,na.rm = T))  
+            mutate(.,Score = prod(.,na.rm = T) * 100)  
           }) %>%
           bind_rows() %>%
           mutate(ID = 1:nrow(.))
@@ -113,20 +113,18 @@ consensus <- function(classifications,threshold = 0.5){
           select(MF:Adduct,consensusLevels) %>%
           mutate(Score = cons$Score)
         
-        return(list(classes = classes,consensusScores = consensus,consensusClass = consensusClass))
-      }) %>%
-      map(~{
-        .$consensusClass
+        return(consensusClass)
       }) %>%
       bind_rows()
   } else {
     consensusClasses <- classifications %>%
-      select(-CID,-InChIKey) %>%
+      select(-ACCESSION_ID,-InChI,-SMILES,-InChIKey) %>%
       mutate(Score = 1)
   }
   
   consensusClasses <- consensusClasses %>%
-    rename(Consensus)
+    rename(`Consensus (%)` = Score) %>%
+    mutate(`Consensus (%)` = `Consensus (%)`)
   
   return(consensusClasses) 
 }

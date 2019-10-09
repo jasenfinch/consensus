@@ -9,7 +9,7 @@
 keggConstruct(x, organism = "hsa", threshold = 0.5)
 
 \S4method{keggConstruct}{Assignment}(x, organism = NULL,
-  threshold = 0.5)
+  threshold = 50)
 }
 \arguments{
 \item{x}{S4 object of class Assignment}

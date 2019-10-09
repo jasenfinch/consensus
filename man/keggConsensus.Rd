@@ -5,7 +5,7 @@
 \title{keggConsensus}
 \usage{
 keggConsensus(MFs, organism = NULL, adductRules = adducts(),
-  threshold = 0.5)
+  threshold = 50)
 }
 \arguments{
 \item{MFs}{tibble containing 2 columns. The first named MF containing molecular formulas. The second named Adduct containing adducts. See example.}
@@ -14,7 +14,7 @@ keggConsensus(MFs, organism = NULL, adductRules = adducts(),
 
 \item{adductRules}{tibble containing adduct formation rules as returned by mzAnnotation::adducts()}
 
-\item{threshold}{majority assignment threshold for consensus classifications}
+\item{threshold}{% majority assignment threshold for consensus classifications}
 }
 \description{
 Return consensus structural classifications for given molecular formulas and their adducts based on the KEGG compound database.

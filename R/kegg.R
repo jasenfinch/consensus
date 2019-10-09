@@ -92,7 +92,8 @@ keggPIPs <- function(MFs,organism = NULL, adductRules = adducts()){
     bind_rows() %>%
     mutate(Name = str_c(MF,' ',Adduct)) %>%
     rowwise() %>%
-    select(Name,MF,Adduct,everything())
+    select(Name,MF,Adduct,everything()) %>%
+    tbl_df()
   
   pips <- hits %>%
     split(.$Name) %>%
@@ -111,7 +112,7 @@ keggPIPs <- function(MFs,organism = NULL, adductRules = adducts()){
     rename(InChI = INCHI,SMILES = SMILE) %>%
     select(MF,Adduct,everything(),-Name)
   
-  return(pips)
+  return(list(hits = hits,PIPs = pips))
 }
 
 
@@ -120,7 +121,7 @@ keggPIPs <- function(MFs,organism = NULL, adductRules = adducts()){
 #' @param MFs tibble containing 2 columns. The first named MF containing molecular formulas. The second named Adduct containing adducts. See example.
 #' @param organism KEGG organism ID. If NULL use all compounds.
 #' @param adductRules tibble containing adduct formation rules as returned by mzAnnotation::adducts()
-#' @param threshold majority assignment threshold for consensus classifications
+#' @param threshold % majority assignment threshold for consensus classifications
 #' @examples 
 #' \dontrun{
 #' d <- tibble(MF = c('C12H22O11','C4H6O5'),Adduct = rep('[M-H]1-',2))
@@ -130,20 +131,20 @@ keggPIPs <- function(MFs,organism = NULL, adductRules = adducts()){
 #' @importFrom mzAnnotation filterACCESSIONS adducts convert
 #' @export
 
-keggConsensus <- function(MFs, organism = NULL, adductRules = adducts(), threshold = 0.5){
+keggConsensus <- function(MFs, organism = NULL, adductRules = adducts(), threshold = 50){
   pips <- keggPIPs(MFs,organism = organism,adductRules = adductRules)
   
   noPIPs <- MFs %>%
-    anti_join(pips, by = c("MF", "Adduct")) %>%
+    anti_join(pips$PIPs, by = c("MF", "Adduct")) %>%
     mutate(kingdom = 'No hits')
   
-  classifications <- pips$InChIKey %>%
+  classifications <- pips$PIPs$InChIKey %>%
     unique() %>%
     classify() %>%
-    right_join(pips,by = 'InChIKey') %>%
+    right_join(pips$PIPs,by = 'InChIKey') %>%
     select(MF,Adduct,ACCESSION_ID:last_col(),everything())
   
-  noClassifications <- pips %>%
+  noClassifications <- pips$PIPs %>%
     anti_join(classifications, by = c("ACCESSION_ID", "MF", "InChI", "SMILES", "Adduct")) %>%
     select(MF,Adduct) %>%
     mutate(kingdom = 'Unclassified')
@@ -153,6 +154,15 @@ keggConsensus <- function(MFs, organism = NULL, adductRules = adducts(), thresho
     full_join(noPIPs, by = c("MF", "Adduct", "kingdom")) %>%
     full_join(noClassifications, by = c("MF", "Adduct", "kingdom")) %>%
     select(MF,Adduct,everything(),`Consensus (%)`)
+  
+  consensi <- new('Consensus')
+  consensi@hits <- pips$hits
+  consensi@PIPs <- pips$PIPs
+  consensi@classifications <- classifications
+  consensi@consensus <- classifications %>%
+    consensus(threshold = threshold) %>%
+    full_join(noPIPs, by = c("MF", "Adduct", "kingdom")) %>%
+    full_join(noClassifications, by = c("MF", "Adduct", "kingdom"))
   
   return(consensi)
 }
@@ -169,7 +179,7 @@ keggConsensus <- function(MFs, organism = NULL, adductRules = adducts(), thresho
 #' @export
 
 setMethod('keggConstruct',signature = 'Assignment',
-          function(x,organism = NULL, threshold = 0.5){
+          function(x,organism = NULL, threshold = 50){
             
             adductRules <- x@parameters@adductRules
             
@@ -178,10 +188,12 @@ setMethod('keggConstruct',signature = 'Assignment',
               select(Name,MF,Adduct) %>%
               distinct()
             
-            pips <- mfs %>%
+            hits <- mfs %>%
               select(MF,Adduct) %>%
               distinct() %>%
-              keggPIPs() %>%
+              keggPIPs() 
+            
+            pips <- hits$PIPs %>%
               left_join(mfs, by = c("MF", "Adduct"))
             
             noPIPs <- mfs %>%
