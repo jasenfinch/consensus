@@ -18,6 +18,9 @@ r_github_packages:
 - jasenfinch/metabolyseR
 - jasenfinch/MFassign
 
+after_success:
+    - Rscript -e 'library(covr); codecov()'
+
 notifications:
   email: false 
   slack:
