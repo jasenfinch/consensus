@@ -3,7 +3,9 @@
 #' @importFrom tidyr gather
 #' @importFrom tidyselect contains
 
-consensus <- function(classifications,threshold = 0.5){
+consensus <- function(classifications,threshold = 50){
+  
+  threshold <- threshold / 100
   
   if (nrow(classifications) > 1) {
     consensusClasses <- classifications %>%
@@ -78,7 +80,7 @@ consensus <- function(classifications,threshold = 0.5){
           select(-ID) %>% 
           split(1:nrow(.)) %>%
           map(~{
-            mutate(.,Score = prod(.,na.rm = T) * 100)  
+            mutate(.,Score = prod(.,na.rm = T))  
           }) %>%
           bind_rows() %>%
           mutate(ID = 1:nrow(.))
@@ -124,7 +126,7 @@ consensus <- function(classifications,threshold = 0.5){
   
   consensusClasses <- consensusClasses %>%
     rename(`Consensus (%)` = Score) %>%
-    mutate(`Consensus (%)` = `Consensus (%)`)
+    mutate(`Consensus (%)` = `Consensus (%)` * 100)
   
   return(consensusClasses) 
 }

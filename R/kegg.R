@@ -173,7 +173,7 @@ keggConsensus <- function(MFs, organism = NULL, adductRules = adducts(), thresho
 #' @description Collate consensus classifications for molecular formula assignments using KEGG.
 #' @param x S4 object of class Assignment
 #' @param organism organism kegg ID. If NULL use all compounds.
-#' @param threshold majority assignment threshold for consensus classifications
+#' @param threshold \% majority assignment threshold for consensus classifications
 #' @importFrom dplyr anti_join full_join rowwise
 #' @importFrom mzAnnotation descriptors
 #' @export
@@ -183,43 +183,12 @@ setMethod('keggConstruct',signature = 'Assignment',
             
             adductRules <- x@parameters@adductRules
             
-            mfs <- x %>%
+            x %>%
               assignments() %>%
-              select(Name,MF,Adduct) %>%
-              distinct()
-            
-            hits <- mfs %>%
               select(MF,Adduct) %>%
               distinct() %>%
-              keggPIPs() 
-            
-            pips <- hits$PIPs %>%
-              left_join(mfs, by = c("MF", "Adduct"))
-            
-            noPIPs <- mfs %>%
-              select(-Name) %>%
-              anti_join(pips, by = c("MF", "Adduct")) %>%
-              mutate(kingdom = 'No hits')
-            
-            classifications <- pips$InChIKey %>%
-              unique() %>%
-              classify() %>%
-              right_join(pips,by = 'InChIKey') %>%
-              select(Name,MF,Adduct,ACCESSION_ID:last_col(),everything())
-            
-            noClassifications <- pips %>%
-              anti_join(classifications, by = c("ACCESSION_ID", "MF", "InChI", "SMILES", "Name", "Adduct")) %>%
-              select(MF,Adduct) %>%
-              mutate(kingdom = 'Unclassified')
-            
-            consensi <- new('Consensus')
-            consensi@PIPs <- pips
-            consensi@classifications <- classifications
-            consensi@consensus <- classifications %>%
-              consensus(threshold = threshold) %>%
-              full_join(noPIPs, by = c("MF", "Adduct", "kingdom")) %>%
-              full_join(noClassifications, by = c("MF", "Adduct", "kingdom"))
-            
-            return(consensi)
+              keggConsensus(organism = organism,
+                            adductRules = adductRules,
+                            threshold = threshold)
           }
 )
