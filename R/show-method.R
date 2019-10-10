@@ -7,10 +7,11 @@ setMethod('classificationTree',signature = 'Consensus',
               select(-`Consensus (%)`) %>%
               gather(Level,Name) %>%
               mutate(Label = str_c(Level,': ',Name)) %>%
+              na.omit() %>%
               select(Label)
             
             connections <- list()
-            for (i in 1:nrow(d)){
+            for (i in 1:nrow(d)) {
               if (i == nrow(d)) {
                 connections[[i]] <- c(character(0))
               } else {

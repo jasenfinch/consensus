@@ -27,7 +27,7 @@ keggCompoundInfo <- function(IDs){
 }
 
 #' @importFrom KEGGREST keggLink
-#' @importFrom tibble deframe
+#' @importFrom tibble deframe tibble
 #' @importFrom stringr str_remove_all
 
 keggCompounds <- function(organism = character()){

@@ -1,18 +1,9 @@
-#' pubchemMatch
-#' @description Query the pubchem database for molecular formula matches.
-#' @param MF a molecular formula to query
-#' @importFrom dplyr rename mutate
-#' @importFrom httr GET content config
+#' @importFrom httr GET config content
 #' @importFrom tibble as_tibble
-#' @examples
-#' \dontrun{ 
-#' pubchemMatch('C12H22O11')
-#' }
-#' @export
+#' @importFrom dplyr mutate rename
 
 pubchemMatch <- function(MF){
-  message(str_c('\n',MF))
-  message('Retreiving CIDs...')
+  message('Retrieving CIDs from PubChem...')
   cmd <- str_c('https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/formula/',
                MF,
                '/JSON')
@@ -81,7 +72,7 @@ pubchemMatch <- function(MF){
     if (nrow(chem_info) > 0) {
      chem_info <- chem_info  %>%
         mutate(ACCESSION_ID = 1:nrow(.)) %>%
-        rename(SMILE = CanonicalSMILES) %>%
+        rename(INCHI = InChI,SMILE = CanonicalSMILES) %>%
         filter(CovalentUnitCount == 1) %>%
        rename(MF = MolecularFormula)
     } else {
@@ -93,56 +84,4 @@ pubchemMatch <- function(MF){
   }
   message(str_c(nrow(chem_info),' CIDs returned'))
   return(chem_info)
-}
-
-#' pubchemConsensus
-#' @description Calculate a consensus classification for a given molecular formula and adducts based on the pubchem database.
-#' @param MF molecular formula
-#' @param adducts character vector of adducts
-#' @param threshold consensus threshold
-#' @param adductRules Adduct formation rules to use for putative ionisation products. Defaults to \code{mzAnnotation::adducts()}
-#' @examples
-#' \dontrun{
-#' pubchemConsensus('C10H10O7')
-#' }
-#' @importFrom stringr str_detect
-#' @importFrom tibble tibble
-#' @export
-
-pubchemConsensus <- function(MF, adducts = c('[M-H]1-'), threshold = 0.5, adductRules = adducts()){
-  hits <- pubchemMatch(MF)
-  
-  if (is.null(hits)) {
-    hits <- tibble()
-    PIPs <- tibble()
-    classifications <- tibble()
-    con <-  tibble(MF = MF,Adduct = adducts,kingdom = 'No hits')
-  } else {
-    PIPs <- pips(hits,adducts)
-    
-    if (nrow(PIPs) == 0) {
-      PIPs <- tibble()
-      classifications <- tibble()
-      con <- tibble(MF = MF,Adduct = adducts,kingdom = 'No hits')
-    } else {
-      classifications <- pipClassifications(PIPs)
-      
-      if (nrow(classifications) == 0) {
-        classifications <- tibble()
-        con <- tibble(MF = MF,Adduct = adducts,kingdom = 'Unclassified')
-      } else {
-        con <- classifications %>%
-          consensus(threshold = threshold)   
-      }
-      
-    }
-  }
-  
-  consensus <- new('Consensus')
-  consensus@hits <- hits
-  consensus@PIPs <- PIPs
-  consensus@classifications <- classifications
-  consensus@consensus <- con
-  
-  return(consensus)
 }

@@ -3,6 +3,7 @@
 
 setMethod('mfHits',signature = 'Consensus',
           function(x){
+            
             db <- database(x)
             
             if (db == 'kegg') {

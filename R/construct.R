@@ -12,22 +12,48 @@ globalVariables(c('.','kingdom','CID','MF','Adduct','InChIKey','superclass','sub
 #' @export
 
 construct <- function(MF, db = c('kegg','pubchem'), organism = character(), adductRules = adducts(), threshold = 50){
+  
+  if (F %in% (db %in% c('kegg','pubchem'))) {
+    stop('Database not recognised!')
+  }
+  
+  message(str_c('\n',MF))
+  
   consense <- new('Consensus')
   consense@MF <- MF
   consense@adductRules <- adductRules
-  consense@organism <- organism 
   consense@threshold <- threshold
 
-  if ('kegg' %in% db) {
-    consense@database <- 'kegg' 
+  db <- sort(db)
+  
+  for (i in db) {
+    if (i == 'kegg') {
+      consense@organism <- organism
+      consense@database <- 'kegg' 
+    }  
+    
+    if (i == 'pubchem') {
+      consense@organism <- character()
+      consense@database <- 'pubchem' 
+    }
+    
+    consense <- mfHits(consense)
+    consense <- classify(consense)
+    consense <- pips(consense)
+    consense <- consensus(consense)
+    
+    if (database(consense) == 'kegg') {
+      kingdoms <- consense %>%
+        consensusClassifications() %>%
+        .$kingdom %>%
+        unique() %>%
+        sort()
+      
+      if (!identical(kingdoms,'No hits') & !identical(kingdoms,'Unclassified') & !identical(kingdoms,c('No hits','Unclassified'))) {
+        break()
+      }
+    }
   }
-  # consense@database <- 'pubchem'
-  
-  
-  consense <- mfHits(consense)
-  consense <- classify(consense)
-  consense <- pips(consense)
-  consense <- consensus(consense)
   
   return(consense)
 }
