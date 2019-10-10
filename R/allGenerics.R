@@ -66,3 +66,7 @@ setGeneric('overallConsensus',function(x){
 setGeneric('classificationTree',function(x){
   standardGeneric('classificationTree')
 })
+
+setGeneric('saveConsensus',function(x,path = '.'){
+  standardGeneric('saveConsensus')
+})

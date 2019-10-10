@@ -48,3 +48,4 @@ Collate: allClasses.R
         pubchem.R
         show-method.R
         search.R
+        library.R
