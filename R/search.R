@@ -1,4 +1,5 @@
 #' @importFrom mzAnnotation filterMF metaboliteDB
+#' @importFrom dplyr rowwise tbl_df
 
 setMethod('mfHits',signature = 'Consensus',
           function(x){
@@ -23,10 +24,15 @@ setMethod('mfHits',signature = 'Consensus',
                 {metaboliteDB(.,descriptors(.))}
             }
             
-            hits@accessions[[1]] <- hits@accessions[[1]] %>%
-              rowwise() %>%
-              mutate(INCHIKEY = convert(INCHI,'inchi','inchikey')) %>%
-              tbl_df()
+            if (nrow(hits@accessions[[1]]) > 0) {
+              hits@accessions[[1]] <- hits@accessions[[1]] %>%
+                rowwise() %>%
+                mutate(INCHIKEY = convert(INCHI,'inchi','inchikey')) %>%
+                tbl_df() 
+            } else {
+              hits@accessions[[1]] <-  hits@accessions[[1]] %>%
+                mutate(INCHIKEY = character())
+            }
             
             x@hits <- hits
             return(x)

@@ -15,7 +15,7 @@ setMethod('classify',signature = 'Consensus',
               getAccessions() %>%
               .$INCHIKEY
             
-            message(str_c('Retreiving classifications for ',length(inchikey),' InChIKeys...'))
+            message(str_c('Retrieving classifications for ',length(inchikey),' InChIKeys...'))
             
             pb <- progress_bar$new(
               format = "[:bar] :percent eta: :eta",

@@ -18,7 +18,11 @@ construct <- function(MF, db = c('kegg','pubchem'), organism = character(), addu
   consense@organism <- organism 
   consense@threshold <- threshold
 
-  consense@database <- 'kegg'
+  if ('kegg' %in% db) {
+    consense@database <- 'kegg' 
+  }
+  # consense@database <- 'pubchem'
+  
   
   consense <- mfHits(consense)
   consense <- classify(consense)

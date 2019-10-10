@@ -58,3 +58,11 @@ setGeneric('classify',function(x){
 setGeneric('consensus',function(x){
   standardGeneric('consensus')
 })
+
+setGeneric('overallConsensus',function(x){
+  standardGeneric('overallConsensus')
+})
+
+setGeneric('classificationTree',function(x){
+  standardGeneric('classificationTree')
+})
