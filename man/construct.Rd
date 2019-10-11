@@ -16,7 +16,7 @@ construct(MF, db = c("kegg", "pubchem"), organism = character(),
 
 \item{adductRules}{adduct rules table as returned by mzAnnotation::adducts()}
 
-\item{threshold}{% majority threshold for consensus classifications}
+\item{threshold}{\% majority threshold for consensus classifications}
 }
 \description{
 Construct consensus structural classifications for a given molecular formula.

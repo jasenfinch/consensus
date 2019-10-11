@@ -7,7 +7,7 @@ globalVariables(c('.','kingdom','CID','MF','Adduct','InChIKey','superclass','sub
 #' @param db databases to search. Can be either kegg or pubchem.
 #' @param organism KEGG organism ID. Ignored if kegg is not specified in db.
 #' @param adductRules adduct rules table as returned by mzAnnotation::adducts()
-#' @param threshold % majority threshold for consensus classifications 
+#' @param threshold \% majority threshold for consensus classifications 
 #' @importFrom mzAnnotation adducts
 #' @export
 

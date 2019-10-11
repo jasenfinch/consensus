@@ -12,13 +12,13 @@ An S4 class to store consensus structral classification results for a molecular 
 \describe{
 \item{\code{MF}}{molecular formula}
 
-\item{\code{adductRules}}{tibble containing adduct rules as returned by mzAnnotation::adducts()}
+\item{\code{adductRules}}{tibble containing adduct rules as returned by \code{mzAnnotation::adducts()}}
 
 \item{\code{organism}}{organism KEGG ID. NA if database is pubchem.}
 
 \item{\code{database}}{database, kegg or pubchem}
 
-\item{\code{threshold}}{% majority for consensus classification}
+\item{\code{threshold}}{\% majority for consensus classification}
 
 \item{\code{hits}}{MetaboliteDatabase containing molecular formula hits from given database}
 
