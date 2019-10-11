@@ -21,7 +21,7 @@ setMethod('mfHits',signature = 'Consensus',
             }
             
             if (db == 'pubchem') {
-              hits <- pubchemMatch(MF) %>%
+              hits <- pubchemMatch(mf(x)) %>%
                 {metaboliteDB(.,descriptors(.))}
             }
             

@@ -8,11 +8,3 @@ test_that('KEGG compound info returned correctly',{
   expect_equal(nrow(compounds),2)
   expect_equal(ncol(compounds),5)
 })
-
-test_that('KEGG consensus returned',{
-  d <- tibble(MF = c('C4H6O5'),Adduct = '[M-H]1-')
-  
-  consensi <- keggConsensus(d,'hsa')
-  
-  expect_true(class(consensi) == 'Consensus')
-})
