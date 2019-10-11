@@ -6,11 +6,11 @@ setMethod('saveConsensus',signature = 'Consensus',
             message(str_c('Exporting to ',path))
             
             if (database(x) == 'kegg') {
-              fileName <- str_c(mf(x),database(x),organism(x),'.rds',sep = '_')  
+              fileName <- str_c(str_c(mf(x),database(x),organism(x),sep = '_'),'.rds')  
             }
             
             if (database(x) == 'pubchem') {
-              fileName <- str_c(mf(x),database(x),'.rds',sep = '_')
+              fileName <- str_c(str_c(mf(x),database(x),sep = '_'),'.rds')
             }
             
             write_rds(x,str_c(path,fileName,sep = '/'))

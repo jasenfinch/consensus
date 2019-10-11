@@ -8,10 +8,8 @@ Authors@R:
            email = "jsf9@aber.ac.uk")
 Description: Consensus structural chemical classifications for putative molecular formula assignments.
 biocViews: Metabolomics
-Depends: R (>= 3.5),
-        mzAnnotation
+Depends: R (>= 3.5)
 Imports: KEGGREST,
-        MFassign,
         classyfireR,
         dplyr,
         httr,
@@ -23,7 +21,8 @@ Imports: KEGGREST,
         stringr,
         tidyr,
         tidyselect,
-        tibble
+        tibble,
+        mzAnnotation
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true

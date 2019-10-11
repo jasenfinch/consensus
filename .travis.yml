@@ -9,14 +9,9 @@ r:
 
 apt_packages:
 - libopenbabel-dev
-- mesa-common-dev
-- libglu1-mesa-dev
 
 r_github_packages:
-- thomasp85/patchwork
 - jasenfinch/mzAnnotation
-- jasenfinch/metabolyseR
-- jasenfinch/MFassign
 
 after_success:
     - Rscript -e 'library(covr); codecov()'
