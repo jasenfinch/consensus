@@ -1,4 +1,4 @@
-#' @importFrom mzAnnotation filterMF metaboliteDB
+#' @importFrom mzAnnotation filterMF metaboliteDB filterACCESSIONS descriptors convert
 #' @importFrom dplyr rowwise tbl_df
 
 setMethod('mfHits',signature = 'Consensus',
@@ -38,6 +38,8 @@ setMethod('mfHits',signature = 'Consensus',
             x@hits <- hits
             return(x)
           })
+
+#' @importFrom mzAnnotation filterIP
 
 setMethod('pips',signature = 'Consensus',
           function(x){

@@ -1,4 +1,5 @@
 #' @importFrom cli tree
+#' @importFrom stats na.omit
 
 setMethod('classificationTree',signature = 'Consensus',
           function(x){

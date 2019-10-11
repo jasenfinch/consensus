@@ -3,6 +3,8 @@
 #' @param IDs KEGG compound accession IDs
 #' @examples 
 #' keggCompoundInfo(c('C00089','C00149'))
+#' @importFrom KEGGREST keggGet
+#' @importFrom stringr str_split_fixed
 #' @export
 
 keggCompoundInfo <- function(IDs){
@@ -29,6 +31,7 @@ keggCompoundInfo <- function(IDs){
 #' @importFrom KEGGREST keggLink
 #' @importFrom tibble deframe tibble
 #' @importFrom stringr str_remove_all
+#' @importFrom mzAnnotation getAccessions
 
 keggCompounds <- function(organism = character()){
   
