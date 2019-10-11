@@ -17,5 +17,36 @@ setMethod('saveConsensus',signature = 'Consensus',
           })
 
 checkLibrary <- function(path){
-  str_c(path,'construction_library',sep = '/') %in% list.dirs(path)
+  str_c(path,'classification_library',sep = '/') %in% list.dirs(path)
+}
+
+#' @importFrom readr read_rds
+
+loadLibrary <- function(path = '.'){
+  libraryPath <- str_c(path,'classification_library',sep = '/')
+  
+  message(str_c('Loading structural classification library at ',libraryPath))
+  
+  libraryContents <- list.files(libraryPath,full.names = TRUE)
+  
+  classificationLibrary <- libraryContents %>%
+    map(~{
+      consense <- read_rds(.) 
+      
+      org <- organism(consense)
+      
+      if (length(org) == 0) {
+        org <- NA
+      }
+      
+      consense %>%
+        consensusClassifications() %>%
+        mutate(db = database(consense),
+                organism = org,
+                MF = mf(consense)) %>%
+        select(db:MF,everything())
+      }) %>%
+    bind_rows()
+  
+  return(classificationLibrary)
 }
