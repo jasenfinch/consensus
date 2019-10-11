@@ -22,7 +22,9 @@ Imports: KEGGREST,
         tidyr,
         tidyselect,
         tibble,
-        mzAnnotation
+        mzAnnotation,
+        readr,
+        cli
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
