@@ -47,9 +47,9 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
               return(.$db[1])
             }
           }) #%>%
-          unlist(use.names = FALSE)
+        unlist(use.names = FALSE)
       })
-      
+    
     
     
   }
@@ -64,7 +64,7 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
       
       for (i in dbase){
         consense <- construct(.,db = i,organism = organism,threshold = threshold)
-          
+        
         saveConsensus(consense,path = libraryPath) 
         
         if (database(consense) == 'kegg') {

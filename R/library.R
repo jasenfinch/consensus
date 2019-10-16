@@ -50,3 +50,23 @@ loadLibrary <- function(path = '.'){
   
   return(classificationLibrary)
 }
+
+setMethod('status',signature = 'Consensus',
+          function(x){
+            st <- x %>%
+              consensusClassifications() %>%
+              .$kingdom %>%
+              unique() %>%
+              sort()
+            
+            if ((length(st) == 1 & !identical(st,'No hits') & !identical(st,'Unclassified')) | !identical(st,c('No hits','Unclassified'))) {
+              st <- 'Classified'
+            }
+            
+            if (identical(st,c('No hits','Unclassified'))) {
+              st <- 'Unclassified'
+            }
+            
+            tibble(MF = mf(x),organism = organism(x),database = database(x),status = st)
+          }
+)

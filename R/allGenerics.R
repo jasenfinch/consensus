@@ -70,3 +70,7 @@ setGeneric('classificationTree',function(x){
 setGeneric('saveConsensus',function(x,path = '.'){
   standardGeneric('saveConsensus')
 })
+
+setGeneric('status',function(x){
+  standardGeneric('status')
+})
