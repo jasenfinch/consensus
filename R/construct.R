@@ -20,11 +20,11 @@ construct <- function(MF, db, organism = character(), threshold = 50){
   consense@adductRules <- adductRules
   consense@threshold <- threshold
   
-  if (i == 'kegg') {
+  if (db == 'kegg') {
     consense@organism <- organism
   }  
   
-  if (i == 'pubchem') {
+  if (db == 'pubchem') {
     consense@organism <- character()
     consense@database <- 'pubchem' 
   }
