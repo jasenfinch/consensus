@@ -27,7 +27,11 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
   } else {
     message(str_c('\nUsing structural classifcation library at ',libraryPath))
     
-    classificationLibrary <- loadLibrary(path) 
+    classificationLibrary <- loadLibrary(path)
+    
+    statuses <- classificationLibrary %>%
+      map(status) %>%
+      bind_rows()
     
     todoMFs <- mfs %>%
       split(.$MF) %>%

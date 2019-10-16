@@ -29,30 +29,19 @@ loadLibrary <- function(path = '.'){
   
   libraryContents <- list.files(libraryPath,full.names = TRUE)
   
-  classificationLibrary <- libraryContents %>%
-    map(~{
-      consense <- read_rds(.) 
-      
-      org <- organism(consense)
-      
-      if (length(org) == 0) {
-        org <- NA
-      }
-      
-      consense %>%
-        consensusClassifications() %>%
-        mutate(db = database(consense),
-                organism = org,
-                MF = mf(consense)) %>%
-        select(db:MF,everything())
-      }) %>%
-    bind_rows()
-  
-  return(classificationLibrary)
+  libraryContents %>%
+    map(read_rds)
 }
 
 setMethod('status',signature = 'Consensus',
           function(x){
+            
+            if (length(organism(x)) == 0) {
+              org <- NA
+            } else {
+              org <- organism(x)
+            }
+            
             st <- x %>%
               consensusClassifications() %>%
               .$kingdom %>%
@@ -67,6 +56,6 @@ setMethod('status',signature = 'Consensus',
               st <- 'Unclassified'
             }
             
-            tibble(MF = mf(x),organism = organism(x),database = database(x),status = st)
+            tibble(MF = mf(x),organism = org,database = database(x),status = st)
           }
 )
