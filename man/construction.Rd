@@ -5,7 +5,7 @@
 \title{construction}
 \usage{
 construction(MFs, path = ".", db = c("kegg", "pubchem"),
-  organism = character(), adductRules = adducts(), threshold = 50)
+  organism = character(), threshold = 50)
 }
 \arguments{
 \item{MFs}{vector of molecular formulas}
@@ -16,10 +16,10 @@ construction(MFs, path = ".", db = c("kegg", "pubchem"),
 
 \item{organism}{KEGG organism ID. Ignored if kegg is not specified in db.}
 
-\item{adductRules}{adduct rules table as returned by mzAnnotation::adducts()}
-
 \item{threshold}{\% majority threshold for consensus classifications}
+
+\item{adductRules}{adduct rules table as returned by mzAnnotation::adducts()}
 }
 \description{
-Build or add to a consensus classification library.
+Build or add to and load a consensus classification library.
 }

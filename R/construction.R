@@ -9,13 +9,20 @@ globalVariables(c('Compound','Consensus (%)','Enzyme','InChI','SMILES','ID','Lev
 #' @param organism KEGG organism ID. Ignored if kegg is not specified in db.
 #' @param adductRules adduct rules table as returned by mzAnnotation::adducts()
 #' @param threshold \% majority threshold for consensus classifications 
+#' @importFrom purrr walk
 #' @export
 
 construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = character(), threshold = 50){
   
+  if (length(organism) == 0) {
+    org <- 'none'
+  } else {
+    org <- organism
+  }
+  
   mfs <- MFs %>%
     map(~{
-      tibble(MF = .,db = db)
+      tibble(MF = .,database = db)
     }) %>%
     bind_rows()
   
@@ -31,60 +38,73 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
     
     statuses <- classificationLibrary %>%
       map(status) %>%
-      bind_rows()
+      bind_rows() %>%
+      filter(database %in% db)
     
-    todoMFs <- mfs %>%
+    if ('kegg' %in% db) {
+      statuses <- statuses %>%
+        split(.$database) %>%
+        map(~{
+          d <- .
+          if (d$database[1] == 'kegg') {
+            d <- d %>% 
+              filter(organism == org)  
+          }
+          return(d)
+        }) %>%
+        bind_rows()
+    }
+    
+    mfs <- mfs %>%
+      left_join(statuses, by = c("MF", "database"))
+    
+    toDo <- mfs %>%
+      toSearch(db)
+    
+    message(str_c(length(unique(toDo$MF))),' MFs to search')
+    
+    toDo %>%
       split(.$MF) %>%
-      map(~{
+      walk(~{
         d <- .
-        cl <- d %>%
-          left_join(classificationLibrary, by = c("MF", "db")) %>%
-          # filter(!is.na(kingdom)) %>%
-          select(db,kingdom) %>%
-          distinct() %>%
-          split(.$db) %>%
-          map(~{
-            kingdoms <- .$kingdom
-            if (!identical(kingdoms,'No hits') & !identical(kingdoms,'Unclassified') & !identical(kingdoms,c('No hits','Unclassified'))) {
-              return(NULL)
-            } else {
-              return(.$db[1])
-            }
-          }) #%>%
-        unlist(use.names = FALSE)
-      })
-    
-    
-    
-  }
-  
-  
-  mfs %>%
-    split(1:nrow(.)) %>%
-    walk(~{
-      dbase <- .$db %>%
-        str_split('; ') %>%
-        .[[1]]
-      
-      for (i in dbase){
-        consense <- construct(.,db = i,organism = organism,threshold = threshold)
+        dbase <- d$database
         
-        saveConsensus(consense,path = libraryPath) 
-        
-        if (database(consense) == 'kegg') {
-          kingdoms <- consense %>%
-            consensusClassifications() %>%
-            .$kingdom %>%
-            unique() %>%
-            sort()
+        for (i in dbase){
+          consense <- construct(d$MF[1],db = i,organism = organism,threshold = threshold)
           
-          if (!identical(kingdoms,'No hits') & !identical(kingdoms,'Unclassified') & !identical(kingdoms,c('No hits','Unclassified'))) {
-            break()
+          saveConsensus(consense,path = libraryPath) 
+          
+          if (database(consense) == 'kegg') {
+            kingdoms <- consense %>%
+              consensusClassifications() %>%
+              .$kingdom %>%
+              unique() %>%
+              sort()
+            
+            if (!identical(kingdoms,'No hits') & !identical(kingdoms,'Unclassified') & !identical(kingdoms,c('No hits','Unclassified'))) {
+              break()
+            }
           }
         }
-      }
-    })
+      })
+  }
   
   message('\nComplete!')
   
+}
+
+toSearch <- function(mfs,db){
+  mfs %>%
+    filter(is.na(status)) %>%
+    split(.$MF) %>%
+    map(~{
+      d <- .
+      if (('kegg' %in% db) & !('kegg' %in% d$database)){
+        d <- d %>%
+          filter(database != 'pubchem')
+      }
+      return(d)
+    }) %>%
+    bind_rows() %>%
+    select(MF,database)
 }

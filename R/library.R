@@ -37,7 +37,7 @@ setMethod('status',signature = 'Consensus',
           function(x){
             
             if (length(organism(x)) == 0) {
-              org <- NA
+              org <- 'none'
             } else {
               org <- organism(x)
             }
