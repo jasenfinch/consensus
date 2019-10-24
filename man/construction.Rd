@@ -17,8 +17,6 @@ construction(MFs, path = ".", db = c("kegg", "pubchem"),
 \item{organism}{KEGG organism ID. Ignored if kegg is not specified in db.}
 
 \item{threshold}{\% majority threshold for consensus classifications}
-
-\item{adductRules}{adduct rules table as returned by mzAnnotation::adducts()}
 }
 \description{
 Build or add to and load a consensus classification library.

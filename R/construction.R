@@ -7,7 +7,6 @@ globalVariables(c('Compound','Consensus (%)','Enzyme','InChI','SMILES','ID','Lev
 #' @param path target file path for classification library 
 #' @param db databases to search. Can be either kegg or pubchem.
 #' @param organism KEGG organism ID. Ignored if kegg is not specified in db.
-#' @param adductRules adduct rules table as returned by mzAnnotation::adducts()
 #' @param threshold \% majority threshold for consensus classifications
 #' @examples 
 #' \dontrun{
