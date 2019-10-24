@@ -132,7 +132,7 @@ setMethod('consensus',signature = 'Consensus',
                 select(Adduct,everything())
               
               noClassi <- p %>%
-                anti_join(classi, by = c("Adduct", "ACCESSION_ID")) %>%
+                anti_join(classi, by = c("Adduct")) %>%
                 select(-ACCESSION_ID) %>%
                 mutate(kingdom = 'Unclassified',`Consensus (%)` = 100) 
               
@@ -142,13 +142,15 @@ setMethod('consensus',signature = 'Consensus',
                   map(conse,thresh = thresh) %>%
                   bind_rows(.id = 'Adduct') %>%
                   full_join(noPIPs, by = c("Adduct", "kingdom", "Consensus (%)")) %>%
-                  full_join(noClassi, by = c("Adduct", "kingdom", "Consensus (%)"))
+                  full_join(noClassi, by = c("Adduct", "kingdom", "Consensus (%)")) %>%
+                  distinct()
               } else {
                 consensusClasses <- classi %>%
                   select(-ACCESSION_ID,-INCHIKEY) %>%
                   mutate(Score = 1)  %>%
                   full_join(noPIPs, by = c("Adduct", "kingdom", "Consensus (%)")) %>%
-                  full_join(noClassi, by = c("Adduct", "kingdom", "Consensus (%)"))
+                  full_join(noClassi, by = c("Adduct", "kingdom", "Consensus (%)")) %>%
+                  distinct()
               }  
             } else {
               consensusClasses <- tibble(Adduct = adductRules(x)$Name,

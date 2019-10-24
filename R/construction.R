@@ -103,8 +103,9 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
             }
           }
         }
-        message('\nComplete!')
       })
+    
+    message('\nComplete!')
     
     classificationLibrary <- loadLibrary(path)
     
