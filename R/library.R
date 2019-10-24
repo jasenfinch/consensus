@@ -17,13 +17,13 @@ setMethod('saveConsensus',signature = 'Consensus',
           })
 
 checkLibrary <- function(path){
-  str_c(path,'classification_library',sep = '/') %in% list.dirs(path)
+  str_c(path,'structural_classification_library',sep = '/') %in% list.dirs(path)
 }
 
 #' @importFrom readr read_rds
 
 loadLibrary <- function(path = '.'){
-  libraryPath <- str_c(path,'classification_library',sep = '/')
+  libraryPath <- str_c(path,'structural_classification_library',sep = '/')
   
   message(str_c('Loading structural classification library at ',libraryPath))
   
