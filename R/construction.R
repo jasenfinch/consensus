@@ -33,6 +33,8 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
     org <- organism
   }
   
+  db <- db %>% sort()
+  
   mfs <- MFs$MF %>%
     map(~{
       tibble(MF = .,database = db)
@@ -101,6 +103,7 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
             }
           }
         }
+        message('\nComplete!')
       })
     
     classificationLibrary <- loadLibrary(path)
@@ -108,7 +111,9 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
     statuses <- classificationLibrary %>%
       map(status) %>%
       bind_rows() %>%
-      filter(database %in% db)
+      rowid_to_column(var = 'ID') %>%
+      filter(database %in% db,MF %in% {MFs$MF %>% 
+               unique()})
     
     if ('kegg' %in% db) {
       statuses <- statuses %>%
@@ -124,11 +129,54 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
         bind_rows()
     }
     
-    mfs_status <- mfs %>%
-      left_join(statuses, by = c("MF", "database"))
-  
-  message('\nComplete!')
-  
+    if (identical(db,c('kegg','pubchem'))) {
+      statuses <- statuses %>%
+        split(.$MF) %>%
+        map(~{
+          d <- .
+          
+          if (length(unique(d$database)) > 1) {
+            if (d$status[d$database == 'kegg'] == 'Classified') {
+              d <- d %>%
+                filter(database == 'kegg')
+            } else {
+              if (d$status[d$database == 'kegg'] == 'No hits') {
+                d <- d %>%
+                  filter(database == 'pubchem')
+              } else {
+                if ((d$status[d$database == 'kegg'] == 'Unclassified') & (d$status[d$database == 'pubchem'] != 'Classified')) {
+                  d <- d %>%
+                    filter(database == 'kegg')
+                } else {
+                  d <- d %>%
+                    filter(database == 'pubchem')
+                }  
+              }  
+              
+            }
+            
+          }
+          
+          return(d)
+        }) %>%
+        bind_rows()
+    }
+    
+    MFs %>%
+      left_join(statuses, by = "MF") %>%
+      split(1:nrow(.)) %>%
+      map(~{
+        d <- .
+        con <- classificationLibrary[[d$ID[1]]] %>%
+          consensusClassifications() %>%
+          filter(Adduct == d$Adduct[1])
+        d %>%
+          left_join(con, by = "Adduct") %>%
+          select(-ID,-status)
+      }) %>%
+      bind_rows() %>%
+      select(`Consensus (%)`,everything()) %>%
+      select(MF:last_col(),`Consensus (%)`)
 }
 
 toSearch <- function(mfs,db){

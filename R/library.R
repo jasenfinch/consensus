@@ -25,7 +25,7 @@ checkLibrary <- function(path){
 loadLibrary <- function(path = '.'){
   libraryPath <- str_c(path,'structural_classification_library',sep = '/')
   
-  message(str_c('Loading structural classification library at ',libraryPath))
+  message(str_c('\nLoading structural classification library at ',libraryPath))
   
   libraryContents <- list.files(libraryPath,full.names = TRUE)
   
@@ -48,13 +48,23 @@ setMethod('status',signature = 'Consensus',
               unique() %>%
               sort()
             
-            if ((length(st) == 1 & !identical(st,'No hits') & !identical(st,'Unclassified')) | !identical(st,c('No hits','Unclassified'))) {
+            if (length(st) == 1 & !identical(st,'No hits') & !identical(st,'Unclassified')) {
               st <- 'Classified'
             }
             
-            if (identical(st,c('No hits','Unclassified'))) {
-              st <- 'Unclassified'
+            if (length(st) > 1) {
+              
+              if ('Unclassified' %in% st) {
+                if (identical(st,c('No hits','Unclassified'))) {
+                  st <- 'Unclassified'
+                } else {
+                  st <- 'Classified'
+                }  
+              } else {
+                st <- 'Classified'
+              }
             }
+            
             
             tibble(MF = mf(x),organism = org,database = database(x),status = st)
           }
