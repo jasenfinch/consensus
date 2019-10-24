@@ -126,6 +126,7 @@ setMethod('consensus',signature = 'Consensus',
                 mutate(kingdom = 'No hits',`Consensus (%)` = 100)
               
               classi <- classifications(x) %>%
+                filter(kingdom != 'Unclassified') %>%
                 filter(ACCESSION_ID %in% p$ACCESSION_ID) %>%
                 left_join(p,by = c('ACCESSION_ID')) %>%
                 select(Adduct,everything())

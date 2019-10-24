@@ -32,7 +32,7 @@ pubchemMatch <- function(MF){
   
   if (names(cids) == 'Fault') {
     message('0 CIDs returned')
-    return(NULL)
+    return(tibble(ACCESSION_ID = character(),MF = character(),INCHI = character(),SMILE = character(),INCHIKEY = character()))
   }
   
   if (names(cids) == "IdentifierList") {

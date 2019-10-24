@@ -25,6 +25,9 @@ setMethod('classify',signature = 'Consensus',
             classi <- inchikey %>%
               map(~{
                 cl <- suppressMessages(get_classification(.))
+                if (is.null(cl)) {
+                 cl <- tibble(Level = 'kingdom','Classification' = 'Unclassified',CHEMONT = NA) 
+                }
                 Sys.sleep(5)
                 pb$tick()
                 return(cl)

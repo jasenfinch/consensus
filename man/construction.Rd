@@ -8,7 +8,7 @@ construction(MFs, path = ".", db = c("kegg", "pubchem"),
   organism = character(), threshold = 50)
 }
 \arguments{
-\item{MFs}{vector of molecular formulas}
+\item{MFs}{Molecular formulas and adducts to search. Should be a tibble containing two character columns named MF and Adduct.}
 
 \item{path}{target file path for classification library}
 
@@ -22,4 +22,10 @@ construction(MFs, path = ".", db = c("kegg", "pubchem"),
 }
 \description{
 Build or add to and load a consensus classification library.
+}
+\examples{
+\dontrun{
+MFs <- tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),Adduct = c('[M-H]1-','[M+Cl]1-'))
+structural_classifications <- construction()
+} 
 }
