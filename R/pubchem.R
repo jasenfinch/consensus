@@ -1,10 +1,9 @@
-#' @importFrom dplyr rename mutate
-#' @importFrom httr GET content config
+#' @importFrom httr GET config content
 #' @importFrom tibble as_tibble
+#' @importFrom dplyr mutate rename
 
 pubchemMatch <- function(MF){
-  message(str_c('\n',MF))
-  message('Retreiving CIDs...')
+  message('Retrieving CIDs from PubChem...')
   cmd <- str_c('https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/formula/',
                MF,
                '/JSON')
@@ -33,7 +32,7 @@ pubchemMatch <- function(MF){
   
   if (names(cids) == 'Fault') {
     message('0 CIDs returned')
-    return(NULL)
+    return(tibble(ACCESSION_ID = character(),MF = character(),INCHI = character(),SMILE = character(),INCHIKEY = character()))
   }
   
   if (names(cids) == "IdentifierList") {
@@ -73,7 +72,7 @@ pubchemMatch <- function(MF){
     if (nrow(chem_info) > 0) {
      chem_info <- chem_info  %>%
         mutate(ACCESSION_ID = 1:nrow(.)) %>%
-        rename(SMILE = CanonicalSMILES) %>%
+        rename(INCHI = InChI,SMILE = CanonicalSMILES) %>%
         filter(CovalentUnitCount == 1) %>%
        rename(MF = MolecularFormula)
     } else {
@@ -85,27 +84,4 @@ pubchemMatch <- function(MF){
   }
   message(str_c(nrow(chem_info),' CIDs returned'))
   return(chem_info)
-}
-
-#' @importFrom mzAnnotation metaboliteDB adducts
-
-pips <- function(hits,adducts,adductRules = adducts()){
-  descriptorTable <- descriptors(hits)
-  db <- metaboliteDB(hits,descriptorTable)
-  
-  accessions <- adducts %>%
-    map(~{
-      rule <- adductRules$Rule[adductRules$Name == .]
-      
-      ips <- filterIP(db,rule)
-      
-      ips <- ips %>%
-        getAccessions()
-      message(nrow(ips),' of ',nrow(hits),' can ionize as ',.)
-      return(ips)
-    }) %>%
-    set_names(adducts) %>%
-    bind_rows(.id = 'Adduct')
-  
-  return(accessions)
 }
