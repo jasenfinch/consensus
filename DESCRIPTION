@@ -8,10 +8,8 @@ Authors@R:
            email = "jsf9@aber.ac.uk")
 Description: Consensus structural chemical classifications for putative molecular formula assignments.
 biocViews: Metabolomics
-Depends: R (>= 3.5),
-        mzAnnotation
+Depends: R (>= 3.5)
 Imports: KEGGREST,
-        MFassign,
         classyfireR,
         dplyr,
         httr,
@@ -23,8 +21,11 @@ Imports: KEGGREST,
         stringr,
         tidyr,
         tidyselect,
-        tibble
-License: GPL (>= 3)
+        tibble,
+        mzAnnotation,
+        readr,
+        cli
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
@@ -37,3 +38,15 @@ collate: 'allGenerics.R'
 Suggests: 
     testthat,
     covr
+Collate: allClasses.R
+        allGenerics.R
+        access.R
+        classify.R
+        consensus.R
+        construct.R
+        construction.R
+        kegg.R
+        pubchem.R
+        show-method.R
+        search.R
+        library.R
