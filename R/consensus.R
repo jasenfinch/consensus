@@ -147,7 +147,7 @@ setMethod('consensus',signature = 'Consensus',
               } else {
                 consensusClasses <- classi %>%
                   select(-ACCESSION_ID,-INCHIKEY) %>%
-                  mutate(Score = 1)  %>%
+                  mutate(`Consensus (%)` = 100)  %>%
                   full_join(noPIPs, by = c("Adduct", "kingdom", "Consensus (%)")) %>%
                   full_join(noClassi, by = c("Adduct", "kingdom", "Consensus (%)")) %>%
                   distinct()
