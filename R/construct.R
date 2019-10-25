@@ -35,5 +35,4 @@ construct <- function(MF, db, organism = character(), threshold = 50){
     pips() %>%
     consensus()
   
-  return(consense)
 }
