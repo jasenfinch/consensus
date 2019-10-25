@@ -29,10 +29,10 @@ construct <- function(MF, db, organism = character(), threshold = 50){
     consense@database <- 'pubchem' 
   }
   
-  consense <- mfHits(consense)
-  consense <- classify(consense)
-  consense <- pips(consense)
-  consense <- consensus(consense)
+  consense %>%
+    mfHits() %>%
+    classify() %>%
+    pips() %>%
+    consensus()
   
-  return(consense)
 }
