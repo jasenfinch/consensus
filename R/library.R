@@ -27,7 +27,7 @@ loadLibrary <- function(path = '.'){
   
   message(str_c('\nLoading structural classification library at ',libraryPath))
   
-  libraryContents <- list.files(libraryPath,full.names = TRUE)
+  libraryContents <- list.files(libraryPath,full.names = TRUE,pattern = '.rds')
   
   libraryContents %>%
     map(read_rds)
