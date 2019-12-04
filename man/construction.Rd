@@ -4,8 +4,13 @@
 \alias{construction}
 \title{construction}
 \usage{
-construction(MFs, path = ".", db = c("kegg", "pubchem"),
-  organism = character(), threshold = 50)
+construction(
+  MFs,
+  path = ".",
+  db = c("kegg", "pubchem"),
+  organism = character(),
+  threshold = 50
+)
 }
 \arguments{
 \item{MFs}{Molecular formulas and adducts to search. Should be a tibble containing two character columns named MF and Adduct.}

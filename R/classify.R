@@ -1,7 +1,7 @@
 
 #' @importFrom magrittr set_names %>%
 #' @importFrom dplyr distinct select bind_rows filter left_join
-#' @importFrom classyfireR get_classification
+#' @importFrom classyfireR get_classification classification
 #' @importFrom purrr map_lgl map
 #' @importFrom tidyr spread
 #' @importFrom tidyselect last_col
@@ -41,6 +41,7 @@ setMethod('classify',signature = 'Consensus',
               map(~{
                 d <- .
                 d %>%
+                  classification() %>%
                   select(-CHEMONT) %>%
                   spread(.,Level,Classification)
               }) %>%
