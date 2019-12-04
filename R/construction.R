@@ -40,6 +40,8 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
     }) %>%
     bind_rows()
   
+  path <- normalizePath(path)
+  
   libraryPath <- str_c(path,'structural_classification_library',sep = '/')
   
   if (isFALSE(checkLibrary(path))) {
