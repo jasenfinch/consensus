@@ -16,12 +16,7 @@ keggCompoundInfo <- function(IDs){
           d <- .
           d %>%
             map(~{str_c(.,collapse = '; ')}) %>%
-            as_tibble() %>%
-            select(ENTRY,NAME,FORMULA,EXACT_MASS) %>%
-            rename(SYNONYM = NAME) %>%
-            mutate(NAME = str_split_fixed(SYNONYM,';',2)[,1],
-                   SYNONYM = str_split_fixed(SYNONYM,';;',2)[,2]) %>%
-              select(ENTRY,NAME,SYNONYM:EXACT_MASS)
+            as_tibble()
           }) %>%
         bind_rows()
     }) %>%
