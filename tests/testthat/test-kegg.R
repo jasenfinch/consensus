@@ -6,5 +6,5 @@ test_that('KEGG compound info returned correctly',{
   
   expect_true(identical(class(compounds),c('tbl_df','tbl','data.frame')))
   expect_equal(nrow(compounds),2)
-  expect_equal(ncol(compounds),5)
+  expect_equal(ncol(compounds),14)
 })
