@@ -10,8 +10,8 @@ globalVariables(c('Compound','Consensus (%)','Enzyme','InChI','SMILES','ID','Lev
 #' @param threshold \% majority threshold for consensus classifications
 #' @examples 
 #' \dontrun{
-#' MFs <- tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),Adduct = c('[M-H]1-','[M+Cl]1-'))
-#' structural_classifications <- construction()
+#' MFs <- tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),Adduct = c('[M-H]1-','[M+Cl]1-','[M-H]1-'))
+#' structural_classifications <- construction(MFs)
 #' } 
 #' @importFrom purrr walk
 #' @export
@@ -51,7 +51,7 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
   } else {
     message(str_c('\nUsing structural classifcation library at ',libraryPath))
     
-    classificationLibrary <- loadLibrary(path)
+    classificationLibrary <- loadLibrary(MFs,path)
     
     statuses <- classificationLibrary %>%
       map(status) %>%
@@ -108,7 +108,7 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
     
     message('\nComplete!')
     
-    classificationLibrary <- loadLibrary(path)
+    classificationLibrary <- loadLibrary(MFs,path)
     
     statuses <- classificationLibrary %>%
       map(status) %>%
