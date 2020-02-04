@@ -7,6 +7,7 @@
 #' @importFrom tidyselect last_col
 #' @importFrom progress progress_bar
 #' @importFrom stringr str_c
+#' @importFrom tibble is_tibble
 
 setMethod('classify',signature = 'Consensus',
           function(x){
@@ -39,11 +40,13 @@ setMethod('classify',signature = 'Consensus',
             classi <- classi %>%
               .[!map_lgl(.,is.null)] %>%
               map(~{
-                d <- .
-                d %>%
-                  classification() %>%
+                if (!is_tibble(.x)) {
+                  .x <- .x %>%
+                    classification()
+                }
+                .x %>%
                   select(-CHEMONT) %>%
-                  spread(.,Level,Classification)
+                  spread(.,Level,Classification) 
               }) %>%
               bind_rows(.id = 'INCHIKEY') %>%
               distinct() %>%
