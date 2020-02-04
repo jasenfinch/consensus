@@ -1,4 +1,4 @@
-#' @importFrom mzAnnotation filterMF metaboliteDB filterACCESSIONS descriptors convert
+#' @importFrom mzAnnotation filterMF metaboliteDB filterACCESSIONS descriptors
 #' @importFrom dplyr rowwise tbl_df
 
 setMethod('mfHits',signature = 'Consensus',
@@ -27,9 +27,7 @@ setMethod('mfHits',signature = 'Consensus',
             
             if (nrow(hits@accessions[[1]]) > 0) {
               hits@accessions[[1]] <- hits@accessions[[1]] %>%
-                rowwise() %>%
-                mutate(INCHIKEY = convert(INCHI,'inchi','inchikey')) %>%
-                tbl_df() 
+               rename(INCHIKEY = InChIKey) 
             } else {
               hits@accessions[[1]] <-  hits@accessions[[1]] %>%
                 mutate(INCHIKEY = character())
