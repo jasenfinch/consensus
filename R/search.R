@@ -1,5 +1,5 @@
 #' @importFrom mzAnnotation filterMF metaboliteDB filterACCESSIONS descriptors convert
-#' @importFrom dplyr rowwise tbl_df
+#' @importFrom dplyr rowwise ungroup
 
 setMethod('mfHits',signature = 'Consensus',
           function(x){
@@ -14,7 +14,21 @@ setMethod('mfHits',signature = 'Consensus',
                 filterACCESSIONS(compounds)
               
               hits <- met %>%
-                filterMF(mf(x))
+                filterMF(mf(x)) %>%
+                {
+                  if (nrow(getAccessions(.)) > 0) {
+                    .@accessions[[1]] <- .@accessions[[1]] %>%
+                      rowwise() %>%
+                      mutate(INCHIKEY = convert(INCHI,'inchi','inchikey')) %>%
+                      ungroup() 
+                  } else {
+                    .@accessions[[1]] <- .@accessions[[1]] %>%
+                      mutate(INCHIKEY = character())
+                  }
+                  
+                  return(.)
+                }
+              
               message(str_c(hits %>% 
                               getAccessions() %>% 
                               nrow()), ' hits returned')
@@ -23,16 +37,6 @@ setMethod('mfHits',signature = 'Consensus',
             if (db == 'pubchem') {
               hits <- pubchemMatch(mf(x)) %>%
                 {metaboliteDB(.,descriptors(.))}
-            }
-            
-            if (nrow(hits@accessions[[1]]) > 0) {
-              hits@accessions[[1]] <- hits@accessions[[1]] %>%
-                rowwise() %>%
-                mutate(INCHIKEY = convert(INCHI,'inchi','inchikey')) %>%
-                tbl_df() 
-            } else {
-              hits@accessions[[1]] <-  hits@accessions[[1]] %>%
-                mutate(INCHIKEY = character())
             }
             
             x@hits <- hits
@@ -53,7 +57,7 @@ setMethod('pips',signature = 'Consensus',
               map(getAccessions) %>%
               bind_rows(.id = 'Adduct') %>%
               select(Adduct,ACCESSION_ID)
-              
+            
             
             x@PIPs <- p
             

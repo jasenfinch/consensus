@@ -22,14 +22,20 @@ checkLibrary <- function(path){
 
 #' @importFrom readr read_rds
 
-loadLibrary <- function(path = '.'){
+loadLibrary <- function(MFs, path = '.'){
   libraryPath <- str_c(path,'structural_classification_library',sep = '/')
   
   message(str_c('\nLoading structural classification library at ',libraryPath))
   
-  libraryContents <- list.files(libraryPath,full.names = TRUE,pattern = '.rds')
+  libraryContents <- list.files(libraryPath,full.names = TRUE,pattern = '.rds') %>%
+    tibble(MF = basename(.) %>%
+             str_split_fixed('_',2) %>%
+             .[,1],
+           path = .) %>%
+  filter(MF %in% MFs$MF)
   
   libraryContents %>%
+    .$path %>%
     map(read_rds)
 }
 
