@@ -203,5 +203,6 @@ toSearch <- function(mfs_status,db){
     }) %>%
     bind_rows() %>%
     filter(status != 'Unclassified' | is.na(status)) %>%
-    select(MF,database)
+    select(MF,database) %>%
+    distinct()
 }
