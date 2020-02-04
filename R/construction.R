@@ -181,18 +181,27 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
       select(MF:last_col(),`Consensus (%)`)
 }
 
-toSearch <- function(mfs,db){
-  mfs %>%
-    filter(is.na(status)) %>%
+toSearch <- function(mfs_status,db){
+  mfs_status %>%
     split(.$MF) %>%
     map(~{
-      d <- .
-      if (('kegg' %in% db) & !('kegg' %in% d$database)){
-        d <- d %>%
-          filter(database != 'pubchem')
+      if (!('Classified' %in% .x$status)) {
+        return(.x)
+      } else {
+        return(NULL)
       }
-      return(d)
     }) %>%
     bind_rows() %>%
+    filter(status != 'No hits' | is.na(status)) %>%
+    split(.$MF) %>%
+    map(~{
+      if (('kegg' %in% .x$database)){
+        .x <- .x %>%
+          filter(database != 'pubchem')
+      }
+      return(.x)
+    }) %>%
+    bind_rows() %>%
+    filter(status != 'Unclassified' | is.na(status)) %>%
     select(MF,database)
 }
