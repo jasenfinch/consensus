@@ -72,7 +72,7 @@ pubchemMatch <- function(MF){
     if (nrow(chem_info) > 0) {
      chem_info <- chem_info  %>%
         mutate(ACCESSION_ID = 1:nrow(.)) %>%
-        rename(INCHI = InChI,SMILE = CanonicalSMILES) %>%
+        rename(INCHI = InChI,SMILE = CanonicalSMILES, INCHIKEY = InChIKey) %>%
         filter(CovalentUnitCount == 1) %>%
        rename(MF = MolecularFormula)
     } else {
