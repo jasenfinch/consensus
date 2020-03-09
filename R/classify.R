@@ -2,7 +2,7 @@
 #' @importFrom magrittr set_names %>%
 #' @importFrom dplyr distinct select bind_rows filter left_join
 #' @importFrom classyfireR get_classification classification
-#' @importFrom purrr map_lgl map
+#' @importFrom purrr map_dbl map
 #' @importFrom tidyr spread
 #' @importFrom tidyselect last_col
 #' @importFrom progress progress_bar
@@ -25,9 +25,12 @@ setMethod('classify',signature = 'Consensus',
             
             classi <- inchikey %>%
               map(~{
-                cl <- suppressMessages(get_classification(.))
+                cl <- suppressMessages(get_classification(.)) 
                 if (is.null(cl)) {
                  cl <- tibble(Level = 'kingdom','Classification' = 'Unclassified',CHEMONT = NA) 
+                } else {
+                  cl <- cl %>%
+                    classification()
                 }
                 Sys.sleep(5)
                 pb$tick()
@@ -38,12 +41,8 @@ setMethod('classify',signature = 'Consensus',
             classes <- c('kingdom','superclass','class','subclass')
             
             classi <- classi %>%
-              .[!map_lgl(.,is.null)] %>%
+              .[map_dbl(.,nrow) > 0] %>%
               map(~{
-                if (!is_tibble(.x)) {
-                  .x <- .x %>%
-                    classification()
-                }
                 .x %>%
                   select(-CHEMONT) %>%
                   spread(.,Level,Classification) 
