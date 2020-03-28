@@ -77,7 +77,15 @@ pubchemMatch <- function(MF){
        rename(MF = MolecularFormula)
     } else {
       message('0 CIDs returned')
-      return(NULL)
+      return(tibble(CID = integer(),
+             MF = character(),
+             SMILE = character(),
+             INCHI = character(),
+             INCHIKEY = character(),
+             IUPACName = character(),
+             Charge = integer(),
+             CovalentUnitCount = integer(),
+             ACCESSION_ID = integer()))
     }
     
    
