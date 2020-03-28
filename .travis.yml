@@ -11,6 +11,7 @@ apt_packages:
 - libopenbabel-dev
 
 r_github_packages:
+- aberHRML/classyfireR
 - jasenfinch/mzAnnotation
 
 after_success:
