@@ -16,59 +16,61 @@ setMethod('classify',signature = 'Consensus',
               getAccessions() %>%
               .$INCHIKEY
             
-            message(str_c('Retrieving classifications for ',length(inchikey),' InChIKeys...'))
-            
-            pb <- progress_bar$new(
-              format = "[:bar] :percent eta: :eta",
-              total = length(inchikey), clear = FALSE)
-            pb$tick(0)
-            
-            classi <- inchikey %>%
-              map(~{
-                cl <- suppressMessages(get_classification(.)) 
-                if (is.null(cl)) {
-                 cl <- tibble(Level = 'kingdom','Classification' = 'Unclassified',CHEMONT = NA) 
-                } else {
-                  cl <- cl %>%
-                    classification()
-                }
-                Sys.sleep(5)
-                pb$tick()
-                return(cl)
-              }) %>%
-              set_names(inchikey)
-            
-            classes <- c('kingdom','superclass','class','subclass')
-            
-            classi <- classi %>%
-              .[map_dbl(.,nrow) > 0] %>%
-              map(~{
-                .x %>%
-                  select(-CHEMONT) %>%
-                  spread(.,Level,Classification) 
-              }) %>%
-              bind_rows(.id = 'INCHIKEY') %>%
-              distinct() %>%
-              filter(!is.na(kingdom))
-            
-            if (nrow(classi) > 0) {
-              classes <- c('kingdom','superclass','class','subclass') %>%
-                {.[. %in% names(classi)]}
+            if (length(inchikey) > 0) {
+              message(str_c('Retrieving classifications for ',length(inchikey),' InChIKeys...'))
+              
+              pb <- progress_bar$new(
+                format = "[:bar] :percent eta: :eta",
+                total = length(inchikey), clear = FALSE)
+              pb$tick(0)
+              
+              classi <- inchikey %>%
+                map(~{
+                  cl <- suppressMessages(get_classification(.)) 
+                  if (is.null(cl)) {
+                    cl <- tibble(Level = 'kingdom','Classification' = 'Unclassified',CHEMONT = NA) 
+                  } else {
+                    cl <- cl %>%
+                      classification()
+                  }
+                  Sys.sleep(5)
+                  pb$tick()
+                  return(cl)
+                }) %>%
+                set_names(inchikey)
+              
+              classes <- c('kingdom','superclass','class','subclass')
               
               classi <- classi %>%
-                select(INCHIKEY,{{classes}},contains('level')) %>%
-                left_join(x %>%
-                            hits() %>%
-                            getAccessions() %>%
-                            select(ACCESSION_ID,INCHIKEY), by = "INCHIKEY") %>%
-                select(ACCESSION_ID,INCHIKEY,everything())
+                .[map_dbl(.,nrow) > 0] %>%
+                map(~{
+                  .x %>%
+                    select(-CHEMONT) %>%
+                    spread(.,Level,Classification) 
+                }) %>%
+                bind_rows(.id = 'INCHIKEY') %>%
+                distinct() %>%
+                filter(!is.na(kingdom))
               
-              message(str_c(length(unique(classi$INCHIKEY)),' classifications returned'))  
-            } else {
-              message('0 classifications returned')
+              if (nrow(classi) > 0) {
+                classes <- c('kingdom','superclass','class','subclass') %>%
+                  {.[. %in% names(classi)]}
+                
+                classi <- classi %>%
+                  select(INCHIKEY,{{classes}},contains('level')) %>%
+                  left_join(x %>%
+                              hits() %>%
+                              getAccessions() %>%
+                              select(ACCESSION_ID,INCHIKEY), by = "INCHIKEY") %>%
+                  select(ACCESSION_ID,INCHIKEY,everything())
+                
+                message(str_c(length(unique(classi$INCHIKEY)),' classifications returned'))  
+              } else {
+                message('0 classifications returned')
+              }
+              
+              x@classifications <- classi  
             }
-            
-            x@classifications <- classi
             
             return(x)
           }
