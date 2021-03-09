@@ -1,5 +1,5 @@
 Package: construction
-Title: Consensus Structural Chemical Classifications For Putative Molecular Formula Assignments
+Title: Consensus Structural Chemical Classifications for Putative Molecular Formula Assignments
 Version: 0.2.9
 Authors@R: 
     person(given = "Jasen",
@@ -31,12 +31,6 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
-collate: 'allGenerics.R'
-    'allClasses.R'
-    'classify.R'
-    'consensus.R'
-    'pipClassifications.R'
-    'pubchem.R'
 Suggests: 
     testthat,
     covr
