@@ -6,20 +6,20 @@ conse <- function(cl,thresh){
   classes <- cl %>%
     select(-Adduct) %>%
     distinct() %>%
-    rowid_to_column(var = 'ID')
+    rowid_to_column(var = 'id')
   
   suppressMessages(freq <- cl %>%
                      left_join(classes) %>%
-                     group_by(ID) %>%
+                     group_by(id) %>%
                      summarise(N = n()) %>%
-                     right_join(classes, by = "ID"))
+                     right_join(classes, by = "id"))
   
   votes <- levels %>%
     map(~{
       lev <- .
       freq %>%
         rename('Class' = !!lev) %>%
-        select(ID,Class,N) %>%
+        select(id,Class,N) %>%
         split(.$Class) %>%
         map(~{
           d <- .
@@ -40,7 +40,7 @@ conse <- function(cl,thresh){
     map(~{
       d <- .
       d %>%
-        gather('Level','Class',-ID) %>%
+        gather('Level','Class',-id) %>%
         left_join(votes, by = c("Level", "Class")) %>%
         select(-Class) %>%
         spread(Level,N)
@@ -50,7 +50,7 @@ conse <- function(cl,thresh){
   clLevels <- clLevels[clLevels %in% names(votesTable)]
   
   votesTable <- votesTable %>%
-    select(ID,clLevels,contains('level'))
+    select(id,clLevels,contains('level'))
   
   N <- nrow(cl)
   
@@ -63,21 +63,21 @@ conse <- function(cl,thresh){
   }
   proportions <- proportions %>%
     select(-N) %>%
-    mutate(ID = 1:nrow(.))
+    mutate(id = 1:nrow(.))
   
   consensus <- proportions %>%
-    select(-ID) %>% 
+    select(-id) %>% 
     split(1:nrow(.)) %>%
     map(~{
       mutate(.,Score = prod(.,na.rm = T))  
     }) %>%
     bind_rows() %>%
-    mutate(ID = 1:nrow(.))
+    mutate(id = 1:nrow(.))
   
   maxScore <- max(consensus$Score)
   
   cons <- consensus %>%
-    select(-ID)
+    select(-id)
   
   while (maxScore < thresh) {
     cons <- cons %>%
@@ -93,14 +93,14 @@ conse <- function(cl,thresh){
   }
   
   cons <- cons %>%
-    mutate(ID = 1:nrow(.)) %>%
+    mutate(id = 1:nrow(.)) %>%
     filter(Score == max(Score)) %>%
     .[1,]
   
   consensusLevels <- names(cons)[1:(ncol(cons) - 2)]
   
   consensusClass <- classes %>%
-    filter(ID == cons$ID) %>%
+    filter(id == cons$id) %>%
     select(consensusLevels) %>%
     mutate(`Consensus (%)` = cons$Score * 100)
   
@@ -127,13 +127,13 @@ setMethod('consensus',signature = 'Consensus',
               
               classi <- classifications(x) %>%
                 filter(kingdom != 'Unclassified') %>%
-                filter(ACCESSION_ID %in% p$ACCESSION_ID) %>%
-                left_join(p,by = c('ACCESSION_ID')) %>%
+                filter(ID %in% p$ID) %>%
+                left_join(p,by = c('ID')) %>%
                 select(Adduct,everything())
               
               noClassi <- p %>%
                 anti_join(classi, by = c("Adduct")) %>%
-                select(-ACCESSION_ID) %>%
+                select(-ID) %>%
                 mutate(kingdom = 'Unclassified',`Consensus (%)` = 100) 
               
               if (nrow(classi) > 1) {
@@ -146,7 +146,7 @@ setMethod('consensus',signature = 'Consensus',
                   distinct()
               } else {
                 consensusClasses <- classi %>%
-                  select(-ACCESSION_ID,-INCHIKEY) %>%
+                  select(-ID,-INCHIKEY) %>%
                   mutate(`Consensus (%)` = 100)  %>%
                   full_join(noPIPs, by = c("Adduct", "kingdom", "Consensus (%)")) %>%
                   full_join(noClassi, by = c("Adduct", "kingdom", "Consensus (%)")) %>%

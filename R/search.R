@@ -36,7 +36,7 @@ setMethod('mfHits',signature = 'Consensus',
             
             if (db == 'pubchem') {
               hits <- pubchemMatch(mf(x)) %>%
-                {metaboliteDB(.,descriptors(.))}
+                {metaboliteDB(.,descriptors(.$SMILES))}
             }
             
             x@hits <- hits

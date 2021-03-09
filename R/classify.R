@@ -61,8 +61,8 @@ setMethod('classify',signature = 'Consensus',
                   left_join(x %>%
                               hits() %>%
                               getAccessions() %>%
-                              select(ACCESSION_ID,INCHIKEY), by = "INCHIKEY") %>%
-                  select(ACCESSION_ID,INCHIKEY,everything())
+                              select(ID,INCHIKEY), by = "INCHIKEY") %>%
+                  select(ID,INCHIKEY,everything())
                 
                 message(str_c(length(unique(classi$INCHIKEY)),' classifications returned'))  
               } else {
