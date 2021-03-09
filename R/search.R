@@ -26,7 +26,7 @@ setMethod('mfHits',signature = 'Consensus',
                       mutate(INCHIKEY = character())
                   }
                   
-                  return(.)
+                  .
                 }
               
               message(str_c(hits %>% 
@@ -56,7 +56,7 @@ setMethod('pips',signature = 'Consensus',
               set_names(a$Name) %>%
               map(getAccessions) %>%
               bind_rows(.id = 'Adduct') %>%
-              select(Adduct,ACCESSION_ID)
+              select(Adduct,ID)
             
             
             x@PIPs <- p
