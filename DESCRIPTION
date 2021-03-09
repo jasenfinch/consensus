@@ -10,7 +10,6 @@ Description: Consensus structural chemical classifications for putative molecula
 biocViews: Metabolomics
 Depends: R (>= 3.5)
 Imports: KEGGREST,
-        classyfireR,
         dplyr,
         httr,
         lubridate,
@@ -22,9 +21,10 @@ Imports: KEGGREST,
         tidyr,
         tidyselect,
         tibble,
-        mzAnnotation,
         readr,
         cli
+Remotes: jasenfinch/mzAnnotation,
+    aberHRML/classyfireR
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
