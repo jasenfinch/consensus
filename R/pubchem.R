@@ -32,7 +32,7 @@ pubchemMatch <- function(MF){
   
   if (names(cids) == 'Fault') {
     message('0 CIDs returned')
-    return(tibble(ACCESSION_ID = character(),MF = character(),INCHI = character(),SMILE = character(),INCHIKEY = character()))
+    return(tibble(ID = character(),MF = character(),INCHI = character(),SMILEs = character(),INCHIKEY = character()))
   }
   
   if (names(cids) == "IdentifierList") {
@@ -71,21 +71,21 @@ pubchemMatch <- function(MF){
     
     if (nrow(chem_info) > 0) {
      chem_info <- chem_info  %>%
-        mutate(ACCESSION_ID = 1:nrow(.)) %>%
-        rename(INCHI = InChI,SMILE = CanonicalSMILES, INCHIKEY = InChIKey) %>%
+        mutate(ID = 1:nrow(.)) %>%
+        rename(INCHI = InChI,SMILES = CanonicalSMILES, INCHIKEY = InChIKey) %>%
         filter(CovalentUnitCount == 1) %>%
        rename(MF = MolecularFormula)
     } else {
       message('0 CIDs returned')
       return(tibble(CID = integer(),
              MF = character(),
-             SMILE = character(),
+             SMILES = character(),
              INCHI = character(),
              INCHIKEY = character(),
              IUPACName = character(),
              Charge = integer(),
              CovalentUnitCount = integer(),
-             ACCESSION_ID = integer()))
+             ID = integer()))
     }
     
    

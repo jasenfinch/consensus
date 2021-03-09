@@ -1,5 +1,5 @@
 globalVariables(c('.','kingdom','CID','MF','Adduct','InChIKey','superclass','subclass','level 5','MF',
-                  'Charge','CanonicalSMILES','CovalentUnitCount','SMILE','ACCESSION_ID','MolecularFormula','com','Name','INCHI','Score','Feature','Intensity'))
+                  'Charge','CanonicalSMILES','CovalentUnitCount','SMILE','id','MolecularFormula','com','Name','INCHI','Score','Feature','Intensity'))
 
 #' @importFrom mzAnnotation adducts
 #' @importFrom methods new

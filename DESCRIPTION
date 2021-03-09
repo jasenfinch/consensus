@@ -1,6 +1,6 @@
 Package: construction
-Title: Consensus Structural Chemical Classifications For Putative Molecular Formula Assignments
-Version: 0.2.8
+Title: Consensus Structural Chemical Classifications for Putative Molecular Formula Assignments
+Version: 0.2.9
 Authors@R: 
     person(given = "Jasen",
            family = "Finch",
@@ -10,7 +10,6 @@ Description: Consensus structural chemical classifications for putative molecula
 biocViews: Metabolomics
 Depends: R (>= 3.5)
 Imports: KEGGREST,
-        classyfireR,
         dplyr,
         httr,
         lubridate,
@@ -22,19 +21,16 @@ Imports: KEGGREST,
         tidyr,
         tidyselect,
         tibble,
-        mzAnnotation,
         readr,
-        cli
+        cli,
+        mzAnnotation,
+        classyfireR
+Remotes: jasenfinch/mzAnnotation,
+    aberHRML/classyfireR
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
-collate: 'allGenerics.R'
-    'allClasses.R'
-    'classify.R'
-    'consensus.R'
-    'pipClassifications.R'
-    'pubchem.R'
 Suggests: 
     testthat,
     covr
