@@ -22,7 +22,9 @@ Imports: KEGGREST,
         tidyselect,
         tibble,
         readr,
-        cli
+        cli,
+        mzAnnotation,
+        classyfireR
 Remotes: jasenfinch/mzAnnotation,
     aberHRML/classyfireR
 License: GPL-3
