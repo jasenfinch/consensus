@@ -1,6 +1,6 @@
 Package: construction
 Title: Consensus Structural Chemical Classifications for Putative Molecular Formula Assignments
-Version: 0.2.9
+Version: 0.2.10
 Authors@R: 
     person(given = "Jasen",
            family = "Finch",
