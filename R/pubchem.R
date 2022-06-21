@@ -72,7 +72,10 @@ pubchemMatch <- function(MF){
     if (nrow(chem_info) > 0) {
      chem_info <- chem_info  %>%
         mutate(ID = 1:nrow(.)) %>%
-        rename(INCHI = InChI,SMILES = CanonicalSMILES, INCHIKEY = InChIKey) %>%
+        rename(NAME = IUPACName,
+               INCHI = InChI,
+               SMILES = CanonicalSMILES, 
+               INCHIKEY = InChIKey) %>%
         filter(CovalentUnitCount == 1) %>%
        rename(MF = MolecularFormula)
     } else {
@@ -82,7 +85,7 @@ pubchemMatch <- function(MF){
              SMILES = character(),
              INCHI = character(),
              INCHIKEY = character(),
-             IUPACName = character(),
+             NAME = character(),
              Charge = integer(),
              CovalentUnitCount = integer(),
              ID = integer()))
