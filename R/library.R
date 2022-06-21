@@ -1,11 +1,11 @@
 #' @importFrom readr write_rds
 
-setGeneric('saveConsensus',function(x,path = 'structural_classification_library'){
+setGeneric('saveConsensus',function(x,path = 'construction_library'){
   standardGeneric('saveConsensus')
 })
 
 setMethod('saveConsensus',signature = 'Consensus',
-          function(x,path = 'structural_classification_library'){
+          function(x,path = 'construction_library'){
             
             message(str_c('Exporting to ',path))
             
@@ -22,13 +22,13 @@ setMethod('saveConsensus',signature = 'Consensus',
 
 #' @importFrom readr read_rds
 
-loadLibrary <- function(MFs, path = 'structural_classification_library'){
+loadLibrary <- function(MFs, path = 'construction_library'){
   
   if (!dir.exists(path)) {
     dir.create(path,recursive = TRUE)  
-    message(str_c('Created structural classifcation library at ',path))
+    message(str_c('Created construction library at ',path))
   } else {
-    message(str_c('Using structural classifcation library at ',path))
+    message(str_c('Using construction library at ',path))
   }
   
   libraryContents <- list.files(path,full.names = TRUE,pattern = '.rds') %>%
