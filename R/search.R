@@ -1,4 +1,4 @@
-#' @importFrom mzAnnotation filterMF metaboliteDB filterACCESSIONS descriptors convert
+#' @importFrom mzAnnotation filterMF metaboliteDB filterEntries descriptors convert
 #' @importFrom dplyr rowwise ungroup
 
 setMethod('mfHits',signature = 'Consensus',
@@ -11,18 +11,18 @@ setMethod('mfHits',signature = 'Consensus',
               compounds <- keggCompounds(organism(x))
               
               met <- metabolites %>%
-                filterACCESSIONS(compounds)
+                filterEntries(compounds)
               
               hits <- met %>%
                 filterMF(mf(x)) %>%
                 {
-                  if (nrow(getAccessions(.)) > 0) {
-                    .@accessions[[1]] <- .@accessions[[1]] %>%
+                  if (nrow(entries(.)) > 0) {
+                    entries(.) <- entries(.) %>%
                       rowwise() %>%
                       mutate(INCHIKEY = convert(INCHI,'inchi','inchikey')) %>%
                       ungroup() 
                   } else {
-                    .@accessions[[1]] <- .@accessions[[1]] %>%
+                    entries(.) <- entries(.) %>%
                       mutate(INCHIKEY = character())
                   }
                   
