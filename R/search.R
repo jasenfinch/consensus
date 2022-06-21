@@ -21,12 +21,12 @@ setMethod('mfHits',signature = 'Consensus',
                 filterMF(mf(x)) %>%
                 {
                   if (nrow(entries(.)) > 0) {
-                    entries(.) <- entries(.) %>%
+                    .@entries <- entries(.) %>%
                       rowwise() %>%
                       mutate(INCHIKEY = convert(INCHI,'inchi','inchikey')) %>%
                       ungroup() 
                   } else {
-                    entries(.) <- entries(.) %>%
+                    .@entries <- entries(.) %>%
                       mutate(INCHIKEY = character())
                   }
                   
@@ -40,14 +40,17 @@ setMethod('mfHits',signature = 'Consensus',
             
             if (db == 'pubchem') {
               hits <- pubchemMatch(mf(x)) %>%
-                {metaboliteDB(.,descriptors(.$SMILES))}
+                metaboliteDB()
             }
             
-            x@hits <- hits
+            x@entries <- entries(hits)
+            x@descriptors <- descriptors(hits)
+            
             return(x)
           })
 
 #' @importFrom mzAnnotation filterIP
+#' @importFrom rlang parse_exprs
 
 setGeneric('pips',function(x){
   standardGeneric('pips')
@@ -59,7 +62,7 @@ setMethod('pips',signature = 'Consensus',
             a <- adductRules(x)
             h <- hits(x)
             
-            p <- a$Rule %>%
+            p <- parse_exprs(a$Rule) %>%
               map(filterIP,db = h) %>%
               set_names(a$Name) %>%
               map(entries) %>%

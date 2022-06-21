@@ -9,22 +9,23 @@ Authors@R:
 Description: Consensus structural chemical classifications for putative molecular formula assignments of m/z mass spectrometry features.
 biocViews: Metabolomics
 Depends: R (>= 3.5)
-Imports: KEGGREST,
+Imports: classyfireR,
+        cli,
         dplyr,
         httr,
+        KEGGREST,
         lubridate,
         magrittr,
         methods,
+        mzAnnotation,
         progress,
         purrr,
+        readr,
+        rlang,
         stringr,
         tidyr,
         tidyselect,
-        tibble,
-        readr,
-        cli,
-        mzAnnotation,
-        classyfireR
+        tibble
 Remotes: jasenfinch/mzAnnotation@devel,
     aberHRML/classyfireR,
     bioc::KEGGREST

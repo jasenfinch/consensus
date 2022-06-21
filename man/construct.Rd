@@ -6,7 +6,7 @@
 \usage{
 construct(
   MF,
-  db = "kegg",
+  db = c("kegg", "pubchem"),
   organism = character(),
   threshold = 50,
   adduct_rules_table = adduct_rules()
@@ -15,7 +15,7 @@ construct(
 \arguments{
 \item{MF}{molecular formula to search}
 
-\item{db}{databases to search. Can one or both of \code{kegg} and \code{pubchem}}
+\item{db}{databases to search. Can be either \code{kegg} or \code{pubchem}.}
 
 \item{organism}{KEGG organism ID to search. Only relevant when argument \code{db} includes \code{kegg}}
 

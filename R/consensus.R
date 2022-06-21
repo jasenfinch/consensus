@@ -112,7 +112,10 @@ setMethod('show','Consensus',
                 }
               },
               '%\n\n'))
-            cat(classificationTree(object))
+            
+            classification_tree <- classificationTree(object)
+            
+            if (!is.null(classification_tree)) print(classification_tree)
           }
 )
 

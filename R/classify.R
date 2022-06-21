@@ -1,7 +1,7 @@
 
 #' @importFrom magrittr set_names %>%
 #' @importFrom dplyr distinct select bind_rows filter left_join
-#' @importFrom classyfireR get_classification classification
+#' @importFrom classyfireR get_classification classification open_cache
 #' @importFrom purrr map_dbl map
 #' @importFrom tidyr spread
 #' @importFrom tidyselect last_col
@@ -9,12 +9,17 @@
 #' @importFrom stringr str_c
 #' @importFrom tibble is_tibble
 
-setGeneric('classify',function(x){
+setGeneric('classify',function(x,conn = NULL){
   standardGeneric('classify')
 })
 
 setMethod('classify',signature = 'Consensus',
-          function(x){
+          function(x,conn = NULL){
+            
+            if (!is.null(conn)){
+              conn <- open_cache(dbname = conn)
+            }
+            
             inchikey <- x %>%
               hits() %>%
               entries() %>%
@@ -30,7 +35,7 @@ setMethod('classify',signature = 'Consensus',
               
               classi <- inchikey %>%
                 map(~{
-                  cl <- suppressMessages(get_classification(.)) 
+                  cl <- suppressMessages(get_classification(.,conn = conn)) 
                   if (is.null(cl)) {
                     cl <- tibble(Level = 'kingdom','Classification' = 'Unclassified',CHEMONT = NA) 
                   } else {
