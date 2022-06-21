@@ -8,16 +8,17 @@
 #' @importFrom progress progress_bar
 #' @importFrom stringr str_c
 #' @importFrom tibble is_tibble
+#' @importFrom RSQLite dbDisconnect
 
-setGeneric('classify',function(x,conn = NULL){
+setGeneric('classify',function(x,classyfireR_cache = NULL){
   standardGeneric('classify')
 })
 
 setMethod('classify',signature = 'Consensus',
-          function(x,conn = NULL){
+          function(x,classyfireR_cache = NULL){
             
-            if (!is.null(conn)){
-              conn <- open_cache(dbname = conn)
+            if (!is.null(classyfireR_cache)){
+              classyfireR_cache <- open_cache(dbname = classyfireR_cache)
             }
             
             inchikey <- x %>%
@@ -35,7 +36,7 @@ setMethod('classify',signature = 'Consensus',
               
               classi <- inchikey %>%
                 map(~{
-                  cl <- suppressMessages(get_classification(.,conn = conn)) 
+                  cl <- suppressMessages(get_classification(.,conn = classyfireR_cache)) 
                   if (is.null(cl)) {
                     cl <- tibble(Level = 'kingdom','Classification' = 'Unclassified',CHEMONT = NA) 
                   } else {
@@ -47,6 +48,10 @@ setMethod('classify',signature = 'Consensus',
                   return(cl)
                 }) %>%
                 set_names(inchikey)
+              
+              if (!is.null(classyfireR_cache)){
+                dbDisconnect(classyfireR_cache)
+              }
               
               classes <- c('kingdom','superclass','class','subclass')
               

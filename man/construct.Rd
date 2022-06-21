@@ -9,7 +9,8 @@ construct(
   db = c("kegg", "pubchem"),
   organism = character(),
   threshold = 50,
-  adduct_rules_table = adduct_rules()
+  adduct_rules_table = adduct_rules(),
+  classyfireR_cache = NULL
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ construct(
 \item{threshold}{percentage majority threshold for consensus classification}
 
 \item{adduct_rules_table}{dataframe containing adduct formation rules. The defaults is \code{mzAnnotation::adduct_rules()}.}
+
+\item{classyfireR_cache}{file path for a \code{classyfireR} cache. See the documentation of \code{classyfireR::get_classification} for more details.}
 }
 \value{
 An S4 object of class \code{Consensus}.
