@@ -26,13 +26,13 @@ keggCompoundInfo <- function(IDs){
 #' @importFrom KEGGREST keggLink
 #' @importFrom tibble deframe tibble
 #' @importFrom stringr str_remove_all
-#' @importFrom mzAnnotation getAccessions
+#' @importFrom mzAnnotation entries
 
 keggCompounds <- function(organism = character()){
   
   if (length(organism) == 0) {
     compounds <- metabolites %>%
-      getAccessions() %>%
+      entries() %>%
       .$ID
   } else {
     enzymes <- keggLink(organism,'enzyme') %>%

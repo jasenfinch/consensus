@@ -13,7 +13,7 @@ setMethod('classify',signature = 'Consensus',
           function(x){
             inchikey <- x %>%
               hits() %>%
-              getAccessions() %>%
+              entries() %>%
               .$INCHIKEY
             
             if (length(inchikey) > 0) {
@@ -60,7 +60,7 @@ setMethod('classify',signature = 'Consensus',
                   select(INCHIKEY,{{classes}},contains('level')) %>%
                   left_join(x %>%
                               hits() %>%
-                              getAccessions() %>%
+                              entries() %>%
                               select(ID,INCHIKEY), by = "INCHIKEY") %>%
                   select(ID,INCHIKEY,everything())
                 

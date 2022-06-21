@@ -5,11 +5,9 @@
 #' @slot organism organism KEGG ID. NA if database is pubchem.
 #' @slot database database, kegg or pubchem
 #' @slot threshold \% majority for consensus classification
-#' @slot hits MetaboliteDatabase containing molecular formula hits from given database
 #' @slot classifications structural classifications for database hits
 #' @slot PIPs putative ionisation product matches from database hits for given adduct rules
 #' @slot consensus consensus structural classifications for adducts
-#' @importClassesFrom mzAnnotation MetaboliteDatabase
 #' @export
 
 setClass('Consensus',
@@ -19,9 +17,9 @@ setClass('Consensus',
            organism = 'character',
            database = 'character',
            threshold = 'numeric',
-           hits = 'MetaboliteDatabase',
            classifications = 'tbl_df',
            PIPs = 'tbl_df',
            consensus = 'tbl_df'
-         )
+         ),
+         contains = 'MetaboliteDatabase'
 )

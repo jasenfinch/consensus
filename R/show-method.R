@@ -36,7 +36,7 @@ setMethod('show','Consensus',
             cat('Organism:\t\t',organism(object),'\n')
             cat('Database:\t\t',database(object),'\n')
             cat('Threshold:\t\t',str_c(threshold(object),'%'),'\n')
-            cat('Hits:\t\t\t',hits(object) %>% getAccessions() %>% nrow(),'\n')
+            cat('Hits:\t\t\t',hits(object) %>% entries() %>% nrow(),'\n')
             cat('Classifications:\t',nrow(classifications(object)),'\n')
             cat('Average PIPs:\t\t',
                 object %>%

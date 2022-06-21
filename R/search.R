@@ -30,7 +30,7 @@ setMethod('mfHits',signature = 'Consensus',
                 }
               
               message(str_c(hits %>% 
-                              getAccessions() %>% 
+                              entries() %>% 
                               nrow()), ' hits returned')
             }
             
@@ -54,7 +54,7 @@ setMethod('pips',signature = 'Consensus',
             p <- a$Rule %>%
               map(filterIP,db = h) %>%
               set_names(a$Name) %>%
-              map(getAccessions) %>%
+              map(entries) %>%
               bind_rows(.id = 'Adduct') %>%
               select(Adduct,ID)
             
