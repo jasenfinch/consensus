@@ -6,7 +6,7 @@
 \usage{
 construction(
   MFs,
-  path = tempdir(),
+  library_path = tempdir(),
   db = c("kegg", "pubchem"),
   organism = character(),
   threshold = 50,
@@ -17,7 +17,7 @@ construction(
 \arguments{
 \item{MFs}{Molecular formulas and adducts to search. Should be a tibble containing two character columns named MF and Adduct.}
 
-\item{path}{target file path for classification library for storing consensus classifications}
+\item{library_path}{target file library_path for classification library for storing consensus classifications}
 
 \item{db}{databases to search. Can be either kegg or pubchem.}
 
@@ -25,9 +25,9 @@ construction(
 
 \item{threshold}{percentage majority threshold for consensus classifications}
 
-\item{adduct_rules_table}{dataframe containing adduct formation rules. The defaults is \code{mzAnnotation::adduct_rules()}.}
+\item{adduct_rules_table}{data frame containing adduct formation rules. The defaults is \code{mzAnnotation::adduct_rules()}.}
 
-\item{classyfireR_cache}{file path for a \code{classyfireR} cache. See the documentation of \code{classyfireR::get_classification} for more details.}
+\item{classyfireR_cache}{file library_path for a \code{classyfireR} cache. See the documentation of \code{classyfireR::get_classification} for more details.}
 }
 \description{
 Build or add to and load a consensus classification library.

@@ -4,12 +4,12 @@ globalVariables(c('Compound','Consensus (%)','Enzyme','InChI','SMILES','ID','Lev
 #' construction
 #' @description Build or add to and load a consensus classification library. 
 #' @param MFs Molecular formulas and adducts to search. Should be a tibble containing two character columns named MF and Adduct.
-#' @param path target file path for classification library for storing consensus classifications
+#' @param library_path target file library_path for classification library for storing consensus classifications
 #' @param db databases to search. Can be either kegg or pubchem.
 #' @param organism KEGG organism ID. Ignored if kegg is not specified in db.
 #' @param threshold percentage majority threshold for consensus classifications
-#' @param adduct_rules_table dataframe containing adduct formation rules. The defaults is `mzAnnotation::adduct_rules()`.
-#' @param classyfireR_cache file path for a `classyfireR` cache. See the documentation of `classyfireR::get_classification` for more details. 
+#' @param adduct_rules_table data frame containing adduct formation rules. The defaults is `mzAnnotation::adduct_rules()`.
+#' @param classyfireR_cache file library_path for a `classyfireR` cache. See the documentation of `classyfireR::get_classification` for more details. 
 #' @examples 
 #' \dontrun{
 #' MFs <- tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),
@@ -20,7 +20,7 @@ globalVariables(c('Compound','Consensus (%)','Enzyme','InChI','SMILES','ID','Lev
 #' @export
 
 construction <- function(MFs, 
-                         path = tempdir(), 
+                         library_path = tempdir(), 
                          db = c('kegg','pubchem'), 
                          organism = character(), 
                          threshold = 50,
@@ -49,9 +49,9 @@ construction <- function(MFs,
     }) %>%
     bind_rows()
   
-  path <- normalizePath(path)
+  library_path <- normalizePath(library_path)
   
-  libraryPath <- paste0(path,'/','structural_classification_library')
+  libraryPath <- paste0(library_path,'/','structural_classification_library')
   
   classificationLibrary <- loadLibrary(MFs,libraryPath)
   
@@ -104,7 +104,7 @@ construction <- function(MFs,
                               adduct_rules_table = adduct_rules_table,
                               classyfireR_cache = classyfireR_cache)
         
-        saveConsensus(consense,path = libraryPath) 
+        saveConsensus(consense,library_path = libraryPath) 
         
         if (database(consense) == 'kegg') {
           kingdoms <- consense %>%
