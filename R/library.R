@@ -1,11 +1,11 @@
 #' @importFrom readr write_rds
 
-setGeneric('saveConsensus',function(x,path = '.'){
+setGeneric('saveConsensus',function(x,path = 'structural_classification_library'){
   standardGeneric('saveConsensus')
 })
 
 setMethod('saveConsensus',signature = 'Consensus',
-          function(x,path = '.'){
+          function(x,path = 'structural_classification_library'){
             
             message(str_c('Exporting to ',path))
             
@@ -20,23 +20,23 @@ setMethod('saveConsensus',signature = 'Consensus',
             write_rds(x,str_c(path,fileName,sep = '/'))
           })
 
-checkLibrary <- function(path){
-  str_c(path,'structural_classification_library',sep = '/') %in% list.dirs(path)
-}
-
 #' @importFrom readr read_rds
 
-loadLibrary <- function(MFs, path = '.'){
-  libraryPath <- str_c(path,'structural_classification_library',sep = '/')
+loadLibrary <- function(MFs, path = 'structural_classification_library'){
   
-  message(str_c('\nLoading structural classification library at ',libraryPath))
+  if (!dir.exists(path)) {
+    dir.create(path,recursive = TRUE)  
+    message(str_c('Created structural classifcation library at ',path))
+  } else {
+    message(str_c('Using structural classifcation library at ',path))
+  }
   
-  libraryContents <- list.files(libraryPath,full.names = TRUE,pattern = '.rds') %>%
+  libraryContents <- list.files(path,full.names = TRUE,pattern = '.rds') %>%
     tibble(MF = basename(.) %>%
              str_split_fixed('_',2) %>%
              .[,1],
            path = .) %>%
-  filter(MF %in% MFs$MF)
+    filter(MF %in% MFs$MF)
   
   libraryContents %>%
     .$path %>%

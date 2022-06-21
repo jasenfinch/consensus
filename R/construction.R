@@ -4,10 +4,12 @@ globalVariables(c('Compound','Consensus (%)','Enzyme','InChI','SMILES','ID','Lev
 #' construction
 #' @description Build or add to and load a consensus classification library. 
 #' @param MFs Molecular formulas and adducts to search. Should be a tibble containing two character columns named MF and Adduct.
-#' @param path target file path for classification library 
+#' @param path target file path for classification library for storing consensus classifications
 #' @param db databases to search. Can be either kegg or pubchem.
 #' @param organism KEGG organism ID. Ignored if kegg is not specified in db.
-#' @param threshold \% majority threshold for consensus classifications
+#' @param threshold percentage majority threshold for consensus classifications
+#' @param adduct_rules_table dataframe containing adduct formation rules. The defaults is `mzAnnotation::adduct_rules()`.
+#' @param classyfireR_cache file path for a `classyfireR` cache. See the documentation of `classyfireR::get_classification` for more details. 
 #' @examples 
 #' \dontrun{
 #' MFs <- tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),
@@ -17,14 +19,16 @@ globalVariables(c('Compound','Consensus (%)','Enzyme','InChI','SMILES','ID','Lev
 #' @importFrom purrr walk
 #' @export
 
-construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = character(), threshold = 50){
+construction <- function(MFs, 
+                         path = tempdir(), 
+                         db = c('kegg','pubchem'), 
+                         organism = character(), 
+                         threshold = 50,
+                         adduct_rules_table = adduct_rules(),
+                         classyfireR_cache = NULL){
   
   if (ncol(MFs) != 2 & !identical(names(MFs),c('MF','Adduct'))) {
     stop('Argument MFs should be a tibble containing two character columns named MF and Adduct')
-  }
-  
-  if (F %in% ((MFs$Adduct %>% unique()) %in% mzAnnotation::adduct_rules()$Name)) {
-    stop('Adducts should be one of those available in mzAnnotation::adducts()$Name')
   }
   
   if (length(organism) == 0) {
@@ -33,7 +37,11 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
     org <- organism
   }
   
-  db <- db %>% sort()
+  db <- match.arg(db,
+                  choices = c('kegg',
+                              'pubchem'),
+                  several.ok = TRUE) %>% 
+    sort()
   
   mfs <- MFs$MF %>%
     map(~{
@@ -43,21 +51,19 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
   
   path <- normalizePath(path)
   
-  libraryPath <- str_c(path,'structural_classification_library',sep = '/')
+  libraryPath <- paste0(path,'/','structural_classification_library')
   
-  if (isFALSE(checkLibrary(path))) {
-    dir.create(libraryPath)  
-    message(str_c('\nCreated structural classifcation library at ',libraryPath))
-    toDo <- mfs
-  } else {
-    message(str_c('\nUsing structural classifcation library at ',libraryPath))
-    
-    classificationLibrary <- loadLibrary(MFs,path)
-    
+  classificationLibrary <- loadLibrary(MFs,libraryPath)
+  
+  if (length(classificationLibrary) > 0){
     statuses <- classificationLibrary %>%
       map(status) %>%
-      bind_rows() %>%
-      filter(database %in% db)
+      bind_rows()
+    
+    if (nrow(statuses) > 0) {
+      statuses <- statuses %>%
+        filter(database %in% db)
+    }
     
     if ('kegg' %in% db) {
       statuses <- statuses %>%
@@ -78,6 +84,8 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
     
     toDo <- mfs_status %>%
       toSearch(db)
+  } else {
+    toDo <- mfs
   }
   
   message(str_c(length(unique(toDo$MF))),' MFs to retrieve out of ',length(unique(mfs$MF)))
@@ -89,7 +97,12 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
       dbase <- d$database
       
       for (i in dbase){
-        consense <- construct(d$MF[1],db = i,organism = organism,threshold = threshold)
+        consense <- construct(d$MF[1],
+                              db = i,
+                              organism = organism,
+                              threshold = threshold,
+                              adduct_rules_table = adduct_rules_table,
+                              classyfireR_cache = classyfireR_cache)
         
         saveConsensus(consense,path = libraryPath) 
         
@@ -109,7 +122,7 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
   
   message('\nComplete!')
   
-  classificationLibrary <- loadLibrary(MFs,path)
+  classificationLibrary <- suppressMessages(loadLibrary(MFs,path))
   
   statuses <- classificationLibrary %>%
     map(status) %>%
