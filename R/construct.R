@@ -1,23 +1,21 @@
 globalVariables(c('.','kingdom','CID','MF','Adduct','InChIKey','superclass','subclass','level 5','MF',
                   'Charge','CanonicalSMILES','CovalentUnitCount','SMILE','id','MolecularFormula','com','Name','INCHI','Score','Feature','Intensity'))
 
-#' @importFrom mzAnnotation adducts
+#' @importFrom mzAnnotation adduct_rules
 #' @importFrom methods new
 
-construct <- function(MF, db, organism = character(), threshold = 50){
+construct <- function(MF,db,organism = character(),threshold = 50,adduct_rules_table = adduct_rules()){
   
   if (!(db %in% c('kegg','pubchem'))) {
     stop('Database not recognised!')
   }
-  
-  adductRules = adducts()
   
   message(str_c('\n',MF))
   
   consense <- new('Consensus')
   consense@MF <- MF
   consense@database <- db
-  consense@adductRules <- adductRules
+  consense@adductRules <- adduct_rules
   consense@threshold <- threshold
   
   if (db == 'kegg') {
