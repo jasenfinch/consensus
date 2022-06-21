@@ -21,7 +21,99 @@ setClass('Consensus',
            PIPs = 'tbl_df',
            consensus = 'tbl_df'
          ),
-         contains = 'MetaboliteDatabase'
+         contains = 'MetaboliteDatabase',
+         prototype = list(
+           classifications = tibble(),
+           PIPs = tibble(),
+           consensus = tibble()
+         )
+)
+
+#' @importFrom cli tree
+#' @importFrom stats na.omit
+
+setGeneric('classificationTree',function(x){
+  standardGeneric('classificationTree')
+})
+
+setMethod('classificationTree',signature = 'Consensus',
+          function(x){
+            d <- x %>%
+              overallConsensus() 
+            
+            if (nrow(d) > 0){
+              d <- d %>%
+                select(-`Consensus (%)`) %>%
+                gather(Level,Name) %>%
+                mutate(Label = str_c(Level,': ',Name)) %>%
+                na.omit() %>%
+                select(Label)
+              
+              connections <- list()
+              for (i in 1:nrow(d)) {
+                if (i == nrow(d)) {
+                  connections[[i]] <- c(character(0))
+                } else {
+                  connections[[i]] <- c(d$Label[(i + 1)])  
+                }
+              } 
+              
+              a <- data.frame(stringsAsFactors = FALSE,
+                              id = d$Label,
+                              connections = I(connections))
+              
+              tree(a)   
+            } else {
+              invisible()
+            }
+            
+          }
+)
+
+setMethod('show','Consensus',
+          function(object){
+            cat('Consensus structural classifications\n\n')
+            cat('MF:\t\t\t',mf(object),'\n')
+            cat('Adducts:\t\t',nrow(adductRules(object)),'\n')
+            cat('Organism:\t\t',organism(object),'\n')
+            cat('Database:\t\t',database(object),'\n')
+            cat('Threshold:\t\t',str_c(threshold(object),'%'),'\n')
+            cat('Hits:\t\t\t',hits(object) %>% entries() %>% nrow(),'\n')
+            cat('Classifications:\t',nrow(classifications(object)),'\n')
+            cat('Average PIPs:\t\t',
+                {
+                  pips <- object %>%
+                    PIPs()
+                  
+                  if (nrow(pips) > 0){
+                    pips %>% 
+                      group_by(Adduct) %>% 
+                      summarise(N = n()) %>% 
+                      .$N %>% 
+                      mean() %>% 
+                      round()
+                  } else {
+                    0
+                  }
+                },
+                '\n')
+            cat('Average Consensus:\t',str_c(
+              {
+                con <- object %>% 
+                  consensusClassifications() 
+                
+                if (nrow(con) > 0){
+                  con %>% 
+                    .$`Consensus (%)` %>% 
+                    mean() %>% 
+                    round()
+                } else {
+                  0
+                }
+              },
+              '%\n\n'))
+            cat(classificationTree(object))
+          }
 )
 
 #' Accessor methods for the `Consensus` S4 class
@@ -52,7 +144,7 @@ setGeneric('adductRules',function(x){
 
 setMethod('adductRules',signature = 'Consensus',
           function(x){
-            x@adductRules
+            x@adduct_rules
           })
 
 #' @rdname access
@@ -108,7 +200,7 @@ setGeneric('hits',function(x){
 
 setMethod('hits',signature = 'Consensus',
           function(x){
-            x@hits
+            as(x,'MetaboliteDatabase')
           })
 
 #' @rdname access
@@ -313,8 +405,8 @@ setMethod('consensus',signature = 'Consensus',
               }  
             } else {
               consensusClasses <- tibble(Adduct = adductRules(x)$Name,
-                                        kingdom = 'No hits',
-                                        `Consensus (%)` = 100)
+                                         kingdom = 'No hits',
+                                         `Consensus (%)` = 100)
             }
             
             x@consensus <- consensusClasses
@@ -328,7 +420,13 @@ setGeneric('overallConsensus',function(x){
 
 setMethod('overallConsensus',signature = 'Consensus',
           function(x){
-            consensusClassifications(x) %>%
-              select(-`Consensus (%)`) %>%
-              conse(thresh = threshold(x))
+            con <- consensusClassifications(x) 
+            
+            if (nrow(con) > 0){
+              con %>%
+                select(-`Consensus (%)`) %>%
+                conse(thresh = threshold(x))
+            } else {
+              con
+            }
           })

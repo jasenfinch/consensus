@@ -42,6 +42,5 @@ Collate: consensus.R
         construction.R
         kegg.R
         pubchem.R
-        show-method.R
         search.R
         library.R
