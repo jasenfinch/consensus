@@ -122,7 +122,7 @@ construction <- function(MFs,
   
   message('\nComplete!')
   
-  classificationLibrary <- suppressMessages(loadLibrary(MFs,path))
+  classificationLibrary <- suppressMessages(loadLibrary(MFs,libraryPath))
   
   statuses <- classificationLibrary %>%
     map(status) %>%
