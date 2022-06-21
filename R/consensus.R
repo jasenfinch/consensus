@@ -1,3 +1,182 @@
+#' Consensus
+#' @description An S4 class to store consensus structral classification results for a molecular formula.
+#' @slot MF molecular formula
+#' @slot adduct_rules tibble containing adduct rules as returned by \code{mzAnnotation::adducts()}
+#' @slot organism organism KEGG ID. NA if database is pubchem.
+#' @slot database database, kegg or pubchem
+#' @slot threshold \% majority for consensus classification
+#' @slot classifications structural classifications for database hits
+#' @slot PIPs putative ionisation product matches from database hits for given adduct rules
+#' @slot consensus consensus structural classifications for adducts
+#' @export
+
+setClass('Consensus',
+         slots = list(
+           MF = 'character',
+           adduct_rules = 'tbl_df',
+           organism = 'character',
+           database = 'character',
+           threshold = 'numeric',
+           classifications = 'tbl_df',
+           PIPs = 'tbl_df',
+           consensus = 'tbl_df'
+         ),
+         contains = 'MetaboliteDatabase'
+)
+
+#' mf
+#' @rdname mf
+#' @description Get and the molecular formula of a Consensus object. 
+#' @param x S4 object of class Consensus
+#' @export
+
+setGeneric('mf',function(x){
+  standardGeneric('mf')
+})
+
+#' @rdname mf
+
+setMethod('mf',signature = 'Consensus',
+          function(x){
+            x@MF
+          })
+
+#' adductRules
+#' @rdname adductRules
+#' @description Get the adduct rules of a Consensus object. 
+#' @param x S4 object of class Consensus
+#' @export
+
+setGeneric('adductRules',function(x){
+  standardGeneric('adductRules')
+})
+
+#' @rdname adductRules
+
+setMethod('adductRules',signature = 'Consensus',
+          function(x){
+            x@adductRules
+          })
+
+#' organism
+#' @rdname organism
+#' @description Get the organism ID of a Consensus object. 
+#' @param x S4 object of class Consensus
+#' @export
+
+setGeneric('organism',function(x){
+  standardGeneric('organism')
+})
+
+#' @rdname organism
+
+setMethod('organism',signature = 'Consensus',
+          function(x){
+            x@organism
+          })
+
+#' database
+#' @rdname database
+#' @description Get the database of a Consensus object. 
+#' @param x S4 object of class Consensus
+#' @export
+
+setGeneric('database',function(x){
+  standardGeneric('database')
+})
+
+#' @rdname database
+
+setMethod('database',signature = 'Consensus',
+          function(x){
+            x@database
+          })
+
+#' threshold
+#' @rdname threshold
+#' @description Get the threshold of a Consensus object. 
+#' @param x S4 object of class Consensus
+#' @export
+
+setGeneric('threshold',function(x){
+  standardGeneric('threshold')
+})
+
+#' @rdname threshold
+
+setMethod('threshold',signature = 'Consensus',
+          function(x){
+            x@threshold
+          })
+
+#' hits
+#' @rdname hits
+#' @description Get the database molecular formula matches of a Consensus object. 
+#' @param x S4 object of class Consensus
+#' @export
+
+setGeneric('hits',function(x){
+  standardGeneric('hits')
+})
+
+#' @rdname hits
+
+setMethod('hits',signature = 'Consensus',
+          function(x){
+            x@hits
+          })
+
+#' PIPs
+#' @rdname PIPs
+#' @description Get the putative ionisation products of a Consensus object. 
+#' @param x S4 object of class Consensus
+#' @export
+
+setGeneric('PIPs',function(x){
+  standardGeneric('PIPs')
+})
+
+#' @rdname PIPs
+
+setMethod('PIPs',signature = 'Consensus',
+          function(x){
+            x@PIPs
+          })
+
+#' classifications
+#' @rdname classifications
+#' @description Get the classifications of a Consensus object. 
+#' @param x S4 object of class Consensus
+#' @export
+
+setGeneric('classifications',function(x){
+  standardGeneric('classifications')
+})
+
+#' @rdname classifications
+
+setMethod('classifications',signature = 'Consensus',
+          function(x){
+            x@classifications
+          })
+
+#' consensusClassifications
+#' @rdname consensusClassifications
+#' @description Get the consensus classifications of a Consensus object. 
+#' @param x S4 object of class Consensus
+#' @export
+
+setGeneric('consensusClassifications',function(x){
+  standardGeneric('consensusClassifications')
+})
+
+#' @rdname consensusClassifications
+
+setMethod('consensusClassifications',signature = 'Consensus',
+          function(x){
+            x@consensus
+          })
+
 conse <- function(cl,thresh){
   thresh <- thresh / 100
   
