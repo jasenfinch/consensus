@@ -22,9 +22,9 @@ setMethod('classify',signature = 'Consensus',
             }
             
             inchikey <- x %>%
-              hits() %>%
               entries() %>%
-              .$INCHIKEY
+              .$INCHIKEY %>% 
+              unique()
             
             if (length(inchikey) > 0) {
               message(str_c('Retrieving classifications for ',length(inchikey),' InChIKeys...'))
@@ -36,14 +36,18 @@ setMethod('classify',signature = 'Consensus',
               
               classi <- inchikey %>%
                 map(~{
-                  cl <- suppressMessages(get_classification(.,conn = classyfireR_cache)) 
+                  out <- capture.output(cl <- get_classification(.x,conn = classyfireR_cache),
+                                        type = 'message')
+                  
                   if (is.null(cl)) {
                     cl <- tibble(Level = 'kingdom','Classification' = 'Unclassified',CHEMONT = NA) 
                   } else {
                     cl <- cl %>%
                       classification()
                   }
-                  Sys.sleep(5)
+                  
+                  if (!grepl('cached',out)) Sys.sleep(5)
+              
                   pb$tick()
                   return(cl)
                 }) %>%
