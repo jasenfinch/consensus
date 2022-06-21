@@ -5,7 +5,7 @@ globalVariables(c('Compound','Consensus (%)','Enzyme','InChI','SMILES','ID','Lev
 #' construction
 #' @rdname construction
 #' @description Build or add to and load a consensus classification library. 
-#' @param MFs Molecular formulas and adducts to search. Should be a tibble containing two character columns named MF and Adduct.
+#' @param x Molecular formulas and adducts to search. Should be a tibble containing two character columns named MF and Adduct.
 #' @param library_path target file library_path for classification library for storing consensus classifications
 #' @param db databases to search. Can be either kegg or pubchem.
 #' @param organism KEGG organism ID. Ignored if kegg is not specified in db.
@@ -14,14 +14,14 @@ globalVariables(c('Compound','Consensus (%)','Enzyme','InChI','SMILES','ID','Lev
 #' @param classyfireR_cache file library_path for a `classyfireR` cache. See the documentation of `classyfireR::get_classification` for more details. 
 #' @examples 
 #' \dontrun{
-#' MFs <- tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),
+#' x <- tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),
 #'               Adduct = c('[M-H]1-','[M+Cl]1-','[M-H]1-'))
-#' structural_classifications <- construction(MFs)
+#' structural_classifications <- construction(x)
 #' } 
 #' @importFrom purrr walk
 #' @export
 
-setGeneric('construction',function(MFs, 
+setGeneric('construction',function(x, 
                                    library_path = tempdir(), 
                                    db = c('kegg','pubchem'), 
                                    organism = character(), 
@@ -34,7 +34,7 @@ setGeneric('construction',function(MFs,
 #' @rdname construction
 
 setMethod('construction',signature = 'tbl_df',
-          function(MFs, 
+          function(x, 
                    library_path = tempdir(), 
                    db = c('kegg','pubchem'), 
                    organism = character(), 
@@ -42,8 +42,8 @@ setMethod('construction',signature = 'tbl_df',
                    adduct_rules_table = adduct_rules(),
                    classyfireR_cache = NULL){
             
-            if (ncol(MFs) != 2 & !identical(names(MFs),c('MF','Adduct'))) {
-              stop('Argument MFs should be a tibble containing two character columns named MF and Adduct')
+            if (ncol(x) != 2 & !identical(names(x),c('MF','Adduct'))) {
+              stop('Argument x should be a tibble containing two character columns named MF and Adduct')
             }
             
             if (length(organism) == 0) {
@@ -58,7 +58,7 @@ setMethod('construction',signature = 'tbl_df',
                             several.ok = TRUE) %>% 
               sort()
             
-            mfs <- MFs$MF %>%
+            mfs <- x$MF %>%
               map(~{
                 tibble(MF = .,database = db)
               }) %>%
@@ -66,9 +66,9 @@ setMethod('construction',signature = 'tbl_df',
             
             library_path <- normalizePath(library_path)
             
-            libraryPath <- paste0(library_path,'/','structural_classification_library')
+            libraryPath <- paste0(library_path,'/','construction_library')
             
-            classificationLibrary <- loadLibrary(MFs,libraryPath)
+            classificationLibrary <- loadLibrary(x,libraryPath)
             
             if (length(classificationLibrary) > 0){
               statuses <- classificationLibrary %>%
@@ -119,7 +119,7 @@ setMethod('construction',signature = 'tbl_df',
                                         adduct_rules_table = adduct_rules_table,
                                         classyfireR_cache = classyfireR_cache)
                   
-                  saveConsensus(consense,library_path = libraryPath) 
+                  saveConsensus(consense,path = libraryPath) 
                   
                   if (database(consense) == 'kegg') {
                     kingdoms <- consense %>%
@@ -137,13 +137,13 @@ setMethod('construction',signature = 'tbl_df',
             
             message('\nComplete!')
             
-            classificationLibrary <- suppressMessages(loadLibrary(MFs,libraryPath))
+            classificationLibrary <- suppressMessages(loadLibrary(x,libraryPath))
             
             statuses <- classificationLibrary %>%
               map(status) %>%
               bind_rows() %>%
               rowid_to_column(var = 'ID') %>%
-              filter(database %in% db,MF %in% {MFs$MF %>% 
+              filter(database %in% db,MF %in% {x$MF %>% 
                   unique()})
             
             if ('kegg' %in% db) {
@@ -193,7 +193,7 @@ setMethod('construction',signature = 'tbl_df',
                 bind_rows()
             }
             
-            MFs %>%
+            x %>%
               left_join(statuses, by = "MF") %>%
               split(1:nrow(.)) %>%
               map(~{
@@ -208,6 +208,41 @@ setMethod('construction',signature = 'tbl_df',
               bind_rows() %>%
               select(`Consensus (%)`,everything()) %>%
               select(MF:last_col(),`Consensus (%)`)
+          }
+)
+
+#' @importFrom assignments assignments
+#' @rdname construction
+
+setMethod('construction',signature = 'Assignment',
+          function(x, 
+                   library_path = tempdir(), 
+                   db = c('kegg','pubchem'), 
+                   organism = character(), 
+                   threshold = 50,
+                   classyfireR_cache = NULL){
+            
+            adduct_rules_table <- assignments::adductRules(x)
+            
+            isotopic_adducts <- adduct_rules_table %>% 
+              filter(Isotopic == 1) %>% 
+              .$Name
+            
+            mfs <- x %>% 
+              assignments() %>% 
+              select(MF,Adduct) %>% 
+              distinct() %>% 
+              filter(!(Adduct %in% isotopic_adducts))
+            
+              construction(
+                mfs,
+                library_path = library_path,
+                db = db,
+                organism = organism,
+                threshold = threshold,
+                adduct_rules_table = adduct_rules_table,
+                classyfireR_cache = classyfireR_cache
+                )
           }
 )
 

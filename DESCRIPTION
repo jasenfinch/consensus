@@ -9,7 +9,8 @@ Authors@R:
 Description: Consensus structural chemical classifications for putative molecular formula assignments of m/z mass spectrometry features.
 biocViews: Metabolomics
 Depends: R (>= 3.5)
-Imports: classyfireR,
+Imports: assignments,
+        classyfireR,
         cli,
         dplyr,
         httr,

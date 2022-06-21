@@ -2,10 +2,32 @@
 % Please edit documentation in R/construction.R
 \name{construction}
 \alias{construction}
+\alias{construction,tbl_df-method}
+\alias{construction,Assignment-method}
 \title{construction}
 \usage{
 construction(
-  MFs,
+  x,
+  library_path = tempdir(),
+  db = c("kegg", "pubchem"),
+  organism = character(),
+  threshold = 50,
+  adduct_rules_table = adduct_rules(),
+  classyfireR_cache = NULL
+)
+
+\S4method{construction}{tbl_df}(
+  x,
+  library_path = tempdir(),
+  db = c("kegg", "pubchem"),
+  organism = character(),
+  threshold = 50,
+  adduct_rules_table = adduct_rules(),
+  classyfireR_cache = NULL
+)
+
+\S4method{construction}{Assignment}(
+  x,
   library_path = tempdir(),
   db = c("kegg", "pubchem"),
   organism = character(),
@@ -15,7 +37,7 @@ construction(
 )
 }
 \arguments{
-\item{MFs}{Molecular formulas and adducts to search. Should be a tibble containing two character columns named MF and Adduct.}
+\item{x}{Molecular formulas and adducts to search. Should be a tibble containing two character columns named MF and Adduct.}
 
 \item{library_path}{target file library_path for classification library for storing consensus classifications}
 
@@ -34,8 +56,8 @@ Build or add to and load a consensus classification library.
 }
 \examples{
 \dontrun{
-MFs <- tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),
+x <- tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),
               Adduct = c('[M-H]1-','[M+Cl]1-','[M-H]1-'))
-structural_classifications <- construction(MFs)
+structural_classifications <- construction(x)
 } 
 }
