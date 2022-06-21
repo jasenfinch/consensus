@@ -24,153 +24,129 @@ setClass('Consensus',
          contains = 'MetaboliteDatabase'
 )
 
-#' mf
-#' @rdname mf
-#' @description Get and the molecular formula of a Consensus object. 
-#' @param x S4 object of class Consensus
+#' Accessor methods for the `Consensus` S4 class
+#' @rdname access
+#' @description  Accessor methods for the `Consensus` S4 class.
+#' @param x S4 object of class `Consensus`
 #' @export
 
 setGeneric('mf',function(x){
   standardGeneric('mf')
 })
 
-#' @rdname mf
+#' @rdname access
 
 setMethod('mf',signature = 'Consensus',
           function(x){
             x@MF
           })
 
-#' adductRules
-#' @rdname adductRules
-#' @description Get the adduct rules of a Consensus object. 
-#' @param x S4 object of class Consensus
+#' @rdname access
 #' @export
 
 setGeneric('adductRules',function(x){
   standardGeneric('adductRules')
 })
 
-#' @rdname adductRules
+#' @rdname access
 
 setMethod('adductRules',signature = 'Consensus',
           function(x){
             x@adductRules
           })
 
-#' organism
-#' @rdname organism
-#' @description Get the organism ID of a Consensus object. 
-#' @param x S4 object of class Consensus
+#' @rdname access
 #' @export
 
 setGeneric('organism',function(x){
   standardGeneric('organism')
 })
 
-#' @rdname organism
+#' @rdname access
 
 setMethod('organism',signature = 'Consensus',
           function(x){
             x@organism
           })
 
-#' database
-#' @rdname database
-#' @description Get the database of a Consensus object. 
-#' @param x S4 object of class Consensus
+#' @rdname access
 #' @export
 
 setGeneric('database',function(x){
   standardGeneric('database')
 })
 
-#' @rdname database
+#' @rdname access
 
 setMethod('database',signature = 'Consensus',
           function(x){
             x@database
           })
 
-#' threshold
-#' @rdname threshold
-#' @description Get the threshold of a Consensus object. 
-#' @param x S4 object of class Consensus
+#' @rdname access
 #' @export
 
 setGeneric('threshold',function(x){
   standardGeneric('threshold')
 })
 
-#' @rdname threshold
+#' @rdname access
 
 setMethod('threshold',signature = 'Consensus',
           function(x){
             x@threshold
           })
 
-#' hits
-#' @rdname hits
-#' @description Get the database molecular formula matches of a Consensus object. 
-#' @param x S4 object of class Consensus
+#' @rdname access
 #' @export
 
 setGeneric('hits',function(x){
   standardGeneric('hits')
 })
 
-#' @rdname hits
+#' @rdname access
 
 setMethod('hits',signature = 'Consensus',
           function(x){
             x@hits
           })
 
-#' PIPs
-#' @rdname PIPs
-#' @description Get the putative ionisation products of a Consensus object. 
-#' @param x S4 object of class Consensus
+#' @rdname access
 #' @export
 
 setGeneric('PIPs',function(x){
   standardGeneric('PIPs')
 })
 
-#' @rdname PIPs
+#' @rdname access
 
 setMethod('PIPs',signature = 'Consensus',
           function(x){
             x@PIPs
           })
 
-#' classifications
-#' @rdname classifications
-#' @description Get the classifications of a Consensus object. 
-#' @param x S4 object of class Consensus
+#' @rdname access
 #' @export
 
 setGeneric('classifications',function(x){
   standardGeneric('classifications')
 })
 
-#' @rdname classifications
+#' @rdname access
 
 setMethod('classifications',signature = 'Consensus',
           function(x){
             x@classifications
           })
 
-#' consensusClassifications
-#' @rdname consensusClassifications
-#' @description Get the consensus classifications of a Consensus object. 
-#' @param x S4 object of class Consensus
+#' @rdname access
 #' @export
 
 setGeneric('consensusClassifications',function(x){
   standardGeneric('consensusClassifications')
 })
 
-#' @rdname consensusClassifications
+#' @rdname access
 
 setMethod('consensusClassifications',signature = 'Consensus',
           function(x){
