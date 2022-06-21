@@ -9,6 +9,10 @@
 #' @importFrom stringr str_c
 #' @importFrom tibble is_tibble
 
+setGeneric('classify',function(x){
+  standardGeneric('classify')
+})
+
 setMethod('classify',signature = 'Consensus',
           function(x){
             inchikey <- x %>%

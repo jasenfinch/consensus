@@ -4,7 +4,11 @@ globalVariables(c('.','kingdom','CID','MF','Adduct','InChIKey','superclass','sub
 #' @importFrom mzAnnotation adduct_rules
 #' @importFrom methods new
 
-construct <- function(MF,db,organism = character(),threshold = 50,adduct_rules_table = adduct_rules()){
+construct <- function(MF,
+                      db,
+                      organism = character(),
+                      threshold = 50,
+                      adduct_rules_table = adduct_rules()){
   
   if (!(db %in% c('kegg','pubchem'))) {
     stop('Database not recognised!')

@@ -1,5 +1,9 @@
 #' @importFrom readr write_rds
 
+setGeneric('saveConsensus',function(x,path = '.'){
+  standardGeneric('saveConsensus')
+})
+
 setMethod('saveConsensus',signature = 'Consensus',
           function(x,path = '.'){
             
@@ -38,6 +42,10 @@ loadLibrary <- function(MFs, path = '.'){
     .$path %>%
     map(read_rds)
 }
+
+setGeneric('status',function(x){
+  standardGeneric('status')
+})
 
 setMethod('status',signature = 'Consensus',
           function(x){

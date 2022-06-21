@@ -291,6 +291,10 @@ conse <- function(cl,thresh){
 #' @importFrom tidyr gather
 #' @importFrom tidyselect contains
 
+setGeneric('consensus',function(x){
+  standardGeneric('consensus')
+})
+
 setMethod('consensus',signature = 'Consensus',
           function(x){
             
@@ -341,6 +345,10 @@ setMethod('consensus',signature = 'Consensus',
             return(x) 
           }
 )
+
+setGeneric('overallConsensus',function(x){
+  standardGeneric('overallConsensus')
+})
 
 setMethod('overallConsensus',signature = 'Consensus',
           function(x){

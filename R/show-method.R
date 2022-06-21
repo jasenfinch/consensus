@@ -1,6 +1,10 @@
 #' @importFrom cli tree
 #' @importFrom stats na.omit
 
+setGeneric('classificationTree',function(x){
+  standardGeneric('classificationTree')
+})
+
 setMethod('classificationTree',signature = 'Consensus',
           function(x){
             d <- x %>%

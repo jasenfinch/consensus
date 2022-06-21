@@ -28,7 +28,8 @@ Build or add to and load a consensus classification library.
 }
 \examples{
 \dontrun{
-MFs <- tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),Adduct = c('[M-H]1-','[M+Cl]1-','[M-H]1-'))
+MFs <- tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),
+              Adduct = c('[M-H]1-','[M+Cl]1-','[M-H]1-'))
 structural_classifications <- construction(MFs)
 } 
 }

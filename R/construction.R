@@ -10,7 +10,8 @@ globalVariables(c('Compound','Consensus (%)','Enzyme','InChI','SMILES','ID','Lev
 #' @param threshold \% majority threshold for consensus classifications
 #' @examples 
 #' \dontrun{
-#' MFs <- tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),Adduct = c('[M-H]1-','[M+Cl]1-','[M-H]1-'))
+#' MFs <- tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),
+#'               Adduct = c('[M-H]1-','[M+Cl]1-','[M-H]1-'))
 #' structural_classifications <- construction(MFs)
 #' } 
 #' @importFrom purrr walk
@@ -22,7 +23,7 @@ construction <- function(MFs, path = '.', db = c('kegg','pubchem'), organism = c
     stop('Argument MFs should be a tibble containing two character columns named MF and Adduct')
   }
   
-  if (F %in% ((MFs$Adduct %>% unique()) %in% mzAnnotation::adducts()$Name)) {
+  if (F %in% ((MFs$Adduct %>% unique()) %in% mzAnnotation::adduct_rules()$Name)) {
     stop('Adducts should be one of those available in mzAnnotation::adducts()$Name')
   }
   

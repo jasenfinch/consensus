@@ -1,6 +1,10 @@
 #' @importFrom mzAnnotation filterMF metaboliteDB filterEntries descriptors convert
 #' @importFrom dplyr rowwise ungroup
 
+setGeneric('mfHits',function(x){
+  standardGeneric('mfHits')
+})
+
 setMethod('mfHits',signature = 'Consensus',
           function(x){
             
@@ -44,6 +48,10 @@ setMethod('mfHits',signature = 'Consensus',
           })
 
 #' @importFrom mzAnnotation filterIP
+
+setGeneric('pips',function(x){
+  standardGeneric('pips')
+})
 
 setMethod('pips',signature = 'Consensus',
           function(x){
