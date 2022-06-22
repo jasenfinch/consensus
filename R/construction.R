@@ -2,19 +2,42 @@
 globalVariables(c('Compound','Consensus (%)','Enzyme','InChI','SMILES','ID','Level','Label',
                   'INCHIKEY'))
 
-#' construction
+setClass('Construction',
+         slots = list(
+           classifications = 'tbl_df'
+         ),
+         contains = 'Assignment',
+         prototype = list(
+           classifications = tibble()
+         ))
+
+setMethod('show',signature = 'Construction',
+          function(object){
+            message('Consensus structural classifications')
+            message(paste0('Assignments: ',nrow(assignments(object))))
+            message(paste0('Classifications: ',nrow(classifications(object))))
+          })
+
+#' @rdname access
+
+setMethod('classifications',signature = 'Construction',
+          function(x) x@classifications)
+
+#' Consensus structural classifications
 #' @rdname construction
 #' @description Build or add to and load a consensus classification library. 
-#' @param x Molecular formulas and adducts to search. Should be a tibble containing two character columns named MF and Adduct.
+#' @param x Molecular formulas and adducts to search. Should either be a tibble containing two character columns named MF and Adduct or and S4 object of class `Assignment`.
 #' @param library_path target file library_path for classification library for storing consensus classifications
 #' @param db databases to search. Can be either `kegg` and/or `pubchem`.
 #' @param organism KEGG organism ID. Ignored if kegg is not specified in db.
 #' @param threshold percentage majority threshold for consensus classifications
 #' @param adduct_rules_table data frame containing adduct formation rules. The defaults is `mzAnnotation::adduct_rules()`.
 #' @param classyfireR_cache file library_path for a `classyfireR` cache. See the documentation of `classyfireR::get_classification` for more details. 
+#' @return 
+#' If argument `x` is a tibble, then a tibble is returned containing the consensus structural classifications. If argument `x` is an object of S4 class `Assignment`, and object of S4 class `Construction` is returned.
 #' @examples 
 #' \dontrun{
-#' x <- tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),
+#' x <- tibble::tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),
 #'               Adduct = c('[M-H]1-','[M+Cl]1-','[M-H]1-'))
 #' structural_classifications <- construction(x)
 #' } 
@@ -234,15 +257,19 @@ setMethod('construction',signature = 'Assignment',
               distinct() %>% 
               filter(!(Adduct %in% isotopic_adducts))
             
-              construction(
-                mfs,
-                library_path = library_path,
-                db = db,
-                organism = organism,
-                threshold = threshold,
-                adduct_rules_table = adduct_rules_table,
-                classyfireR_cache = classyfireR_cache
-                )
+            structural_classifications <- construction(
+              mfs,
+              library_path = library_path,
+              db = db,
+              organism = organism,
+              threshold = threshold,
+              adduct_rules_table = adduct_rules_table,
+              classyfireR_cache = classyfireR_cache
+            )
+            
+            new('Construction',
+                assignments = assignments(x),
+                classifications = structural_classifications)
           }
 )
 
