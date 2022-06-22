@@ -15,7 +15,6 @@ Imports: assignments,
         dplyr,
         httr,
         KEGGREST,
-        lubridate,
         magrittr,
         methods,
         mzAnnotation,
@@ -33,7 +32,6 @@ Remotes: jasenfinch/mzAnnotation@devel,
     bioc::KEGGREST
 License: GPL-3
 Encoding: UTF-8
-LazyData: true
 RoxygenNote: 7.2.0
 Roxygen: list(markdown = TRUE)
 Suggests: 

@@ -1,6 +1,8 @@
 
 globalVariables(c('Compound','Consensus (%)','Enzyme','InChI','SMILES','ID','Level','Label',
-                  'INCHIKEY'))
+                  'INCHIKEY','.','Adduct','CanonicalSMILES','Charge','CovalentUnitCount',
+                  'Feature','INCHI','IUPACName','InChIKey','Isotope','MF','MolecularFormula',
+                  'Name','Score','id','kingdom','level','value'))
 
 setClass('Construction',
          slots = list(

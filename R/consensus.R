@@ -189,6 +189,7 @@ setGeneric('hits',function(x){
 })
 
 #' @rdname access
+#' @importFrom methods as
 
 setMethod('hits',signature = 'Consensus',
           function(x){
