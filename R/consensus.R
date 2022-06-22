@@ -119,10 +119,10 @@ setMethod('show','Consensus',
           }
 )
 
-#' Accessor methods for the `Consensus` S4 class
+#' Accessor methods for the `Consensus` and `Construction` S4 classes
 #' @rdname access
-#' @description  Accessor methods for the `Consensus` S4 class.
-#' @param x S4 object of class `Consensus`
+#' @description  Accessor methods for the `Consensus` and `Construction` S4 classes.
+#' @param x object of S4  class `Consensus` or `Construction`
 #' @export
 
 setGeneric('mf',function(x){
@@ -377,7 +377,7 @@ setMethod('consensus',signature = 'Consensus',
               noPIPs <- adductRules(x) %>%
                 select(Adduct = Name) %>%
                 anti_join(p, by = "Adduct") %>%
-                mutate(kingdom = 'No hits',`Consensus (%)` = 100)
+                mutate(kingdom = 'No database hits',`Consensus (%)` = 100)
               
               classi <- classifications(x) %>%
                 filter(kingdom != 'Unclassified') %>%
@@ -408,7 +408,7 @@ setMethod('consensus',signature = 'Consensus',
               }  
             } else {
               consensusClasses <- tibble(Adduct = adductRules(x)$Name,
-                                         kingdom = 'No hits',
+                                         kingdom = 'No database hits',
                                          `Consensus (%)` = 100)
             }
             

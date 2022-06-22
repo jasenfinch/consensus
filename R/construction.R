@@ -15,13 +15,47 @@ setMethod('show',signature = 'Construction',
           function(object){
             message('Consensus structural classifications')
             message(paste0('Assignments: ',nrow(assignments(object))))
-            message(paste0('Classifications: ',nrow(classifications(object))))
+            message(paste0('Classifications: ',nrow(object@classifications)))
           })
 
 #' @rdname access
+#' @importFrom assignments featureData
 
 setMethod('classifications',signature = 'Construction',
-          function(x) x@classifications)
+          function(x) {
+            x %>% 
+              featureData() %>%
+              {tibble(Feature = colnames(.))} %>% 
+              left_join(assignments(x),
+                        by = 'Feature') %>% 
+              select(Feature,Name,MF,Isotope,Adduct) %>% 
+              left_join(x@classifications,
+                        by = c('MF','Adduct')) %>% 
+              mutate(kingdom = kingdom %>% 
+                       replace(is.na(MF),
+                               'Unknown'))
+            })
+
+#' @rdname access
+#' @export
+
+setGeneric('summariseClassifications',function(x)
+  standardGeneric('summariseClassifications'))
+
+#' @rdname access
+#' @importFrom tidyr drop_na
+
+setMethod('summariseClassifications',signature = 'Construction',
+          function(x){
+            x %>% 
+              classifications() %>% 
+              select(kingdom:last_col(1)) %>% 
+              gather(level,value) %>% 
+              drop_na() %>% 
+              group_by(level,value) %>% 
+              summarise(count = n(),
+                        .groups = 'drop')
+          })
 
 #' Consensus structural classifications
 #' @rdname construction
@@ -33,8 +67,7 @@ setMethod('classifications',signature = 'Construction',
 #' @param threshold percentage majority threshold for consensus classifications
 #' @param adduct_rules_table data frame containing adduct formation rules. The defaults is `mzAnnotation::adduct_rules()`.
 #' @param classyfireR_cache file library_path for a `classyfireR` cache. See the documentation of `classyfireR::get_classification` for more details. 
-#' @return 
-#' If argument `x` is a tibble, then a tibble is returned containing the consensus structural classifications. If argument `x` is an object of S4 class `Assignment`, and object of S4 class `Construction` is returned.
+#' @return If argument `x` is a tibble, then a tibble is returned containing the consensus structural classifications. If argument `x` is an object of S4 class `Assignment`, and object of S4 class `Construction` is returned.
 #' @examples 
 #' \dontrun{
 #' x <- tibble::tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),
@@ -151,7 +184,7 @@ setMethod('construction',signature = 'tbl_df',
                       unique() %>%
                       sort()
                     
-                    if (!identical(kingdoms,'No hits') & !identical(kingdoms,'Unclassified') & !identical(kingdoms,c('No hits','Unclassified'))) {
+                    if (!identical(kingdoms,'No database hits') & !identical(kingdoms,'Unclassified') & !identical(kingdoms,c('No database hits','Unclassified'))) {
                       break()
                     }
                   }
@@ -194,7 +227,7 @@ setMethod('construction',signature = 'tbl_df',
                       d <- d %>%
                         filter(database == 'kegg')
                     } else {
-                      if (d$status[d$database == 'kegg'] == 'No hits') {
+                      if (d$status[d$database == 'kegg'] == 'No database hits') {
                         d <- d %>%
                           filter(database == 'pubchem')
                       } else {
@@ -247,15 +280,10 @@ setMethod('construction',signature = 'Assignment',
             
             adduct_rules_table <- assignments::adductRules(x)
             
-            isotopic_adducts <- adduct_rules_table %>% 
-              filter(Isotopic == 1) %>% 
-              .$Name
-            
             mfs <- x %>% 
               assignments() %>% 
               select(MF,Adduct) %>% 
-              distinct() %>% 
-              filter(!(Adduct %in% isotopic_adducts))
+              distinct()
             
             structural_classifications <- construction(
               mfs,
@@ -268,7 +296,7 @@ setMethod('construction',signature = 'Assignment',
             )
             
             new('Construction',
-                assignments = assignments(x),
+                x,
                 classifications = structural_classifications)
           }
 )
@@ -287,7 +315,7 @@ toSearch <- function(mfs_status,db){
       }
     }) %>%
     bind_rows() %>%
-    filter(status != 'No hits' | is.na(status))
+    filter(status != 'No database hits' | is.na(status))
   
   if (nrow(to) > 0) {
     to <- to %>%

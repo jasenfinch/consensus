@@ -20,7 +20,9 @@
 \alias{consensusClassifications}
 \alias{consensusClassifications,Consensus-method}
 \alias{classifications,Construction-method}
-\title{Accessor methods for the \code{Consensus} S4 class}
+\alias{summariseClassifications}
+\alias{summariseClassifications,Construction-method}
+\title{Accessor methods for the \code{Consensus} and \code{Construction} S4 classes}
 \usage{
 mf(x)
 
@@ -59,10 +61,14 @@ consensusClassifications(x)
 \S4method{consensusClassifications}{Consensus}(x)
 
 \S4method{classifications}{Construction}(x)
+
+summariseClassifications(x)
+
+\S4method{summariseClassifications}{Construction}(x)
 }
 \arguments{
-\item{x}{S4 object of class \code{Consensus}}
+\item{x}{object of S4  class \code{Consensus} or \code{Construction}}
 }
 \description{
-Accessor methods for the \code{Consensus} S4 class.
+Accessor methods for the \code{Consensus} and \code{Construction} S4 classes.
 }

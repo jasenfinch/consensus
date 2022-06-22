@@ -62,14 +62,14 @@ setMethod('status',signature = 'Consensus',
               unique() %>%
               sort()
             
-            if (length(st) == 1 & !identical(st,'No hits') & !identical(st,'Unclassified')) {
+            if (length(st) == 1 & !identical(st,'No database hits') & !identical(st,'Unclassified')) {
               st <- 'Classified'
             }
             
             if (length(st) > 1) {
               
               if ('Unclassified' %in% st) {
-                if (identical(st,c('No hits','Unclassified'))) {
+                if (identical(st,c('No database hits','Unclassified'))) {
                   st <- 'Unclassified'
                 } else {
                   st <- 'Classified'
