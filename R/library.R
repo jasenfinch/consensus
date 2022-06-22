@@ -1,21 +1,18 @@
 #' @importFrom readr write_rds
 
-setGeneric('saveConsensus',function(x,path = 'construction_library'){
-  standardGeneric('saveConsensus')
-})
+setGeneric('saveConsensus',function(x,path = 'construction_library')
+  standardGeneric('saveConsensus'))
 
 setMethod('saveConsensus',signature = 'Consensus',
           function(x,path = 'construction_library'){
             
             message(str_c('Exporting to ',path))
             
-            if (database(x) == 'kegg') {
-              fileName <- str_c(str_c(mf(x),database(x),organism(x),sep = '_'),'.rds')  
-            }
+            db <- database(x)
             
-            if (database(x) == 'pubchem') {
-              fileName <- str_c(str_c(mf(x),database(x),sep = '_'),'.rds')
-            }
+            fileName <- switch(db,
+                               kegg = str_c(str_c(mf(x),db,organism(x),sep = '_'),'.rds'),
+                               pubchem = str_c(str_c(mf(x),db,sep = '_'),'.rds'))
             
             write_rds(x,str_c(path,fileName,sep = '/'))
           })
@@ -25,7 +22,9 @@ setMethod('saveConsensus',signature = 'Consensus',
 loadLibrary <- function(MFs, path = 'construction_library'){
   
   if (!dir.exists(path)) {
-    dir.create(path,recursive = TRUE)  
+    dir.create(
+      path,
+      recursive = TRUE)  
     message(str_c('Created construction library at ',path))
   } else {
     message(str_c('Using construction library at ',path))
@@ -62,7 +61,9 @@ setMethod('status',signature = 'Consensus',
               unique() %>%
               sort()
             
-            if (length(st) == 1 & !identical(st,'No database hits') & !identical(st,'Unclassified')) {
+            if (length(st) == 1 & 
+                !identical(st,'No database hits') & 
+                !identical(st,'Unclassified')) {
               st <- 'Classified'
             }
             
