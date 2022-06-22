@@ -76,7 +76,7 @@ setMethod('summariseClassifications',signature = 'Construction',
 #'               Adduct = c('[M-H]1-','[M+Cl]1-','[M-H]1-'))
 #' structural_classifications <- construction(x)
 #' } 
-#' @importFrom purrr walk
+#' @importFrom purrr walk2
 #' @export
 
 setGeneric('construction',function(x, 
@@ -163,11 +163,20 @@ setMethod('construction',signature = 'tbl_df',
             
             message(str_c(length(unique(toDo$MF))),' MFs to retrieve out of ',length(unique(mfs$MF)))
             
-            toDo %>%
-              split(.$MF) %>%
-              walk(~{
+            search_mfs <- toDo %>%
+              rowid_to_column(var = 'idx') %>% 
+              split(.$MF) 
+            
+            n_mfs <- length(search_mfs)
+            
+            search_mfs %>%
+              walk2(seq_along(.),
+                    ~{
                 d <- .
                 dbase <- d$database
+                
+                message(' ')
+                message(paste0(.y,'. (',round(.y / n_mfs * 100),'%) '),appendLF = FALSE)
                 
                 for (i in dbase){
                   consense <- construct(d$MF[1],
@@ -186,7 +195,9 @@ setMethod('construction',signature = 'tbl_df',
                       unique() %>%
                       sort()
                     
-                    if (!identical(kingdoms,'No database hits') & !identical(kingdoms,'Unclassified') & !identical(kingdoms,c('No database hits','Unclassified'))) {
+                    if (!identical(kingdoms,'No database hits') & 
+                        !identical(kingdoms,'Unclassified') & 
+                        !identical(kingdoms,c('No database hits','Unclassified'))) {
                       break()
                     }
                   }

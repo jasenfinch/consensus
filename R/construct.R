@@ -28,7 +28,7 @@ construct <- function(MF,
     organism <- character()
   }
   
-  message(str_c('\n',MF))
+  message(MF)
   
   x <- new('Consensus',
            MF = MF,
