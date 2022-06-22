@@ -7,7 +7,7 @@ globalVariables(c('Compound','Consensus (%)','Enzyme','InChI','SMILES','ID','Lev
 #' @description Build or add to and load a consensus classification library. 
 #' @param x Molecular formulas and adducts to search. Should be a tibble containing two character columns named MF and Adduct.
 #' @param library_path target file library_path for classification library for storing consensus classifications
-#' @param db databases to search. Can be either kegg or pubchem.
+#' @param db databases to search. Can be either `kegg` and/or `pubchem`.
 #' @param organism KEGG organism ID. Ignored if kegg is not specified in db.
 #' @param threshold percentage majority threshold for consensus classifications
 #' @param adduct_rules_table data frame containing adduct formation rules. The defaults is `mzAnnotation::adduct_rules()`.
@@ -23,7 +23,7 @@ globalVariables(c('Compound','Consensus (%)','Enzyme','InChI','SMILES','ID','Lev
 
 setGeneric('construction',function(x, 
                                    library_path = tempdir(), 
-                                   db = c('kegg','pubchem'), 
+                                   db = 'kegg', 
                                    organism = character(), 
                                    threshold = 50,
                                    adduct_rules_table = adduct_rules(),
@@ -36,7 +36,7 @@ setGeneric('construction',function(x,
 setMethod('construction',signature = 'tbl_df',
           function(x, 
                    library_path = tempdir(), 
-                   db = c('kegg','pubchem'), 
+                   db = 'kegg', 
                    organism = character(), 
                    threshold = 50,
                    adduct_rules_table = adduct_rules(),
@@ -217,7 +217,7 @@ setMethod('construction',signature = 'tbl_df',
 setMethod('construction',signature = 'Assignment',
           function(x, 
                    library_path = tempdir(), 
-                   db = c('kegg','pubchem'), 
+                   db = 'kegg', 
                    organism = character(), 
                    threshold = 50,
                    classyfireR_cache = NULL){
