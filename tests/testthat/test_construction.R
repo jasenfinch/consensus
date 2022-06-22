@@ -1,13 +1,11 @@
 
-context('construction')
-
-test_that('construction workds',{
-  MFs <- tibble(MF = c('C4H11N','C10H14O7P2'),
-              Adduct = rep('[M-H]1-',2))
-  
-  res <- construction(MFs)
-  res1 <- construction(MFs)
-  
-  expect_equal(nrow(res),2)
-  expect_equal(nrow(res1),2)
-})
+# test_that('construction works',{
+#   MFs <- tibble(MF = c('C4H11N','C10H14O7P2'),
+#               Adduct = rep('[M-H]1-',2))
+# 
+#   structural_classifications <- construction(MFs,library_path = '.')
+#   structural_classifications_using_cache <- construction(MFs,library_path = '.')
+# 
+#   expect_identical(structural_classifications,
+#                    structural_classifications_using_cache)
+# })
