@@ -17,9 +17,8 @@ setGeneric('classify',function(x,classyfireR_cache = NULL){
 setMethod('classify',signature = 'Consensus',
           function(x,classyfireR_cache = NULL){
             
-            if (!is.null(classyfireR_cache)){
+            if (!is.null(classyfireR_cache))
               classyfireR_cache <- open_cache(dbname = classyfireR_cache)
-            }
             
             inchikey <- x %>%
               entries() %>%
@@ -36,26 +35,27 @@ setMethod('classify',signature = 'Consensus',
               
               classi <- inchikey %>%
                 map(~{
+                  message(.x)
                   out <- capture.output(cl <- get_classification(.x,conn = classyfireR_cache),
                                         type = 'message')
                   
-                  if (is.null(cl)) {
+                  if (is.null(cl)) 
                     cl <- tibble(Level = 'kingdom','Classification' = 'Unclassified',CHEMONT = NA) 
-                  } else {
+                  else
                     cl <- cl %>%
                       classification()
-                  }
                   
-                  if (!grepl('cached',out)) Sys.sleep(5)
-              
+                  if (length(out) > 0)
+                    if (!grepl('cached',out)) 
+                      Sys.sleep(5)
+                  
                   pb$tick()
                   return(cl)
                 }) %>%
                 set_names(inchikey)
               
-              if (!is.null(classyfireR_cache)){
+              if (!is.null(classyfireR_cache))
                 dbDisconnect(classyfireR_cache)
-              }
               
               classes <- c('kingdom','superclass','class','subclass')
               
@@ -83,9 +83,8 @@ setMethod('classify',signature = 'Consensus',
                   select(ID,INCHIKEY,everything())
                 
                 message(str_c(length(unique(classi$INCHIKEY)),' classifications returned'))  
-              } else {
+              } else 
                 message('0 classifications returned')
-              }
               
               x@classifications <- classi  
             }
