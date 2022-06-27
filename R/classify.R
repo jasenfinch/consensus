@@ -35,7 +35,6 @@ setMethod('classify',signature = 'Consensus',
               
               classi <- inchikey %>%
                 map(~{
-                  message(.x)
                   out <- capture.output(cl <- get_classification(.x,conn = classyfireR_cache),
                                         type = 'message')
                   
