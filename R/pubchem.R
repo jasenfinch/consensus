@@ -1,6 +1,7 @@
 #' @importFrom httr GET config content
 #' @importFrom tibble as_tibble
 #' @importFrom dplyr mutate rename
+#' @importFrom rlang syms
 
 pubchemMatch <- function(MF){
   message('Retrieving CIDs from PubChem...')
@@ -76,7 +77,19 @@ pubchemMatch <- function(MF){
     
     if (nrow(chem_info) > 0) {
      chem_info <- chem_info  %>%
-        mutate(ID = 1:nrow(.)) %>%
+        mutate(ID = 1:nrow(.)) 
+     
+     if (any(!(descs %in% colnames(chem_info)))){
+       missing_columns <- descs[!(descs %in% colnames(chem_info))] %>% 
+         rlang::syms()
+       
+       for (i in missing_columns){
+         chem_info <- chem_info %>% 
+           mutate(!!i := NA) 
+       }
+     }
+     
+     chem_info <- chem_info %>%
         rename(NAME = IUPACName,
                INCHI = InChI,
                SMILES = CanonicalSMILES, 
