@@ -2,7 +2,8 @@
 context('PubChem searches')
 
 test_that('Pubchem MF matching works',{
-  mf <- pubchemMatch('C12H22O11')
+  mf <- pubchemMatch('C18H29NO14')
   
-  expect_identical(class(mf),c('tbl_df','tbl','data.frame'))
+  expect_s3_class(mf,'tbl_df')
 })
+  
