@@ -77,6 +77,7 @@ setMethod('summariseClassifications',signature = 'Construction',
 #' structural_classifications <- construction(x)
 #' } 
 #' @importFrom purrr walk2
+#' @importFrom tidyr expand_grid
 #' @export
 
 setGeneric('construction',function(x, 
@@ -116,11 +117,10 @@ setMethod('construction',signature = 'tbl_df',
                             several.ok = TRUE) %>% 
               sort()
             
-            mfs <- x$MF %>%
-              map(~{
-                tibble(MF = .,database = db)
-              }) %>%
-              bind_rows()
+            mfs <- expand_grid(
+              MF = x$MF,
+              database = db
+            )
             
             library_path <- normalizePath(library_path)
             
@@ -139,21 +139,14 @@ setMethod('construction',signature = 'tbl_df',
               }
               
               if ('kegg' %in% db) {
-                statuses <- statuses %>%
-                  split(.$database) %>%
-                  map(~{
-                    d <- .
-                    if (d$database[1] == 'kegg') {
-                      d <- d %>% 
-                        filter(organism == org)  
-                    }
-                    return(d)
-                  }) %>%
-                  bind_rows()
+                statuses <- statuses %>% 
+                  filter(db != 'kegg' | 
+                           (db == 'kegg' & organism == org))
               }
               
               mfs_status <- mfs %>%
-                left_join(statuses, by = c("MF", "database"))
+                left_join(statuses, 
+                          by = c("MF", "database"))
               
               toDo <- mfs_status %>%
                 toSearch(db)
@@ -330,18 +323,6 @@ toSearch <- function(mfs_status,db){
     bind_rows() %>%
     filter(status != 'No database hits' | is.na(status))
   
-  if (nrow(to) > 0) {
-    to <- to %>%
-      split(.$MF) %>%
-      map(~{
-        if (('kegg' %in% .x$database)){
-          .x <- .x %>%
-            filter(database != 'pubchem')
-        }
-        return(.x)
-      }) %>%
-      bind_rows()
-  }
   to %>%
     filter(status != 'Unclassified' | is.na(status)) %>%
     select(MF,database) %>%
