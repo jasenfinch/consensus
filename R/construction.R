@@ -140,8 +140,8 @@ setMethod('construction',signature = 'tbl_df',
               
               if ('kegg' %in% db) {
                 statuses <- statuses %>% 
-                  filter(db != 'kegg' | 
-                           (db == 'kegg' & organism == org))
+                  filter(database != 'kegg' | 
+                           (database == 'kegg' & organism == org))
               }
               
               mfs_status <- mfs %>%
