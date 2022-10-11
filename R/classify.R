@@ -38,11 +38,17 @@ setMethod('classify',signature = 'Consensus',
                   out <- capture.output(cl <- get_classification(.x,conn = classyfireR_cache),
                                         type = 'message')
                   
-                  if (is.null(cl) | length(classification(cl)) == 0) 
+                  if (is.null(cl)) 
                     cl <- tibble(Level = 'kingdom','Classification' = 'Unclassified',CHEMONT = NA) 
-                  else
+                  else {
                     cl <- cl %>%
                       classification()
+                    
+                    if (length(cl) == 0) {
+                      cl <- tibble(Level = 'kingdom','Classification' = 'Unclassified',CHEMONT = NA)
+                    }
+                  }
+                    
                   
                   if (length(out) > 0)
                     if (!grepl('cached',out)) 
