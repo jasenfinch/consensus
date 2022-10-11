@@ -38,7 +38,7 @@ setMethod('classify',signature = 'Consensus',
                   out <- capture.output(cl <- get_classification(.x,conn = classyfireR_cache),
                                         type = 'message')
                   
-                  if (is.null(cl)) 
+                  if (is.null(cl) | length(classification(cl)) == 0) 
                     cl <- tibble(Level = 'kingdom','Classification' = 'Unclassified',CHEMONT = NA) 
                   else
                     cl <- cl %>%
