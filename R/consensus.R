@@ -342,7 +342,7 @@ conse <- function(cl,thresh){
   
   consensusClass <- classes %>%
     filter(id == cons$id) %>%
-    select(consensusLevels) %>%
+    select(all_of(consensusLevels)) %>%
     mutate(`Consensus (%)` = cons$Score * 100)
   
   return(consensusClass)
