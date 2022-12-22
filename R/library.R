@@ -17,7 +17,7 @@ setMethod('saveConsensus',signature = 'Consensus',
             }
             
             fileName <- switch(db,
-                               kegg = str_c(str_c(mf(x),db,orgsep = '_'),'.rds'),
+                               kegg = str_c(str_c(mf(x),db,org,sep = '_'),'.rds'),
                                pubchem = str_c(str_c(mf(x),db,sep = '_'),'.rds'))
             
             write_rds(x,str_c(path,fileName,sep = '/'))
