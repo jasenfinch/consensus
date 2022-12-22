@@ -232,6 +232,7 @@ setGeneric('consensusClassifications',function(x){
 })
 
 #' @rdname access
+#' @importFrom dplyr all_of
 
 setMethod('consensusClassifications',signature = 'Consensus',
           function(x){
@@ -290,7 +291,7 @@ conse <- function(cl,thresh){
   clLevels <- clLevels[clLevels %in% names(votesTable)]
   
   votesTable <- votesTable %>%
-    select(id,clLevels,contains('level'))
+    select(id,all_of(clLevels),contains('level'))
   
   N <- nrow(cl)
   
