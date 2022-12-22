@@ -165,14 +165,12 @@ setMethod('construction',signature = 'tbl_df',
             search_mfs %>%
               walk2(seq_along(.),
                     ~{
-                d <- .
-                dbase <- d$database
                 
                 message(' ')
                 message(paste0(.y,'. (',round(.y / n_mfs * 100),'%) '),appendLF = FALSE)
                 
-                for (i in dbase){
-                  consense <- construct(d$MF[1],
+                for (i in .x$database){
+                  consense <- construct(.x$MF[1],
                                         db = i,
                                         organism = organism,
                                         threshold = threshold,
