@@ -23,7 +23,7 @@ setMethod('mfHits',signature = 'Consensus',
                   if (nrow(entries(.)) > 0) {
                     .@entries <- entries(.) %>%
                       rowwise() %>%
-                      mutate(INCHIKEY = convert(INCHI,'inchi','inchikey')) %>%
+                      mutate(INCHIKEY = convert(INCHI,'INCHI','INCHIKEY')) %>%
                       ungroup() 
                   } else {
                     .@entries <- entries(.) %>%
