@@ -10,8 +10,14 @@ setMethod('saveConsensus',signature = 'Consensus',
             
             db <- database(x)
             
+            if (length(organism(x)) == 0) {
+              org <- 'none'
+            } else {
+              org <- organism(x)
+            }
+            
             fileName <- switch(db,
-                               kegg = str_c(str_c(mf(x),db,organism(x),sep = '_'),'.rds'),
+                               kegg = str_c(str_c(mf(x),db,orgsep = '_'),'.rds'),
                                pubchem = str_c(str_c(mf(x),db,sep = '_'),'.rds'))
             
             write_rds(x,str_c(path,fileName,sep = '/'))
