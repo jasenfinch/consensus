@@ -1,4 +1,4 @@
-#' @importFrom mzAnnotation filterMF metaboliteDB filterEntries descriptors convert
+#' @importFrom cheminf filterMF metaboliteDB filterEntries descriptors convert
 #' @importFrom dplyr rowwise ungroup
 
 setGeneric('mfHits',function(x){
@@ -49,7 +49,7 @@ setMethod('mfHits',signature = 'Consensus',
             return(x)
           })
 
-#' @importFrom mzAnnotation filterIP
+#' @importFrom cheminf filterIP
 #' @importFrom rlang parse_exprs
 
 setGeneric('pips',function(x){

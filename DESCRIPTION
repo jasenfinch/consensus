@@ -10,6 +10,7 @@ Description: Consensus structural chemical classifications for putative molecula
 biocViews: Metabolomics
 Depends: R (>= 3.5)
 Imports: assignments,
+        cheminf,
         classyfireR,
         cli,
         dplyr,
@@ -27,12 +28,14 @@ Imports: assignments,
         tidyr,
         tidyselect,
         tibble
-Remotes: jasenfinch/mzAnnotation@devel,
+Remotes: 
+    jasenfinch/mzAnnotation@devel,
+    jasenfinch/cheminf,  
     aberHRML/classyfireR,
     bioc::KEGGREST
 License: GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Suggests: 
     testthat,
