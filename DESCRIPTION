@@ -48,3 +48,4 @@ Collate: consensus.R
         pubchem.R
         search.R
         library.R
+        reexports.R
