@@ -1,3 +1,4 @@
+#' @importClassesFrom cheminf MetaboliteDatabase
 
 setClass('Consensus',
          slots = list(

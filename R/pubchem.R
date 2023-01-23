@@ -1,7 +1,7 @@
 #' @importFrom httr GET config content
 #' @importFrom tibble as_tibble
 #' @importFrom dplyr mutate rename
-#' @importFrom rlang syms
+#' @importFrom rlang syms :=
 
 pubchemMatch <- function(MF){
   message('Retrieving CIDs from PubChem...')
