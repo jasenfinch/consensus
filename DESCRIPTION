@@ -8,9 +8,9 @@ Authors@R:
            email = "jsf9@aber.ac.uk")
 Description: Consensus structural chemical classifications for putative molecular formula assignments of m/z mass spectrometry features.
 biocViews: Metabolomics
-Depends: R (>= 3.5),
-        cheminf
+Depends: R (>= 3.5)
 Imports: assignments,
+        cheminf,
         classyfireR,
         cli,
         dplyr,
