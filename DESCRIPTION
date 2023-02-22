@@ -6,7 +6,7 @@ Authors@R:
            family = "Finch",
            role = c("aut", "cre"),
            email = "jsf9@aber.ac.uk")
-Description: Consensus structural chemical classifications for putative molecular formula assignments of m/z mass spectrometry features.
+Description: Consensus structural chemical classifications for putative molecular formula assignments of m/z features from electrospray ionisation mass spectrometry data.
 biocViews: Metabolomics
 Depends: R (>= 3.5)
 Imports: assignments,
@@ -29,7 +29,7 @@ Imports: assignments,
         tidyselect,
         tibble
 Remotes: 
-    jasenfinch/mzAnnotation@devel,
+    aberHRML/mzAnnotation,
     jasenfinch/cheminf,  
     aberHRML/classyfireR,
     bioc::KEGGREST
