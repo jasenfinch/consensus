@@ -2,3 +2,16 @@ url: https://jasenfinch.github.io/construction/
 template:
   bootstrap: 5
 
+reference:
+  - title: Consensus classification
+    contents:
+    - construction
+    - construct
+  
+  - title: Accessors
+    contents:
+    - mf
+  
+  - title: Other
+    contents:
+    - keggCompoundInfo

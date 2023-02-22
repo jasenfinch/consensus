@@ -7,10 +7,10 @@
 keggCompoundInfo(IDs)
 }
 \arguments{
-\item{IDs}{KEGG compound accession IDs}
+\item{IDs}{a vector of KEGG compound entry IDs}
 }
 \description{
-Return KEGG compound accession information.
+Retrieve KEGG compound information.
 }
 \examples{
 keggCompoundInfo(c('C00089','C00149'))

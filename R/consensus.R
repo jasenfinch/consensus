@@ -113,6 +113,50 @@ setMethod('show','Consensus',
 #' @rdname access
 #' @description  Accessor methods for the `Consensus` and `Construction` S4 classes.
 #' @param x object of S4  class `Consensus` or `Construction`
+#' @details 
+#' * `mf` - Return the searched molecular formula
+#' * `adductRules` - Return a tibble of adduct formation rules.
+#' * `organism` - Return the KEGG organism ID.
+#' * `database` - Return the searched database.
+#' * `threshold` - Return the percentage consensus threshold for structural classification selection.
+#' * `hits` - Return a `MetaboliteDatabase` ionisation database of matched database hits.
+#' * `PIPs` - Return the putative ionisation products of database hits
+#' * `classifications` -Return the structural chemical classifications of database hits.
+#' * `consensusClassifications` - Return the consensus classification or classifications.
+#' * `summariseClassifications` - Return a tibble of summarised consensus structural classifications.
+#' @return 
+#' A character, a numeric, a tibble or an object of S4 class `MetaboliteDatabase`, depending on the method used.
+#' @examples 
+#' consensus <- construct(
+#'   'C4H6O5',
+#'   organism = 'hsa')
+#' 
+#' ## Return the molecular formula
+#' mf(consensus)
+#' 
+#' ## Return the adduct formation rules
+#' adductRules(consensus)
+#' 
+#' ## Return the KEGG organism ID
+#' organism(consensus)
+#' 
+#' ## Return the searched database
+#' database(consensus)
+#' 
+#' ## Return the % consensus threshold
+#' threshold(consensus)
+#' 
+#' ## Return the `MetaboliteDatabase` ionisation database of searched database  hits
+#' hits(consensus)
+#' 
+#' ## Return the putative ionisation products
+#' PIPs(consensus)
+#' 
+#' ## Return the structural classifications
+#' classifications(consensus)
+#' 
+#' ## Return the consensus structural classification
+#' consensusClassifications(consensus)
 #' @export
 
 setGeneric('mf',function(x){
