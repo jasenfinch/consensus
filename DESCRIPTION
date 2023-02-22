@@ -28,7 +28,8 @@ Imports: assignments,
         tidyselect,
         tibble
 Remotes: 
-    jasenfinch/mzAnnotation@devel,
+    aberHRML/assignments,
+    aberHRML/mzAnnotation,
     jasenfinch/cheminf,  
     aberHRML/classyfireR,
     bioc::KEGGREST
