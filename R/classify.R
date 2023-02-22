@@ -59,9 +59,6 @@ setMethod('classify',signature = 'Consensus',
                 }) %>%
                 set_names(inchikey)
               
-              if (!is.null(classyfireR_cache))
-                dbDisconnect(classyfireR_cache)
-              
               classes <- c('kingdom','superclass','class','subclass')
               
               classi <- classi %>%
@@ -93,6 +90,9 @@ setMethod('classify',signature = 'Consensus',
               
               x@classifications <- classi  
             }
+            
+            if (!is.null(classyfireR_cache))
+              dbDisconnect(classyfireR_cache)
             
             return(x)
           }
