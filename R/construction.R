@@ -15,9 +15,9 @@ setClass('Construction',
 
 setMethod('show',signature = 'Construction',
           function(object){
-            message('Consensus structural classifications')
-            message(paste0('Assignments: ',nrow(assignments(object))))
-            message(paste0('Classifications: ',nrow(object@classifications)))
+            cat('Consensus structural classifications','\n')
+            cat(paste0('Assignments: ',nrow(assignments(object))),'\n')
+            cat(paste0('Classifications: ',nrow(object@classifications)))
           })
 
 #' @rdname access
