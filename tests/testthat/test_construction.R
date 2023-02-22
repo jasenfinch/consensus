@@ -24,6 +24,8 @@ test_that('construction works',{
   
   
   expect_s3_class(structural_classifications,'tbl_df')
+  
+  unlink(paste0(tempdir(),'ClassyFireCache.db'))
 })
 
 test_that('construction works for the Assignment S4 class',{
