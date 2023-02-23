@@ -1,48 +1,51 @@
 Package: construction
 Title: Consensus Structural Chemical Classifications for Putative Molecular Formula Assignments
-Version: 0.2.10
+Version: 0.3.0
 Authors@R: 
     person(given = "Jasen",
            family = "Finch",
            role = c("aut", "cre"),
            email = "jsf9@aber.ac.uk")
-Description: Consensus structural chemical classifications for putative molecular formula assignments.
-biocViews: Metabolomics
+Description: Consensus structural chemical classifications for putative molecular formula assignments of m/z mass spectrometry features.
 Depends: R (>= 3.5)
-Imports: KEGGREST,
+Imports: assignments,
+        cheminf,
+        classyfireR,
+        cli,
         dplyr,
         httr,
-        lubridate,
+        KEGGREST,
         magrittr,
         methods,
+        mzAnnotation,
         progress,
         purrr,
+        readr,
+        rlang,
+        RSQLite,
         stringr,
         tidyr,
         tidyselect,
-        tibble,
-        readr,
-        cli,
-        mzAnnotation,
-        classyfireR
-Remotes: jasenfinch/mzAnnotation,
-    aberHRML/classyfireR
+        tibble
+Remotes: 
+    aberHRML/assignments,
+    aberHRML/mzAnnotation,
+    jasenfinch/cheminf,  
+    aberHRML/classyfireR,
+    bioc::KEGGREST
 License: GPL-3
 Encoding: UTF-8
-LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
+Roxygen: list(markdown = TRUE)
 Suggests: 
     testthat,
     covr
-Collate: allClasses.R
-        allGenerics.R
-        access.R
+Collate: consensus.R
         classify.R
-        consensus.R
         construct.R
         construction.R
         kegg.R
         pubchem.R
-        show-method.R
         search.R
         library.R
+URL: https://jasenfinch.github.io/construction/

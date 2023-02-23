@@ -1,6 +1,6 @@
 #' keggCompoundInfo
-#' @description Return KEGG compound accession information.
-#' @param IDs KEGG compound accession IDs
+#' @description Retrieve KEGG compound information.
+#' @param IDs a vector of KEGG compound entry IDs
 #' @examples 
 #' keggCompoundInfo(c('C00089','C00149'))
 #' @importFrom KEGGREST keggGet
@@ -26,13 +26,13 @@ keggCompoundInfo <- function(IDs){
 #' @importFrom KEGGREST keggLink
 #' @importFrom tibble deframe tibble
 #' @importFrom stringr str_remove_all
-#' @importFrom mzAnnotation getAccessions
+#' @importFrom cheminf entries
 
 keggCompounds <- function(organism = character()){
   
   if (length(organism) == 0) {
     compounds <- metabolites %>%
-      getAccessions() %>%
+      entries() %>%
       .$ID
   } else {
     enzymes <- keggLink(organism,'enzyme') %>%

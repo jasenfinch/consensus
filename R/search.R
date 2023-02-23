@@ -1,5 +1,9 @@
-#' @importFrom mzAnnotation filterMF metaboliteDB filterACCESSIONS descriptors convert
+#' @importFrom cheminf filterMF metaboliteDB filterEntries descriptors convert
 #' @importFrom dplyr rowwise ungroup
+
+setGeneric('mfHits',function(x){
+  standardGeneric('mfHits')
+})
 
 setMethod('mfHits',signature = 'Consensus',
           function(x){
@@ -11,18 +15,18 @@ setMethod('mfHits',signature = 'Consensus',
               compounds <- keggCompounds(organism(x))
               
               met <- metabolites %>%
-                filterACCESSIONS(compounds)
+                filterEntries(compounds)
               
               hits <- met %>%
                 filterMF(mf(x)) %>%
                 {
-                  if (nrow(getAccessions(.)) > 0) {
-                    .@accessions[[1]] <- .@accessions[[1]] %>%
+                  if (nrow(entries(.)) > 0) {
+                    .@entries <- entries(.) %>%
                       rowwise() %>%
-                      mutate(INCHIKEY = convert(INCHI,'inchi','inchikey')) %>%
+                      mutate(INCHIKEY = convert(INCHI,'INCHI','INCHIKEY')) %>%
                       ungroup() 
                   } else {
-                    .@accessions[[1]] <- .@accessions[[1]] %>%
+                    .@entries <- entries(.) %>%
                       mutate(INCHIKEY = character())
                   }
                   
@@ -30,20 +34,27 @@ setMethod('mfHits',signature = 'Consensus',
                 }
               
               message(str_c(hits %>% 
-                              getAccessions() %>% 
+                              entries() %>% 
                               nrow()), ' hits returned')
             }
             
             if (db == 'pubchem') {
               hits <- pubchemMatch(mf(x)) %>%
-                {metaboliteDB(.,descriptors(.$SMILES))}
+                metaboliteDB()
             }
             
-            x@hits <- hits
+            x@entries <- entries(hits)
+            x@descriptors <- descriptors(hits)
+            
             return(x)
           })
 
-#' @importFrom mzAnnotation filterIP
+#' @importFrom cheminf filterIP
+#' @importFrom rlang parse_exprs
+
+setGeneric('pips',function(x){
+  standardGeneric('pips')
+})
 
 setMethod('pips',signature = 'Consensus',
           function(x){
@@ -51,10 +62,10 @@ setMethod('pips',signature = 'Consensus',
             a <- adductRules(x)
             h <- hits(x)
             
-            p <- a$Rule %>%
+            p <- parse_exprs(a$Rule) %>%
               map(filterIP,db = h) %>%
               set_names(a$Name) %>%
-              map(getAccessions) %>%
+              map(entries) %>%
               bind_rows(.id = 'Adduct') %>%
               select(Adduct,ID)
             

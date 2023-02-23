@@ -2,33 +2,64 @@
 % Please edit documentation in R/construction.R
 \name{construction}
 \alias{construction}
-\title{construction}
+\alias{construction,tbl_df-method}
+\alias{construction,Assignment-method}
+\title{Consensus structural classifications for putative ionisation products}
 \usage{
 construction(
-  MFs,
-  path = ".",
-  db = c("kegg", "pubchem"),
+  x,
+  library_path = tempdir(),
+  db = "kegg",
   organism = character(),
-  threshold = 50
+  threshold = 50,
+  adduct_rules_table = adduct_rules(),
+  classyfireR_cache = NULL
+)
+
+\S4method{construction}{tbl_df}(
+  x,
+  library_path = tempdir(),
+  db = "kegg",
+  organism = character(),
+  threshold = 50,
+  adduct_rules_table = adduct_rules(),
+  classyfireR_cache = NULL
+)
+
+\S4method{construction}{Assignment}(
+  x,
+  library_path = tempdir(),
+  db = "kegg",
+  organism = character(),
+  threshold = 50,
+  classyfireR_cache = NULL
 )
 }
 \arguments{
-\item{MFs}{Molecular formulas and adducts to search. Should be a tibble containing two character columns named MF and Adduct.}
+\item{x}{The molecular formulas and adducts to search. This should either be a tibble containing two character columns named \code{MF} and \code{Adduct} or and S4 object of class \code{Assignment}.}
 
-\item{path}{target file path for classification library}
+\item{library_path}{the target file path for the classification library in which to store consensus classification data}
 
-\item{db}{databases to search. Can be either kegg or pubchem.}
+\item{db}{the databases to search. This can either be \code{kegg} and/or \code{pubchem}.}
 
-\item{organism}{KEGG organism ID. Ignored if kegg is not specified in db.}
+\item{organism}{the KEGG organism ID. This is Ignored if argument \code{db} is set to \code{pubchem}}
 
-\item{threshold}{\% majority threshold for consensus classifications}
+\item{threshold}{the percentage majority threshold for consensus classification}
+
+\item{adduct_rules_table}{a data frame containing the adduct formation rules. The defaults is \code{mzAnnotation::adduct_rules()}.}
+
+\item{classyfireR_cache}{the file path for a \code{classyfireR} cache. See the documentation of \code{classyfireR::get_classification} for more details.}
+}
+\value{
+If argument \code{x} is a tibble, then a tibble is returned containing the consensus structural classifications. If argument \code{x} is an object of S4 class \code{Assignment}, and object of S4 class \code{Construction} is returned.
 }
 \description{
-Build or add to and load a consensus classification library.
+Perform consensus structural classification for molecular formulas assigned to \emph{m/z} features from electrospray ionisation mass spectrometry approaches.
 }
 \examples{
-\dontrun{
-MFs <- tibble(MF = c(rep('C12H22O11',2),'C4H6O5'),Adduct = c('[M-H]1-','[M+Cl]1-','[M-H]1-'))
-structural_classifications <- construction(MFs)
-} 
+x <- tibble::tibble(MF = c('C12H22O11','C4H6O5'),
+                    Adduct = c('[M+Cl]1-','[M-H]1-'))
+structural_classifications <- construction(x)
+
+structural_classifications
 }

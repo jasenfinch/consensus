@@ -1,3 +1,289 @@
+#' @importClassesFrom cheminf MetaboliteDatabase
+
+setClass('Consensus',
+         slots = list(
+           MF = 'character',
+           adduct_rules = 'tbl_df',
+           organism = 'character',
+           database = 'character',
+           threshold = 'numeric',
+           classifications = 'tbl_df',
+           PIPs = 'tbl_df',
+           consensus = 'tbl_df'
+         ),
+         contains = 'MetaboliteDatabase',
+         prototype = list(
+           classifications = tibble(),
+           PIPs = tibble(),
+           consensus = tibble()
+         )
+)
+
+#' @importFrom cli tree
+#' @importFrom stats na.omit
+
+setGeneric('classificationTree',function(x){
+  standardGeneric('classificationTree')
+})
+
+setMethod('classificationTree',signature = 'Consensus',
+          function(x){
+            d <- x %>%
+              overallConsensus() 
+            
+            if (nrow(d) > 0){
+              d <- d %>%
+                select(-`Consensus (%)`) %>%
+                gather(Level,Name) %>%
+                mutate(Label = str_c(Level,': ',Name)) %>%
+                na.omit() %>%
+                select(Label)
+              
+              connections <- list()
+              for (i in 1:nrow(d)) {
+                if (i == nrow(d)) {
+                  connections[[i]] <- c(character(0))
+                } else {
+                  connections[[i]] <- c(d$Label[(i + 1)])  
+                }
+              } 
+              
+              a <- data.frame(stringsAsFactors = FALSE,
+                              id = d$Label,
+                              connections = I(connections))
+              
+              tree(a)   
+            } else {
+              invisible()
+            }
+            
+          }
+)
+
+setMethod('show','Consensus',
+          function(object){
+            cat('Consensus structural classifications\n\n')
+            cat('MF:\t\t\t',mf(object),'\n')
+            cat('Adducts:\t\t',nrow(adductRules(object)),'\n')
+            cat('Organism:\t\t',organism(object),'\n')
+            cat('Database:\t\t',database(object),'\n')
+            cat('Threshold:\t\t',str_c(threshold(object),'%'),'\n')
+            cat('Hits:\t\t\t',hits(object) %>% entries() %>% nrow(),'\n')
+            cat('Classifications:\t',nrow(classifications(object)),'\n')
+            cat('Average PIPs:\t\t',
+                {
+                  pips <- object %>%
+                    PIPs()
+                  
+                  if (nrow(pips) > 0){
+                    pips %>% 
+                      group_by(Adduct) %>% 
+                      summarise(N = n()) %>% 
+                      .$N %>% 
+                      mean() %>% 
+                      round()
+                  } else {
+                    0
+                  }
+                },
+                '\n')
+            cat('Average Consensus:\t',str_c(
+              {
+                con <- object %>% 
+                  consensusClassifications() 
+                
+                if (nrow(con) > 0){
+                  con %>% 
+                    .$`Consensus (%)` %>% 
+                    mean() %>% 
+                    round()
+                } else {
+                  0
+                }
+              },
+              '%\n\n'))
+            
+            classification_tree <- classificationTree(object)
+            
+            if (!is.null(classification_tree)) print(classification_tree)
+          }
+)
+
+#' Accessor methods for the `Consensus` and `Construction` S4 classes
+#' @rdname access
+#' @description  Accessor methods for the `Consensus` and `Construction` S4 classes.
+#' @param x object of S4  class `Consensus` or `Construction`
+#' @details 
+#' * `mf` - Return the searched molecular formula
+#' * `adductRules` - Return a tibble of adduct formation rules.
+#' * `organism` - Return the KEGG organism ID.
+#' * `database` - Return the searched database.
+#' * `threshold` - Return the percentage consensus threshold for structural classification selection.
+#' * `hits` - Return a `MetaboliteDatabase` ionisation database of matched database hits.
+#' * `PIPs` - Return the putative ionisation products of database hits
+#' * `classifications` -Return the structural chemical classifications of database hits.
+#' * `consensusClassifications` - Return the consensus classification or classifications.
+#' * `summariseClassifications` - Return a tibble of summarised consensus structural classifications.
+#' @return 
+#' A character, a numeric, a tibble or an object of S4 class `MetaboliteDatabase`, depending on the method used.
+#' @examples 
+#' consensus <- construct(
+#'   'C4H6O5',
+#'   organism = 'hsa')
+#' 
+#' ## Return the molecular formula
+#' mf(consensus)
+#' 
+#' ## Return the adduct formation rules
+#' adductRules(consensus)
+#' 
+#' ## Return the KEGG organism ID
+#' organism(consensus)
+#' 
+#' ## Return the searched database
+#' database(consensus)
+#' 
+#' ## Return the % consensus threshold
+#' threshold(consensus)
+#' 
+#' ## Return the `MetaboliteDatabase` ionisation database of searched database  hits
+#' hits(consensus)
+#' 
+#' ## Return the putative ionisation products
+#' PIPs(consensus)
+#' 
+#' ## Return the structural classifications
+#' classifications(consensus)
+#' 
+#' ## Return the consensus structural classification
+#' consensusClassifications(consensus)
+#' @export
+
+setGeneric('mf',function(x){
+  standardGeneric('mf')
+})
+
+#' @rdname access
+
+setMethod('mf',signature = 'Consensus',
+          function(x){
+            x@MF
+          })
+
+#' @rdname access
+#' @export
+
+setGeneric('adductRules',function(x){
+  standardGeneric('adductRules')
+})
+
+#' @rdname access
+
+setMethod('adductRules',signature = 'Consensus',
+          function(x){
+            x@adduct_rules
+          })
+
+#' @rdname access
+#' @export
+
+setGeneric('organism',function(x){
+  standardGeneric('organism')
+})
+
+#' @rdname access
+
+setMethod('organism',signature = 'Consensus',
+          function(x){
+            x@organism
+          })
+
+#' @rdname access
+#' @export
+
+setGeneric('database',function(x){
+  standardGeneric('database')
+})
+
+#' @rdname access
+
+setMethod('database',signature = 'Consensus',
+          function(x){
+            x@database
+          })
+
+#' @rdname access
+#' @export
+
+setGeneric('threshold',function(x){
+  standardGeneric('threshold')
+})
+
+#' @rdname access
+
+setMethod('threshold',signature = 'Consensus',
+          function(x){
+            x@threshold
+          })
+
+#' @rdname access
+#' @export
+
+setGeneric('hits',function(x){
+  standardGeneric('hits')
+})
+
+#' @rdname access
+#' @importFrom methods as
+
+setMethod('hits',signature = 'Consensus',
+          function(x){
+            as(x,'MetaboliteDatabase')
+          })
+
+#' @rdname access
+#' @export
+
+setGeneric('PIPs',function(x){
+  standardGeneric('PIPs')
+})
+
+#' @rdname access
+
+setMethod('PIPs',signature = 'Consensus',
+          function(x){
+            x@PIPs
+          })
+
+#' @rdname access
+#' @export
+
+setGeneric('classifications',function(x){
+  standardGeneric('classifications')
+})
+
+#' @rdname access
+
+setMethod('classifications',signature = 'Consensus',
+          function(x){
+            x@classifications
+          })
+
+#' @rdname access
+#' @export
+
+setGeneric('consensusClassifications',function(x){
+  standardGeneric('consensusClassifications')
+})
+
+#' @rdname access
+#' @importFrom dplyr all_of
+
+setMethod('consensusClassifications',signature = 'Consensus',
+          function(x){
+            x@consensus
+          })
+
 conse <- function(cl,thresh){
   thresh <- thresh / 100
   
@@ -50,7 +336,7 @@ conse <- function(cl,thresh){
   clLevels <- clLevels[clLevels %in% names(votesTable)]
   
   votesTable <- votesTable %>%
-    select(id,clLevels,contains('level'))
+    select(id,all_of(clLevels),contains('level'))
   
   N <- nrow(cl)
   
@@ -101,7 +387,7 @@ conse <- function(cl,thresh){
   
   consensusClass <- classes %>%
     filter(id == cons$id) %>%
-    select(consensusLevels) %>%
+    select(all_of(consensusLevels)) %>%
     mutate(`Consensus (%)` = cons$Score * 100)
   
   return(consensusClass)
@@ -111,6 +397,10 @@ conse <- function(cl,thresh){
 #' @importFrom dplyr everything group_by summarise right_join n anti_join full_join
 #' @importFrom tidyr gather
 #' @importFrom tidyselect contains
+
+setGeneric('consensus',function(x){
+  standardGeneric('consensus')
+})
 
 setMethod('consensus',signature = 'Consensus',
           function(x){
@@ -123,7 +413,7 @@ setMethod('consensus',signature = 'Consensus',
               noPIPs <- adductRules(x) %>%
                 select(Adduct = Name) %>%
                 anti_join(p, by = "Adduct") %>%
-                mutate(kingdom = 'No hits',`Consensus (%)` = 100)
+                mutate(kingdom = 'No database hits',`Consensus (%)` = 100)
               
               classi <- classifications(x) %>%
                 filter(kingdom != 'Unclassified') %>%
@@ -154,8 +444,8 @@ setMethod('consensus',signature = 'Consensus',
               }  
             } else {
               consensusClasses <- tibble(Adduct = adductRules(x)$Name,
-                                        kingdom = 'No hits',
-                                        `Consensus (%)` = 100)
+                                         kingdom = 'No database hits',
+                                         `Consensus (%)` = 100)
             }
             
             x@consensus <- consensusClasses
@@ -163,9 +453,19 @@ setMethod('consensus',signature = 'Consensus',
           }
 )
 
+setGeneric('overallConsensus',function(x){
+  standardGeneric('overallConsensus')
+})
+
 setMethod('overallConsensus',signature = 'Consensus',
           function(x){
-            consensusClassifications(x) %>%
-              select(-`Consensus (%)`) %>%
-              conse(thresh = threshold(x))
+            con <- consensusClassifications(x) 
+            
+            if (nrow(con) > 0){
+              con %>%
+                select(-`Consensus (%)`) %>%
+                conse(thresh = threshold(x))
+            } else {
+              con
+            }
           })

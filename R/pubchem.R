@@ -1,6 +1,7 @@
 #' @importFrom httr GET config content
 #' @importFrom tibble as_tibble
 #' @importFrom dplyr mutate rename
+#' @importFrom rlang syms :=
 
 pubchemMatch <- function(MF){
   message('Retrieving CIDs from PubChem...')
@@ -13,7 +14,7 @@ pubchemMatch <- function(MF){
     content() %>%
     {.$Waiting$ListKey}
   
-  while (T) {
+  while (TRUE) {
     Sys.sleep(0.3)
     cid_cmd <- str_c('https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/listkey/',
                      key,
@@ -31,8 +32,14 @@ pubchemMatch <- function(MF){
   }
   
   if (names(cids) == 'Fault') {
-    message('0 CIDs returned')
-    return(tibble(ID = character(),MF = character(),INCHI = character(),SMILES = character(),INCHIKEY = character()))
+    chem_info <- tibble(
+      ID = character(),
+      NAME = character(),
+      MF = character(),
+      INCHI = character(),
+      SMILES = character(),
+      INCHIKEY = character()
+    )
   }
   
   if (names(cids) == "IdentifierList") {
@@ -70,25 +77,40 @@ pubchemMatch <- function(MF){
       filter(Charge == 0)
     
     if (nrow(chem_info) > 0) {
-     chem_info <- chem_info  %>%
-        mutate(ID = 1:nrow(.)) %>%
-        rename(INCHI = InChI,SMILES = CanonicalSMILES, INCHIKEY = InChIKey) %>%
+      chem_info <- chem_info  %>%
+        mutate(ID = 1:nrow(.)) 
+      
+      if (any(!(descs %in% colnames(chem_info)))){
+        missing_columns <- descs[!(descs %in% colnames(chem_info))] %>% 
+          rlang::syms()
+        
+        for (i in missing_columns){
+          chem_info <- chem_info %>% 
+            mutate(!!i := NA) 
+        }
+      }
+      
+      chem_info <- chem_info %>%
+        rename(NAME = IUPACName,
+               INCHI = InChI,
+               SMILES = CanonicalSMILES, 
+               INCHIKEY = InChIKey) %>%
         filter(CovalentUnitCount == 1) %>%
-       rename(MF = MolecularFormula)
+        rename(MF = MolecularFormula)
     } else {
       message('0 CIDs returned')
       return(tibble(CID = integer(),
-             MF = character(),
-             SMILES = character(),
-             INCHI = character(),
-             INCHIKEY = character(),
-             IUPACName = character(),
-             Charge = integer(),
-             CovalentUnitCount = integer(),
-             ID = integer()))
+                    MF = character(),
+                    SMILES = character(),
+                    INCHI = character(),
+                    INCHIKEY = character(),
+                    NAME = character(),
+                    Charge = integer(),
+                    CovalentUnitCount = integer(),
+                    ID = integer()))
     }
     
-   
+    
   }
   message(str_c(nrow(chem_info),' CIDs returned'))
   return(chem_info)
