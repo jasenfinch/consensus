@@ -48,11 +48,6 @@ setMethod('classify',signature = 'Consensus',
                       cl <- tibble(Level = 'kingdom','Classification' = 'Unclassified',CHEMONT = NA)
                     }
                   }
-                    
-                  
-                  if (length(out) > 0)
-                    if (!grepl('cached',out)) 
-                      Sys.sleep(5)
                   
                   pb$tick()
                   return(cl)
