@@ -1,3 +1,9 @@
+# construction 0.3.1
+
+* Remove throttling of ClassyFire database queries.
+
+* Added elapsed time to the progress bar.
+
 # construction 0.3.0
 
 * The package documentation is now available at <https://jasenfinch.github.io/construction/>.
