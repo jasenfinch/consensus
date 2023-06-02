@@ -13,6 +13,7 @@ Imports: assignments,
         classyfireR,
         cli,
         dplyr,
+        furrr,
         httr,
         KEGGREST,
         magrittr,
@@ -39,7 +40,8 @@ RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Suggests: 
     testthat,
-    covr
+    covr,
+    future
 Collate: consensus.R
         classify.R
         construct.R
