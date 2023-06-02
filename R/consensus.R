@@ -397,6 +397,7 @@ conse <- function(cl,thresh){
 #' @importFrom dplyr everything group_by summarise right_join n anti_join full_join
 #' @importFrom tidyr gather
 #' @importFrom tidyselect contains
+#' @importFrom furrr future_map
 
 setGeneric('consensus',function(x){
   standardGeneric('consensus')
@@ -429,7 +430,7 @@ setMethod('consensus',signature = 'Consensus',
               if (nrow(classi) > 1) {
                 consensusClasses <- classi %>%
                   split(.$Adduct) %>%
-                  map(conse,thresh = thresh) %>%
+                  future_map(conse,thresh = thresh) %>%
                   bind_rows(.id = 'Adduct') %>%
                   full_join(noPIPs, by = c("Adduct", "kingdom", "Consensus (%)")) %>%
                   full_join(noClassi, by = c("Adduct", "kingdom", "Consensus (%)")) %>%
