@@ -14,15 +14,15 @@ construct(
 )
 }
 \arguments{
-\item{MF}{molecular formula to search}
+\item{MF}{the molecular formula to search}
 
 \item{db}{databases to search. Can be either \code{kegg} or \code{pubchem}.}
 
-\item{organism}{KEGG organism ID to search. Only relevant when argument \code{db} includes \code{kegg}}
+\item{organism}{the KEGG organism ID to search. Ignored if argument \code{db} includes \code{pubchem}.}
 
-\item{threshold}{percentage majority threshold for consensus classification}
+\item{threshold}{the percentage majority threshold for consensus classification}
 
-\item{adduct_rules_table}{dataframe containing adduct formation rules. The defaults is \code{mzAnnotation::adduct_rules()}.}
+\item{adduct_rules_table}{a dataframe containing adduct formation rules. The defaults is \code{mzAnnotation::adduct_rules()}.}
 
 \item{classyfireR_cache}{file path for a \code{classyfireR} cache. See the documentation of \code{classyfireR::get_classification} for more details.}
 }

@@ -1,6 +1,6 @@
 #' keggCompoundInfo
-#' @description Return KEGG compound accession information.
-#' @param IDs KEGG compound accession IDs
+#' @description Retrieve KEGG compound information.
+#' @param IDs a vector of KEGG compound entry IDs
 #' @examples 
 #' keggCompoundInfo(c('C00089','C00149'))
 #' @importFrom KEGGREST keggGet

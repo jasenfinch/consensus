@@ -69,6 +69,55 @@ summariseClassifications(x)
 \arguments{
 \item{x}{object of S4  class \code{Consensus} or \code{Construction}}
 }
+\value{
+A character, a numeric, a tibble or an object of S4 class \code{MetaboliteDatabase}, depending on the method used.
+}
 \description{
 Accessor methods for the \code{Consensus} and \code{Construction} S4 classes.
+}
+\details{
+\itemize{
+\item \code{mf} - Return the searched molecular formula
+\item \code{adductRules} - Return a tibble of adduct formation rules.
+\item \code{organism} - Return the KEGG organism ID.
+\item \code{database} - Return the searched database.
+\item \code{threshold} - Return the percentage consensus threshold for structural classification selection.
+\item \code{hits} - Return a \code{MetaboliteDatabase} ionisation database of matched database hits.
+\item \code{PIPs} - Return the putative ionisation products of database hits
+\item \code{classifications} -Return the structural chemical classifications of database hits.
+\item \code{consensusClassifications} - Return the consensus classification or classifications.
+\item \code{summariseClassifications} - Return a tibble of summarised consensus structural classifications.
+}
+}
+\examples{
+consensus <- construct(
+  'C4H6O5',
+  organism = 'hsa')
+
+## Return the molecular formula
+mf(consensus)
+
+## Return the adduct formation rules
+adductRules(consensus)
+
+## Return the KEGG organism ID
+organism(consensus)
+
+## Return the searched database
+database(consensus)
+
+## Return the \% consensus threshold
+threshold(consensus)
+
+## Return the `MetaboliteDatabase` ionisation database of searched database  hits
+hits(consensus)
+
+## Return the putative ionisation products
+PIPs(consensus)
+
+## Return the structural classifications
+classifications(consensus)
+
+## Return the consensus structural classification
+consensusClassifications(consensus)
 }
