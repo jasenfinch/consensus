@@ -28,10 +28,7 @@ Imports: assignments,
         tidyselect,
         tibble
 Remotes: 
-<<<<<<< HEAD
-=======
     aberHRML/assignments,
->>>>>>> 63a4e6be769b1b3ecad292dc617067c3ea841883
     aberHRML/mzAnnotation,
     jasenfinch/cheminf,  
     aberHRML/classyfireR,
