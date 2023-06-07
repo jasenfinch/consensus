@@ -1,8 +1,8 @@
 
-globalVariables(c('Compound','Consensus (%)','Enzyme','InChI','SMILES','ID','Level','Label',
+globalVariables(c('Compound','consensus (%)','Enzyme','InChI','SMILES','ID','Level','Label',
                   'INCHIKEY','.','Adduct','CanonicalSMILES','Charge','CovalentUnitCount',
                   'Feature','INCHI','IUPACName','InChIKey','Isotope','MF','MolecularFormula',
-                  'Name','Score','id','kingdom','level','value'))
+                  'Name','Score','id','kingdom','level','value','file_name','adduct','total'))
 
 setClass('Construction',
          slots = list(
@@ -32,11 +32,11 @@ setMethod('classifications',signature = 'Construction',
                         by = 'Feature') %>% 
               select(Feature,Name,MF,Isotope,Adduct) %>% 
               left_join(x@classifications,
-                        by = c('MF','Adduct')) %>% 
+                        by = c('MF' = 'mf','Adduct' = 'adduct')) %>% 
               mutate(kingdom = kingdom %>% 
                        replace(is.na(MF),
                                'Unknown'))
-            })
+          })
 
 #' @rdname access
 #' @export
@@ -76,8 +76,8 @@ setMethod('summariseClassifications',signature = 'Construction',
 #' structural_classifications <- construction(x)
 #' 
 #' structural_classifications
-#' @importFrom purrr walk2
-#' @importFrom tidyr expand_grid
+#' @importFrom purrr map_dfr
+#' @importFrom dplyr cross_join group_split slice relocate arrange
 #' @export
 
 setGeneric('construction',function(x, 
@@ -105,169 +105,82 @@ setMethod('construction',signature = 'tbl_df',
               stop('Argument x should be a tibble containing two character columns named MF and Adduct')
             }
             
-            if (length(organism) == 0) {
-              org <- 'none'
-            } else {
-              org <- organism
-            }
-            
             db <- match.arg(db,
                             choices = c('kegg',
                                         'pubchem'),
                             several.ok = TRUE) %>% 
               sort()
             
-            mfs <- expand_grid(
-              MF = x$MF,
-              database = db
-            )
-            
-            library_path <- normalizePath(library_path)
-            
-            libraryPath <- paste0(library_path,'/','construction_library')
-            
-            classificationLibrary <- loadLibrary(x,libraryPath)
-            
-            if (length(classificationLibrary) > 0){
-              statuses <- classificationLibrary %>%
-                map(status) %>%
-                bind_rows()
-              
-              if (nrow(statuses) > 0) {
-                statuses <- statuses %>%
-                  filter(database %in% db)
-              }
-              
-              if ('kegg' %in% db) {
-                statuses <- statuses %>% 
-                  filter(database != 'kegg' | 
-                           (database == 'kegg' & organism == org))
-              }
-              
-              mfs_status <- mfs %>%
-                left_join(statuses, 
-                          by = c("MF", "database"))
-              
-              toDo <- mfs_status %>%
-                toSearch(db)
-            } else {
-              toDo <- mfs
+            if (length(organism) == 0){
+              organism <- 'none'
             }
             
-            message(str_c(length(unique(toDo$MF))),' MFs to retrieve out of ',length(unique(mfs$MF)))
+            library_path <- normalizePath(library_path) %>% 
+              paste0(.,'/','construction_library')
             
-            search_mfs <- toDo %>%
-              rowid_to_column(var = 'idx') %>% 
-              split(.$MF) 
+            items <- cross_join(
+              x,
+              tibble(database = db)
+            ) %>% 
+              mutate(
+                organism = organism
+              )
             
-            n_mfs <- length(search_mfs)
+            search_mfs <- items %>% 
+              status(library_path = library_path) %>% 
+              searchNecessary(db = db)
             
-            search_mfs %>%
-              walk2(seq_along(.),
-                    ~{
-                
-                message(' ')
-                message(paste0(.y,'. (',round(.y / n_mfs * 100),'%) '),appendLF = FALSE)
-                
-                for (i in .x$database){
-                  consense <- construct(.x$MF[1],
-                                        db = i,
-                                        organism = organism,
-                                        threshold = threshold,
-                                        adduct_rules_table = adduct_rules_table,
-                                        classyfireR_cache = classyfireR_cache)
-                  
-                  saveConsensus(consense,path = libraryPath) 
-                  
-                  if (database(consense) == 'kegg') {
-                    kingdoms <- consense %>%
-                      consensusClassifications() %>%
-                      .$kingdom %>%
-                      unique() %>%
-                      sort()
-                    
-                    if (!identical(kingdoms,'No database hits') & 
-                        !identical(kingdoms,'Unclassified') & 
-                        !identical(kingdoms,c('No database hits','Unclassified'))) {
-                      break()
-                    }
-                  }
-                }
-              })
+            message(str_c(length(unique(search_mfs$MF))),' MFs to retrieve out of ',length(unique(x$MF)))
+            
+            while(nrow(search_mfs) > 0){
+              message()
+              
+              construct(
+                MF = search_mfs$MF[1],
+                db = search_mfs$database[1],
+                organism = if (search_mfs$organism[1] == 'none') {character()} else {search_mfs$organism[1]},
+                adduct_rules_table = adduct_rules_table,
+                classyfireR_cache = classyfireR_cache
+              ) %>% 
+                saveConsensus(path = library_path) 
+              
+              search_mfs <- items %>% 
+                status(library_path = library_path) %>% 
+                searchNecessary(db = db)
+            }
             
             message('\nComplete!')
             
-            classificationLibrary <- suppressMessages(loadLibrary(x,libraryPath))
+            statuses <- items %>%
+              status(library_path = library_path) %>% 
+              filter(
+                exists == TRUE
+              ) %>% 
+              group_by(
+                MF,
+                Adduct
+              ) %>% 
+              arrange(status) %>% 
+              slice(1)
             
-            statuses <- classificationLibrary %>%
-              map(status) %>%
-              bind_rows() %>%
-              rowid_to_column(var = 'ID') %>%
-              filter(database %in% db,MF %in% {x$MF %>% 
-                  unique()})
-            
-            if ('kegg' %in% db) {
-              statuses <- statuses %>%
-                split(.$database) %>%
-                map(~{
-                  d <- .
-                  if (d$database[1] == 'kegg') {
-                    d <- d %>% 
-                      filter(organism == org)  
-                  }
-                  return(d)
-                }) %>%
-                bind_rows()
-            }
-            
-            if (identical(db,c('kegg','pubchem'))) {
-              statuses <- statuses %>%
-                split(.$MF) %>%
-                map(~{
-                  d <- .
-                  
-                  if (length(unique(d$database)) > 1) {
-                    if (d$status[d$database == 'kegg'] == 'Classified') {
-                      d <- d %>%
-                        filter(database == 'kegg')
-                    } else {
-                      if (d$status[d$database == 'kegg'] == 'No database hits') {
-                        d <- d %>%
-                          filter(database == 'pubchem')
-                      } else {
-                        if ((d$status[d$database == 'kegg'] == 'Unclassified') & (d$status[d$database == 'pubchem'] != 'Classified')) {
-                          d <- d %>%
-                            filter(database == 'kegg')
-                        } else {
-                          d <- d %>%
-                            filter(database == 'pubchem')
-                        }  
-                      }  
-                      
-                    }
-                    
-                  }
-                  
-                  return(d)
-                }) %>%
-                bind_rows()
-            }
-            
-            x %>%
-              left_join(statuses, by = "MF") %>%
-              split(1:nrow(.)) %>%
-              map(~{
-                d <- .
-                con <- classificationLibrary[[d$ID[1]]] %>%
-                  consensusClassifications() %>%
-                  filter(Adduct == d$Adduct[1])
-                d %>%
-                  left_join(con, by = "Adduct") %>%
-                  select(-ID,-status)
-              }) %>%
-              bind_rows() %>%
-              select(`Consensus (%)`,everything()) %>%
-              select(MF:last_col(),`Consensus (%)`)
+            statuses %>% 
+              rowwise() %>% 
+              group_split() %>%
+              map_dfr(
+                ~fileName(.x$MF,.x$database,.x$organism,path = library_path) %>% 
+                  read_rds() %>% 
+                  consensus(
+                    adduct = .x$Adduct[1],
+                    threshold = threshold
+                  ) %>% 
+                  mutate(
+                    mf = .x$MF
+                  ) %>% 
+                  relocate(
+                    mf,
+                    .before = adduct
+                  )
+              )
           }
 )
 
@@ -304,26 +217,3 @@ setMethod('construction',signature = 'Assignment',
                 classifications = structural_classifications)
           }
 )
-
-toSearch <- function(mfs_status,db){
-  to <- mfs_status %>%
-    split(.$MF) %>%
-    map(~{
-      if (!('Classified' %in% .x$status)) {
-        return(.x)
-      } else {
-        tibble(MF = character(),
-               database = character(),
-               organism = character(),
-               status = character())
-      }
-    }) %>%
-    bind_rows() %>%
-    filter(status != 'No database hits' | is.na(status))
-  
-  to %>%
-    filter(status != 'Unclassified' | is.na(status)) %>%
-    select(MF,database) %>%
-    distinct()
-}
-
