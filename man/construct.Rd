@@ -8,7 +8,6 @@ construct(
   MF,
   db = c("kegg", "pubchem"),
   organism = character(),
-  threshold = 50,
   adduct_rules_table = adduct_rules(),
   classyfireR_cache = NULL
 )
@@ -19,8 +18,6 @@ construct(
 \item{db}{databases to search. Can be either \code{kegg} or \code{pubchem}.}
 
 \item{organism}{the KEGG organism ID to search. Ignored if argument \code{db} includes \code{pubchem}.}
-
-\item{threshold}{the percentage majority threshold for consensus classification}
 
 \item{adduct_rules_table}{a dataframe containing adduct formation rules. The defaults is \code{mzAnnotation::adduct_rules()}.}
 

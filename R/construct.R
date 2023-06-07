@@ -3,7 +3,6 @@
 #' @param MF the molecular formula to search
 #' @param db databases to search. Can be either `kegg` or `pubchem`.
 #' @param organism the KEGG organism ID to search. Ignored if argument `db` includes `pubchem`.
-#' @param threshold the percentage majority threshold for consensus classification
 #' @param adduct_rules_table a dataframe containing adduct formation rules. The defaults is `mzAnnotation::adduct_rules()`.
 #' @param classyfireR_cache file path for a `classyfireR` cache. See the documentation of `classyfireR::get_classification` for more details.  
 #' @return An S4 object of class `Consensus`.
@@ -16,7 +15,6 @@
 construct <- function(MF,
                       db = c('kegg','pubchem'),
                       organism = character(),
-                      threshold = 50,
                       adduct_rules_table = adduct_rules(),
                       classyfireR_cache = NULL){
   
@@ -34,12 +32,11 @@ construct <- function(MF,
            MF = MF,
            database = db,
            organism = organism,
-           adduct_rules = adduct_rules_table,
-           threshold = threshold)
+           adduct_rules = adduct_rules_table)
   
   x %>%
     mfHits() %>%
     classify(classyfireR_cache = classyfireR_cache) %>%
     pips() %>%
-    consensus()
+    calcConsensus()
 }
