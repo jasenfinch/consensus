@@ -13,6 +13,7 @@ Imports: assignments,
         classyfireR,
         cli,
         dplyr,
+        furrr,
         httr,
         KEGGREST,
         magrittr,
@@ -38,6 +39,7 @@ Encoding: UTF-8
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Suggests: 
+    future,
     testthat,
     covr
 Collate: consensus.R
