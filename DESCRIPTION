@@ -14,6 +14,7 @@ Imports: assignments,
         cli,
         dplyr,
         furrr,
+        ggplot2,
         httr,
         KEGGREST,
         magrittr,
@@ -33,9 +34,11 @@ Remotes:
     aberHRML/mzAnnotation,
     jasenfinch/cheminf,  
     aberHRML/classyfireR,
+    davidsjoberg/ggsankey,
     bioc::KEGGREST
 License: GPL-3
 Encoding: UTF-8
+LazyData: true
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Suggests: 
@@ -47,7 +50,9 @@ Collate: consensus.R
         construct.R
         construction.R
         kegg.R
+        plot.R
         pubchem.R
         search.R
+        structural_classifications.R
         library.R
 URL: https://jasenfinch.github.io/construction/
