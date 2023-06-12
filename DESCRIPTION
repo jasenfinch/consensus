@@ -44,7 +44,8 @@ Roxygen: list(markdown = TRUE)
 Suggests: 
     future,
     testthat,
-    covr
+    covr,
+    future
 Collate: consensus.R
         classify.R
         construct.R
