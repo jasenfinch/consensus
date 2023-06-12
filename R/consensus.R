@@ -285,6 +285,7 @@ setMethod('consensus',signature = 'Consensus',
               ) %>% 
               group_by(level) %>% 
               slice(1) %>% 
+              ungroup() %>% 
               select(-n) %>% 
               mutate(
                 `consensus (%)` = min(`consensus (%)`)
