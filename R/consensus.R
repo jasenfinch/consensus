@@ -281,8 +281,10 @@ setMethod('consensus',signature = 'Consensus',
               consensusClassifications() %>% 
               filter(
                 adduct == selected_adduct,
-                `consensus (%)` > threshold
+                `consensus (%)` >= threshold
               ) %>% 
+              group_by(level) %>% 
+              slice(1) %>% 
               select(-n) %>% 
               mutate(
                 `consensus (%)` = min(`consensus (%)`)
