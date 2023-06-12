@@ -1,6 +1,6 @@
 
 #' @importFrom magrittr set_names %>%
-#' @importFrom dplyr distinct select bind_rows filter left_join
+#' @importFrom dplyr distinct select bind_rows filter left_join everything
 #' @importFrom classyfireR get_classification classification open_cache
 #' @importFrom purrr map_dbl map
 #' @importFrom tidyr spread

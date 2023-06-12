@@ -6,14 +6,17 @@ setClass('Consensus',
            adduct_rules = 'tbl_df',
            organism = 'character',
            database = 'character',
-           threshold = 'numeric',
            classifications = 'tbl_df',
            PIPs = 'tbl_df',
            consensus = 'tbl_df'
          ),
          contains = 'MetaboliteDatabase',
          prototype = list(
-           classifications = tibble(),
+           classifications = tibble(
+             ID = character(),
+             INCHIKEY = character(),
+             kingdom = character()
+           ),
            PIPs = tibble(),
            consensus = tibble()
          )
@@ -22,18 +25,24 @@ setClass('Consensus',
 #' @importFrom cli tree
 #' @importFrom stats na.omit
 
-setGeneric('classificationTree',function(x){
+setGeneric('classificationTree',function(x,adduct,threshold = 50){
   standardGeneric('classificationTree')
 })
 
+#' @importFrom dplyr any_of
+
 setMethod('classificationTree',signature = 'Consensus',
-          function(x){
-            d <- x %>%
-              overallConsensus() 
+          function(x,adduct,threshold = 50){
             
-            if (nrow(d) > 0){
-              d <- d %>%
-                select(-`Consensus (%)`) %>%
+            if (nrow(classifications(x)) > 0){
+              d <- x %>%
+                consensus(adduct,threshold) %>%
+                select(
+                  any_of(c('kingdom',
+                           'superclass',
+                           'class',
+                           'subclass')),
+                  any_of(paste('level',5:10))) %>%
                 gather(Level,Name) %>%
                 mutate(Label = str_c(Level,': ',Name)) %>%
                 na.omit() %>%
@@ -60,6 +69,8 @@ setMethod('classificationTree',signature = 'Consensus',
           }
 )
 
+#' @importFrom dplyr summarise
+
 setMethod('show','Consensus',
           function(object){
             cat('Consensus structural classifications\n\n')
@@ -67,7 +78,6 @@ setMethod('show','Consensus',
             cat('Adducts:\t\t',nrow(adductRules(object)),'\n')
             cat('Organism:\t\t',organism(object),'\n')
             cat('Database:\t\t',database(object),'\n')
-            cat('Threshold:\t\t',str_c(threshold(object),'%'),'\n')
             cat('Hits:\t\t\t',hits(object) %>% entries() %>% nrow(),'\n')
             cat('Classifications:\t',nrow(classifications(object)),'\n')
             cat('Average PIPs:\t\t',
@@ -86,24 +96,9 @@ setMethod('show','Consensus',
                     0
                   }
                 },
-                '\n')
-            cat('Average Consensus:\t',str_c(
-              {
-                con <- object %>% 
-                  consensusClassifications() 
-                
-                if (nrow(con) > 0){
-                  con %>% 
-                    .$`Consensus (%)` %>% 
-                    mean() %>% 
-                    round()
-                } else {
-                  0
-                }
-              },
-              '%\n\n'))
+                '\n\n')
             
-            classification_tree <- classificationTree(object)
+            classification_tree <- classificationTree(object,'M')
             
             if (!is.null(classification_tree)) print(classification_tree)
           }
@@ -113,6 +108,8 @@ setMethod('show','Consensus',
 #' @rdname access
 #' @description  Accessor methods for the `Consensus` and `Construction` S4 classes.
 #' @param x object of S4  class `Consensus` or `Construction`
+#' @param adduct the ionisation adduct for which a consensus should be calculated 
+#' @param threshold the percentage majority threshold for consensus classification
 #' @details 
 #' * `mf` - Return the searched molecular formula
 #' * `adductRules` - Return a tibble of adduct formation rules.
@@ -142,9 +139,6 @@ setMethod('show','Consensus',
 #' 
 #' ## Return the searched database
 #' database(consensus)
-#' 
-#' ## Return the % consensus threshold
-#' threshold(consensus)
 #' 
 #' ## Return the `MetaboliteDatabase` ionisation database of searched database  hits
 #' hits(consensus)
@@ -215,20 +209,6 @@ setMethod('database',signature = 'Consensus',
 #' @rdname access
 #' @export
 
-setGeneric('threshold',function(x){
-  standardGeneric('threshold')
-})
-
-#' @rdname access
-
-setMethod('threshold',signature = 'Consensus',
-          function(x){
-            x@threshold
-          })
-
-#' @rdname access
-#' @export
-
 setGeneric('hits',function(x){
   standardGeneric('hits')
 })
@@ -277,196 +257,108 @@ setGeneric('consensusClassifications',function(x){
 })
 
 #' @rdname access
-#' @importFrom dplyr all_of
 
 setMethod('consensusClassifications',signature = 'Consensus',
           function(x){
             x@consensus
           })
 
-conse <- function(cl,thresh){
-  thresh <- thresh / 100
-  
-  levels <- names(cl)[which(names(cl) == 'kingdom'):length(names(cl))]
-  
-  classes <- cl %>%
-    select(-Adduct) %>%
-    distinct() %>%
-    rowid_to_column(var = 'id')
-  
-  suppressMessages(freq <- cl %>%
-                     left_join(classes) %>%
-                     group_by(id) %>%
-                     summarise(N = n()) %>%
-                     right_join(classes, by = "id"))
-  
-  votes <- levels %>%
-    map(~{
-      lev <- .
-      freq %>%
-        rename('Class' = !!lev) %>%
-        select(id,Class,N) %>%
-        split(.$Class) %>%
-        map(~{
-          d <- .
-          d %>%
-            group_by(Class) %>%
-            summarise(N = sum(N))
-        }) %>%
-        bind_rows()
-    }) %>%
-    set_names(levels) %>%
-    bind_rows(.id = 'Level')
-  
-  clLevels <- c('kingdom','superclass','class','subclass')
-  
-  votesTable <- freq %>%
-    select(-N) %>%
-    split(1:nrow(.)) %>%
-    map(~{
-      d <- .
-      d %>%
-        gather('Level','Class',-id) %>%
-        left_join(votes, by = c("Level", "Class")) %>%
-        select(-Class) %>%
-        spread(Level,N)
-    }) %>%
-    bind_rows() 
-  
-  clLevels <- clLevels[clLevels %in% names(votesTable)]
-  
-  votesTable <- votesTable %>%
-    select(id,all_of(clLevels),contains('level'))
-  
-  N <- nrow(cl)
-  
-  p <- votesTable %>%
-    mutate(N = N) %>%
-    select(N,kingdom:names(.)[length(names(.))])
-  proportions <- p
-  for (i in 2:ncol(proportions)) {
-    proportions[,i] <- p[,i] / p[,i - 1]
-  }
-  proportions <- proportions %>%
-    select(-N) %>%
-    mutate(id = 1:nrow(.))
-  
-  consensus <- proportions %>%
-    select(-id) %>% 
-    split(1:nrow(.)) %>%
-    map(~{
-      mutate(.,Score = prod(.,na.rm = T))  
-    }) %>%
-    bind_rows() %>%
-    mutate(id = 1:nrow(.))
-  
-  maxScore <- max(consensus$Score)
-  
-  cons <- consensus %>%
-    select(-id)
-  
-  while (maxScore < thresh) {
-    cons <- cons %>%
-      select(-Score) %>%
-      .[,-ncol(.)] %>%
-      split(1:nrow(.)) %>%
-      map(~{
-        mutate(.,Score = prod(.,na.rm = T))  
-      }) %>%
-      bind_rows()
-    
-    maxScore <- max(cons$Score)
-  }
-  
-  cons <- cons %>%
-    mutate(id = 1:nrow(.)) %>%
-    filter(Score == max(Score)) %>%
-    .[1,]
-  
-  consensusLevels <- names(cons)[1:(ncol(cons) - 2)]
-  
-  consensusClass <- classes %>%
-    filter(id == cons$id) %>%
-    select(all_of(consensusLevels)) %>%
-    mutate(`Consensus (%)` = cons$Score * 100)
-  
-  return(consensusClass)
-}
+#' @rdname access
+#' @export
 
-#' @importFrom tibble rowid_to_column
-#' @importFrom dplyr everything group_by summarise right_join n anti_join full_join
-#' @importFrom tidyr gather
-#' @importFrom tidyselect contains
-#' @importFrom furrr future_map
-
-setGeneric('consensus',function(x){
+setGeneric('consensus',function(x,adduct,threshold = 50){
   standardGeneric('consensus')
 })
 
+#' @rdname access
+
 setMethod('consensus',signature = 'Consensus',
+          function(x,adduct,threshold = 50){
+            
+            selected_adduct <- adduct
+            
+            x %>% 
+              consensusClassifications() %>% 
+              filter(
+                adduct == selected_adduct,
+                `consensus (%)` > threshold
+              ) %>% 
+              select(-n) %>% 
+              mutate(
+                `consensus (%)` = min(`consensus (%)`)
+              ) %>% 
+              spread(
+                level,
+                class
+              )
+          })
+
+#' @importFrom dplyr group_by n count join_by
+#' @importFrom tidyr gather
+#' @importFrom tidyselect contains
+
+setGeneric('calcConsensus',function(x){
+  standardGeneric('calcConsensus')
+})
+
+setMethod('calcConsensus',signature = 'Consensus',
           function(x){
             
-            thresh <- threshold(x)
-            p <- PIPs(x)
+            x@consensus <- x %>% 
+              adductRules() %>% 
+              select(adduct = Name) %>% 
+              left_join(
+                x %>% 
+                  PIPs(),
+                join_by(adduct == Adduct)) %>% 
+              left_join(
+                x %>% 
+                  classifications(),
+                join_by(ID)
+              ) %>% 
+              mutate(
+                kingdom = kingdom %>% 
+                  replace(
+                    is.na(kingdom),
+                    'No database hits'
+                  )
+              ) %>% 
+              group_by(
+                adduct
+              ) %>% 
+              mutate(
+                total = n()
+              ) %>% 
+              gather(
+                level,
+                class,
+                -(ID:INCHIKEY),
+                -adduct,
+                -total) %>% 
+              filter(
+                !is.na(class)
+              ) %>% 
+              group_by(
+                adduct,
+                level,
+                class,
+                total
+              ) %>% 
+              count() %>% 
+              mutate(
+                `consensus (%)` = n / total * 100,
+                level = factor(
+                  level,
+                  levels = c(
+                    'kingdom',
+                    'superclass',
+                    'class',
+                    'subclass',
+                    paste('level',5:10)
+                  ))
+              ) %>% 
+              ungroup()
             
-            if (nrow(p) > 0) {
-              
-              noPIPs <- adductRules(x) %>%
-                select(Adduct = Name) %>%
-                anti_join(p, by = "Adduct") %>%
-                mutate(kingdom = 'No database hits',`Consensus (%)` = 100)
-              
-              classi <- classifications(x) %>%
-                filter(kingdom != 'Unclassified') %>%
-                filter(ID %in% p$ID) %>%
-                left_join(p,by = c('ID')) %>%
-                select(Adduct,everything())
-              
-              noClassi <- p %>%
-                anti_join(classi, by = c("Adduct")) %>%
-                select(-ID) %>%
-                mutate(kingdom = 'Unclassified',`Consensus (%)` = 100) 
-              
-              if (nrow(classi) > 1) {
-                consensusClasses <- classi %>%
-                  split(.$Adduct) %>%
-                  future_map(conse,thresh = thresh) %>%
-                  bind_rows(.id = 'Adduct') %>%
-                  full_join(noPIPs, by = c("Adduct", "kingdom", "Consensus (%)")) %>%
-                  full_join(noClassi, by = c("Adduct", "kingdom", "Consensus (%)")) %>%
-                  distinct()
-              } else {
-                consensusClasses <- classi %>%
-                  select(-ID,-INCHIKEY) %>%
-                  mutate(`Consensus (%)` = 100)  %>%
-                  full_join(noPIPs, by = c("Adduct", "kingdom", "Consensus (%)")) %>%
-                  full_join(noClassi, by = c("Adduct", "kingdom", "Consensus (%)")) %>%
-                  distinct()
-              }  
-            } else {
-              consensusClasses <- tibble(Adduct = adductRules(x)$Name,
-                                         kingdom = 'No database hits',
-                                         `Consensus (%)` = 100)
-            }
-            
-            x@consensus <- consensusClasses
             return(x) 
           }
 )
-
-setGeneric('overallConsensus',function(x){
-  standardGeneric('overallConsensus')
-})
-
-setMethod('overallConsensus',signature = 'Consensus',
-          function(x){
-            con <- consensusClassifications(x) 
-            
-            if (nrow(con) > 0){
-              con %>%
-                select(-`Consensus (%)`) %>%
-                conse(thresh = threshold(x))
-            } else {
-              con
-            }
-          })
