@@ -15,6 +15,7 @@ Imports: assignments,
         dplyr,
         furrr,
         ggplot2,
+        ggsankey,
         httr,
         KEGGREST,
         magrittr,
@@ -45,7 +46,6 @@ Suggests:
     future,
     testthat,
     covr,
-    future
 Collate: consensus.R
         classify.R
         construct.R
