@@ -76,7 +76,7 @@ setMethod('summariseClassifications',signature = 'Construction',
 #' structural_classifications <- construction(x)
 #' 
 #' structural_classifications
-#' @importFrom purrr map_dfr
+#' @importFrom furrr future_map_dfr
 #' @importFrom dplyr cross_join group_split slice relocate arrange
 #' @export
 
@@ -94,7 +94,7 @@ setGeneric('construction',function(x,
 
 setMethod('construction',signature = 'tbl_df',
           function(x, 
-                   library_path = tempdir(), 
+                   library_path = paste0(tempdir(),'/construction_library'), 
                    db = 'kegg', 
                    organism = character(), 
                    threshold = 50,
@@ -114,9 +114,6 @@ setMethod('construction',signature = 'tbl_df',
             if (length(organism) == 0){
               organism <- 'none'
             }
-            
-            library_path <- normalizePath(library_path) %>% 
-              paste0(.,'/','construction_library')
             
             items <- cross_join(
               x,
@@ -166,7 +163,7 @@ setMethod('construction',signature = 'tbl_df',
             statuses %>% 
               rowwise() %>% 
               group_split() %>%
-              map_dfr(
+              future_map_dfr(
                 ~fileName(.x$MF,.x$database,.x$organism,path = library_path) %>% 
                   read_rds() %>% 
                   consensus(
