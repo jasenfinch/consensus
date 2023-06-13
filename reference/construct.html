@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">construction</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,7 +49,6 @@
 <span>  <span class="va">MF</span>,</span>
 <span>  db <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"kegg"</span>, <span class="st">"pubchem"</span><span class="op">)</span>,</span>
 <span>  organism <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  threshold <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>  adduct_rules_table <span class="op">=</span> <span class="fu">adduct_rules</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  classyfireR_cache <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -67,10 +66,6 @@
 
 <dt>organism</dt>
 <dd><p>the KEGG organism ID to search. Ignored if argument <code>db</code> includes <code>pubchem</code>.</p></dd>
-
-
-<dt>threshold</dt>
-<dd><p>the percentage majority threshold for consensus classification</p></dd>
 
 
 <dt>adduct_rules_table</dt>
@@ -109,11 +104,9 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> Adducts:		 58 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Organism:		  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Database:		 kegg </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Threshold:		 50% </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Hits:			 8 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Classifications:	 8 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Average PIPs:		 8 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Average Consensus:	 53%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> kingdom: Organic compounds</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> └─superclass: Organic acids and derivatives</span>

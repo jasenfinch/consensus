@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">construction</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,11 +65,6 @@
 <span><span class="co"># S4 method for Consensus</span></span>
 <span><span class="fu">database</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">threshold</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S4 method for Consensus</span></span>
-<span><span class="fu">threshold</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span></span>
 <span><span class="fu">hits</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for Consensus</span></span>
@@ -89,6 +84,11 @@
 <span></span>
 <span><span class="co"># S4 method for Consensus</span></span>
 <span><span class="fu">consensusClassifications</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">consensus</span><span class="op">(</span><span class="va">x</span>, <span class="va">adduct</span>, threshold <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for Consensus</span></span>
+<span><span class="fu">consensus</span><span class="op">(</span><span class="va">x</span>, <span class="va">adduct</span>, threshold <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for Construction</span></span>
 <span><span class="fu">classifications</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
@@ -103,6 +103,14 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>x</dt>
 <dd><p>object of S4  class <code>Consensus</code> or <code>Construction</code></p></dd>
+
+
+<dt>adduct</dt>
+<dd><p>the ionisation adduct for which a consensus should be calculated</p></dd>
+
+
+<dt>threshold</dt>
+<dd><p>the percentage majority threshold for consensus classification</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -167,10 +175,6 @@
 <span class="r-in"><span><span class="fu">database</span><span class="op">(</span><span class="va">consensus</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "kegg"</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Return the % consensus threshold</span></span></span>
-<span class="r-in"><span><span class="fu">threshold</span><span class="op">(</span><span class="va">consensus</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 50</span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Return the `MetaboliteDatabase` ionisation database of searched database  hits</span></span></span>
 <span class="r-in"><span><span class="fu">hits</span><span class="op">(</span><span class="va">consensus</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -203,20 +207,20 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Return the consensus structural classification</span></span></span>
 <span class="r-in"><span><span class="fu">consensusClassifications</span><span class="op">(</span><span class="va">consensus</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 58 × 6</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Adduct         kingdom           superclass    class subclass `Consensus (%)`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> M              Organic compounds Organic acid… Hydr… Beta hy…             100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> [2M+3H2O+2H]2+ Organic compounds Organic acid… Hydr… Beta hy…             100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> [2M+ACN+H]1+   Organic compounds Organic acid… Hydr… Beta hy…             100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> [2M+ACN+Na]1+  Organic compounds Organic acid… Hydr… Beta hy…             100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> [2M+FA-H]1-    Organic compounds Organic acid… Hydr… Beta hy…             100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> [2M+H]1+       Organic compounds Organic acid… Hydr… Beta hy…             100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> [2M+Hac-H]1-   Organic compounds Organic acid… Hydr… Beta hy…             100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> [2M+K41]1+     Organic compounds Organic acid… Hydr… Beta hy…             100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> [2M+K]1+       Organic compounds Organic acid… Hydr… Beta hy…             100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> [2M+NH4]1+     Organic compounds Organic acid… Hydr… Beta hy…             100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 48 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 220 × 6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    adduct         level      class                   total     n `consensus (%)`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> M              class      Hydroxy acids and deri…     1     1             100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> M              kingdom    Organic compounds           1     1             100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> M              subclass   Beta hydroxy acids and…     1     1             100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> M              superclass Organic acids and deri…     1     1             100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> [2M+3H2O+2H]2+ class      Hydroxy acids and deri…     1     1             100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> [2M+3H2O+2H]2+ kingdom    Organic compounds           1     1             100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> [2M+3H2O+2H]2+ subclass   Beta hydroxy acids and…     1     1             100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> [2M+3H2O+2H]2+ superclass Organic acids and deri…     1     1             100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> [2M+ACN+H]1+   class      Hydroxy acids and deri…     1     1             100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> [2M+ACN+H]1+   kingdom    Organic compounds           1     1             100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 210 more rows</span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
