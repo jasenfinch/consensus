@@ -6,7 +6,6 @@
 #' @examples
 #' plotSankey(construction::structural_classifications)
 #' @importFrom ggsankey make_long geom_sankey geom_sankey_text theme_sankey
-#' @importFrom rlang as_list
 #' @importFrom ggplot2 ggplot aes theme element_text guides labs
 #' @importFrom purrr flatten_chr
 #' @importFrom dplyr across
@@ -52,7 +51,7 @@ setMethod('plotSankey',
                   everything()
                 )
               ) %>% 
-              as_list() %>% 
+              as.list() %>% 
               map(
                 ~.x %>% 
                   na.omit() %>% 
