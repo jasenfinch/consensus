@@ -9,8 +9,6 @@
 \alias{organism,Consensus-method}
 \alias{database}
 \alias{database,Consensus-method}
-\alias{threshold}
-\alias{threshold,Consensus-method}
 \alias{hits}
 \alias{hits,Consensus-method}
 \alias{PIPs}
@@ -19,6 +17,8 @@
 \alias{classifications,Consensus-method}
 \alias{consensusClassifications}
 \alias{consensusClassifications,Consensus-method}
+\alias{consensus}
+\alias{consensus,Consensus-method}
 \alias{classifications,Construction-method}
 \alias{summariseClassifications}
 \alias{summariseClassifications,Construction-method}
@@ -40,10 +40,6 @@ database(x)
 
 \S4method{database}{Consensus}(x)
 
-threshold(x)
-
-\S4method{threshold}{Consensus}(x)
-
 hits(x)
 
 \S4method{hits}{Consensus}(x)
@@ -60,6 +56,10 @@ consensusClassifications(x)
 
 \S4method{consensusClassifications}{Consensus}(x)
 
+consensus(x, adduct, threshold = 50)
+
+\S4method{consensus}{Consensus}(x, adduct, threshold = 50)
+
 \S4method{classifications}{Construction}(x)
 
 summariseClassifications(x)
@@ -68,6 +68,10 @@ summariseClassifications(x)
 }
 \arguments{
 \item{x}{object of S4  class \code{Consensus} or \code{Construction}}
+
+\item{adduct}{the ionisation adduct for which a consensus should be calculated}
+
+\item{threshold}{the percentage majority threshold for consensus classification}
 }
 \value{
 A character, a numeric, a tibble or an object of S4 class \code{MetaboliteDatabase}, depending on the method used.
@@ -105,9 +109,6 @@ organism(consensus)
 
 ## Return the searched database
 database(consensus)
-
-## Return the \% consensus threshold
-threshold(consensus)
 
 ## Return the `MetaboliteDatabase` ionisation database of searched database  hits
 hits(consensus)

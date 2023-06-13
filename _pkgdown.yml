@@ -15,3 +15,5 @@ reference:
   - title: Other
     contents:
     - keggCompoundInfo
+    - plotSankey
+    - structural_classifications

@@ -45,4 +45,5 @@ test_that('construction works for the Assignment S4 class',{
   expect_s4_class(structural_classifications,'Construction')
   expect_s3_class(classifications(structural_classifications),'tbl_df')
   expect_s3_class(summariseClassifications(structural_classifications),'tbl_df')
+  expect_s3_class(plotSankey(structural_classifications),'ggplot')
 })

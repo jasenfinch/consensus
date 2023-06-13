@@ -1,3 +1,18 @@
+# construction 0.4.0
+
+* The `construct()` function no longer uses the `threshold` argument. 
+This argument is now used with the `consensus()` method that calculates consensus calculations based on a provided `adduct` and `threshold` arguments.
+
+* The `construction()` method now supports parallel processing using the [`future`](https://future.futureverse.org/) package.
+
+* The search logic within the `construction()` method has been streamlined to improve performance.
+
+* The argument `library_path` in the method `construction()` now specifies the full path to the construction library.
+
+* Added the `plotSankey()` method to plot structural overviews 
+
+* Added the `structural_classifications` example data set for the `plotSankey()` plot example.
+
 # construction 0.3.1
 
 * Remove throttling of ClassyFire database queries.
