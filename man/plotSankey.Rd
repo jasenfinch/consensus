@@ -2,9 +2,21 @@
 % Please edit documentation in R/plot.R
 \name{plotSankey}
 \alias{plotSankey}
+\alias{plotSankey,tbl_df-method}
+\alias{plotSankey,Construction-method}
 \title{Sankey plot}
 \usage{
 plotSankey(
+  x,
+  exclude_kingdoms = c("Unclassified", "No database hits", "Unknown")
+)
+
+\S4method{plotSankey}{tbl_df}(
+  x,
+  exclude_kingdoms = c("Unclassified", "No database hits", "Unknown")
+)
+
+\S4method{plotSankey}{Construction}(
   x,
   exclude_kingdoms = c("Unclassified", "No database hits", "Unknown")
 )

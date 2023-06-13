@@ -18,7 +18,7 @@ construction(
 
 \S4method{construction}{tbl_df}(
   x,
-  library_path = paste0(tempdir(), "/construction_library"),
+  library_path = tempdir(),
   db = "kegg",
   organism = character(),
   threshold = 50,

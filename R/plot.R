@@ -17,6 +17,8 @@ setGeneric('plotSankey',function(x,
   standardGeneric('plotSankey')
 )
 
+#' @rdname plotSankey
+
 setMethod('plotSankey',
           signature = 'tbl_df',
           function(x,exclude_kingdoms = c('Unclassified','No database hits','Unknown')){
@@ -28,7 +30,10 @@ setMethod('plotSankey',
             
             df <- x %>% 
               make_long(
-                kingdom:subclass,
+                any_of(c('kingdom',
+                       'superclass',
+                       'class',
+                       'subclass')),
                 contains('level')) %>% 
               filter(
                 !(is.na(node) & is.na(next_node))
@@ -36,7 +41,10 @@ setMethod('plotSankey',
             
             node_orders <- x %>% 
               select(
-                kingdom:subclass,
+                any_of(c('kingdom',
+                       'superclass',
+                       'class',
+                       'subclass')),
                 contains('level')) %>% 
               distinct() %>% 
               arrange(
@@ -97,6 +105,8 @@ setMethod('plotSankey',
               )
             
           })
+
+#' @rdname plotSankey
 
 setMethod('plotSankey',
           signature = 'Construction',
