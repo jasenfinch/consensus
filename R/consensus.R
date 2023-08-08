@@ -25,14 +25,14 @@ setClass('Consensus',
 #' @importFrom cli tree
 #' @importFrom stats na.omit
 
-setGeneric('classificationTree',function(x,adduct,threshold = 50){
+setGeneric('classificationTree',function(x,adduct,threshold = 66){
   standardGeneric('classificationTree')
 })
 
 #' @importFrom dplyr any_of
 
 setMethod('classificationTree',signature = 'Consensus',
-          function(x,adduct,threshold = 50){
+          function(x,adduct,threshold = 66){
             
             if (nrow(classifications(x)) > 0){
               d <- x %>%
@@ -266,14 +266,14 @@ setMethod('consensusClassifications',signature = 'Consensus',
 #' @rdname access
 #' @export
 
-setGeneric('consensus',function(x,adduct,threshold = 50){
+setGeneric('consensus',function(x,adduct,threshold = 66){
   standardGeneric('consensus')
 })
 
 #' @rdname access
 
 setMethod('consensus',signature = 'Consensus',
-          function(x,adduct,threshold = 50){
+          function(x,adduct,threshold = 66){
             
             selected_adduct <- adduct
             

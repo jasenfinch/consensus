@@ -39,7 +39,7 @@ setMethod('saveConsensus',signature = 'Consensus',
 
 #' @importFrom readr read_rds
 
-status <- function(items,library_path,threshold = 50){
+status <- function(items,library_path,threshold = 66){
   
   item_status <- items %>% 
     rowwise() %>% 
