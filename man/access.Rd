@@ -56,9 +56,9 @@ consensusClassifications(x)
 
 \S4method{consensusClassifications}{Consensus}(x)
 
-consensus(x, adduct, threshold = 50)
+consensus(x, adduct, threshold = 66)
 
-\S4method{consensus}{Consensus}(x, adduct, threshold = 50)
+\S4method{consensus}{Consensus}(x, adduct, threshold = 66)
 
 \S4method{classifications}{Construction}(x)
 

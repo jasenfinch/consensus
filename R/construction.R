@@ -85,7 +85,7 @@ setGeneric('construction',function(x,
                                    library_path = tempdir(), 
                                    db = 'kegg', 
                                    organism = character(), 
-                                   threshold = 50,
+                                 threshold = 66,
                                    adduct_rules_table = adduct_rules(),
                                    classyfireR_cache = NULL)
   standardGeneric('construction')
@@ -98,7 +98,7 @@ setMethod('construction',signature = 'tbl_df',
                    library_path = paste0(tempdir(),'/construction_library'), 
                    db = 'kegg', 
                    organism = character(), 
-                   threshold = 50,
+                 threshold = 66,
                    adduct_rules_table = adduct_rules(),
                    classyfireR_cache = NULL){
             
@@ -190,7 +190,7 @@ setMethod('construction',signature = 'Assignment',
                    library_path = tempdir(), 
                    db = 'kegg', 
                    organism = character(), 
-                   threshold = 50,
+                 threshold = 66,
                    classyfireR_cache = NULL){
             
             adduct_rules_table <- assignments::adductRules(x)

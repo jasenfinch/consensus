@@ -1,3 +1,7 @@
+# construction 0.4.1
+
+* Increase the default consensus threshold to 66%.
+
 # construction 0.4.0
 
 * The `construct()` function no longer uses the `threshold` argument. 
