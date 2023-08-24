@@ -85,7 +85,7 @@ setGeneric('construction',function(x,
                                    library_path = tempdir(), 
                                    db = 'kegg', 
                                    organism = character(), 
-                                 threshold = 66,
+                                   threshold = 66,
                                    adduct_rules_table = adduct_rules(),
                                    classyfireR_cache = NULL)
   standardGeneric('construction')
@@ -125,7 +125,9 @@ setMethod('construction',signature = 'tbl_df',
               )
             
             search_mfs <- items %>% 
-              status(library_path = library_path) %>% 
+              status(
+                library_path = library_path,
+                threshold = threshold) %>% 
               searchNecessary(db = db)
             
             message(str_c(length(unique(search_mfs$MF))),' MFs to retrieve out of ',length(unique(x$MF)))
@@ -143,14 +145,18 @@ setMethod('construction',signature = 'tbl_df',
                 saveConsensus(path = library_path) 
               
               search_mfs <- items %>% 
-                status(library_path = library_path) %>% 
+                status(
+                  library_path = library_path,
+                  threshold = threshold) %>% 
                 searchNecessary(db = db)
             }
             
             message('\nComplete!')
             
             statuses <- items %>%
-              status(library_path = library_path) %>% 
+              status(
+                library_path = library_path,
+                threshold = threshold) %>% 
               filter(
                 exists == TRUE
               ) %>% 
@@ -190,7 +196,7 @@ setMethod('construction',signature = 'Assignment',
                    library_path = tempdir(), 
                    db = 'kegg', 
                    organism = character(), 
-                 threshold = 66,
+                   threshold = 66,
                    classyfireR_cache = NULL){
             
             adduct_rules_table <- assignments::adductRules(x)
