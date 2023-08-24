@@ -57,6 +57,7 @@ status <- function(items,library_path,threshold = 66){
       status = status %>%
         replace(
           !. %in% c(
+            'No consensus',
             'No database hits',
             'Unclassified',
             'Unavailable'
@@ -68,6 +69,7 @@ status <- function(items,library_path,threshold = 66){
                         'Classified',
                         'Unclassified',
                         'No database hits',
+                        'No consensus',
                         'Unavailable'
                       ))
     )
