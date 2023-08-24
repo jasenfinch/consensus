@@ -1,3 +1,9 @@
+# construction 0.4.2
+
+* Added the "No consensus" kingdom for occasions where a consensus above the specified threshold cannot be reached.
+
+* Ensure that the specified consensus threshold is correctly set when assessing library status.
+
 # construction 0.4.1
 
 * Increase the default consensus threshold to 66%.
