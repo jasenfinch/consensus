@@ -98,7 +98,7 @@ setMethod('construction',signature = 'tbl_df',
                    library_path = paste0(tempdir(),'/construction_library'), 
                    db = 'kegg', 
                    organism = character(), 
-                 threshold = 66,
+                   threshold = 66,
                    adduct_rules_table = adduct_rules(),
                    classyfireR_cache = NULL){
             
