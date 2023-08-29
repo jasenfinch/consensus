@@ -277,23 +277,38 @@ setMethod('consensus',signature = 'Consensus',
             
             selected_adduct <- adduct
             
-            x %>% 
+            classifications <- x %>% 
               consensusClassifications() %>% 
               filter(
-                adduct == selected_adduct,
-                `consensus (%)` >= threshold
-              ) %>% 
-              group_by(level) %>% 
-              slice(1) %>% 
-              ungroup() %>% 
-              select(-n) %>% 
-              mutate(
-                `consensus (%)` = min(`consensus (%)`)
-              ) %>% 
-              spread(
-                level,
-                class
+                adduct == selected_adduct
               )
+            
+            above_threshold <- classifications %>% 
+              filter(
+                `consensus (%)` >= threshold
+              ) 
+            
+            if (nrow(above_threshold) > 0) {
+              above_threshold %>% 
+                group_by(level) %>% 
+                slice(1) %>% 
+                ungroup() %>% 
+                select(-n) %>% 
+                mutate(
+                  `consensus (%)` = min(`consensus (%)`)
+                ) %>% 
+                spread(
+                  level,
+                  class
+                )
+            } else {
+              tibble(
+                adduct = adduct,
+                total = nrow(classifications),
+                `consensus (%)` = 100,
+                kingdom = 'No consensus'
+              )
+            }
           })
 
 #' @importFrom dplyr group_by n count join_by
