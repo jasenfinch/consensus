@@ -331,7 +331,10 @@ setMethod('calcConsensus',signature = 'Consensus',
                 join_by(adduct == Adduct)) %>% 
               left_join(
                 x %>% 
-                  classifications(),
+                  classifications() %>% 
+                  mutate(
+                    ID = as.numeric(ID)
+                  ),
                 join_by(ID)
               ) %>% 
               mutate(
