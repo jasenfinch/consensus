@@ -135,14 +135,16 @@ setMethod('construction',signature = 'tbl_df',
             while(nrow(search_mfs) > 0){
               message()
               
-              construct(
-                MF = search_mfs$MF[1],
-                db = search_mfs$database[1],
-                organism = if (search_mfs$organism[1] == 'none') {character()} else {search_mfs$organism[1]},
-                adduct_rules_table = adduct_rules_table,
-                classyfireR_cache = classyfireR_cache
-              ) %>% 
-                saveConsensus(path = library_path) 
+              try({
+                construct(
+                  MF = search_mfs$MF[1],
+                  db = search_mfs$database[1],
+                  organism = if (search_mfs$organism[1] == 'none') {character()} else {search_mfs$organism[1]},
+                  adduct_rules_table = adduct_rules_table,
+                  classyfireR_cache = classyfireR_cache
+                ) %>% 
+                  saveConsensus(path = library_path) 
+              })
               
               search_mfs <- items %>% 
                 status(
