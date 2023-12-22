@@ -327,7 +327,10 @@ setMethod('calcConsensus',signature = 'Consensus',
               select(adduct = Name) %>% 
               left_join(
                 x %>% 
-                  PIPs(),
+                  PIPs() %>% 
+                  mutate(
+                    ID = as.numeric(ID)
+                  ),
                 join_by(adduct == Adduct)) %>% 
               left_join(
                 x %>% 
